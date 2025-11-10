@@ -34,29 +34,26 @@ export const EdgeDetector: FC<TCannyEdgeDetectorProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <Box sx={{ display: 'flex', gap: '1rem'}}>
-        <Box
-          sx={{
-            video: {
-              border: '1px solid #ccc',
-              display: 'none',
-            }
-          }}
-        >
+      <Box sx={{
+        display: 'flex',
+        gap: '1rem',
+        canvas: {
+          border: '1px solid #ccc',
+          transform: 'rotate(180deg)',
+        },
+        video: {
+          border: '1px solid #ccc',
+          display: 'none',
+        }
+      }}>
+        <Box>
           <video
             ref={videoRef}
             width={640}
             height={480}
           />
         </Box>
-        <Box
-          sx={{
-            canvas: { 
-              border: '1px solid #ccc', 
-              transform: 'rotate(180deg)',
-            }
-          }}
-        >
+        <Box>
           <canvas
             ref={canvasRef}
             width={640}
