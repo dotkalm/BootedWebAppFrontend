@@ -28,7 +28,6 @@ export default function RootLayout({
           margin: 0,
           padding: 0,
           minHeight: '100vh',
-          backgroundColor: 'darkblue',
           overscrollBehaviorY: 'none',
           overscrollBehavior: 'none',
           overflowY: 'auto',

@@ -1,9 +1,8 @@
 import { EdgeDetector } from '@/components/EdgeDetector';
+import Webcam from '@/components/Webcam';
 
 export default function Home() {
   return (
-    <div>
-      <EdgeDetector />
-    </div>
+      <Webcam />
   );
 }

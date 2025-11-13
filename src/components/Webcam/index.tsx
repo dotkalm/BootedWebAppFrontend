@@ -25,98 +25,70 @@ export default function WebcamCapture({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Use custom webcam hook
-  const { videoRef, isStreaming, error: webcamError } = useWebcam({
+  const { videoRef } = useWebcam({
     width,
     height,
-    facingMode: 'user'
+    facingMode: 'environment',
   });
 
-  // Use custom WebGL context hook
-  const { gl, error: glError } = useWebGLContext({
-    canvasRef,
-    enabled: isStreaming
-  });
-
-  // Create texture from video frames
-  const { texture } = useVideoTexture({
-    gl,
-    videoRef,
-    enabled: isStreaming && !!gl
-  });
-
-  // Render texture to canvas
-  const { program } = useWebGLRenderer({
-    gl,
-    texture,
-    vertexShaderSource: vertexShaderSrc,
-    fragmentShaderSource: fragmentShaderSrc,
-    enabled: !!gl && !!texture
-  });
-
-  const error = webcamError || glError;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {error && (
-        <Alert severity="error">{error}</Alert>
-      )}
-
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Paper
         elevation={3}
         sx={{
-          position: 'relative',
-          width: width,
-          height: height,
-          overflow: 'hidden'
+          height: {
+            xs: '100vh',
+          },
+          width: {
+            xs: '100vw',
+          },
+          display: 'flex',
+          alignContent: {
+            xs: 'center',
+            sm: 'flex-start'
+          },
+          alignItems: {
+            xs: 'flex-start',
+            sm: 'center',
+          },
+          justifyContent: {
+            xs: 'center',
+            sm: 'flex-start'
+          },
+          video: {
+            marginLeft: {
+              xs: '0em',
+              sm: '5em',
+            },
+            marginTop: {
+              xs: '2em',
+              sm: '0em',
+            },
+            borderRadius: '2em',
+            borderWidth: '.5em',
+            borderColor: '#fff',
+            borderStyle: 'solid', 
+            height: {
+              xs: '60%',
+              sm: 'auto',
+            },
+            width: {
+              xs: 'auto',
+              sm: '60%',
+            }
+          }
         }}
       >
         {/* Hidden video - we'll render via WebGL instead */}
         <video
           ref={videoRef}
-          width={width}
-          height={height}
-          style={{ display: 'none' }}
+          height='auto'
+          width='100%'
           playsInline
           muted
         />
-
-        {/* Canvas for WebGL rendering */}
-        <canvas
-          ref={canvasRef}
-          width={width}
-          height={height}
-          style={{ display: 'block' }}
-        />
-
-        {!isStreaming && !error && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: 'grey.200',
-              gap: 2
-            }}
-          >
-            <CircularProgress />
-            <Typography color="text.secondary">
-              Initializing webcam...
-            </Typography>
-          </Box>
-        )}
       </Paper>
-
-      {isStreaming && (
-        <Alert severity="success">
-          Webcam active {gl && '| WebGL ready'} {texture && '| Video texture streaming'} {program && '| Rendering'}
-        </Alert>
-      )}
     </Box>
   );
 }

@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       use: 'raw-loader',
     });
     return config;
-  },
+  }
 };
 
 export default nextConfig;
