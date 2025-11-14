@@ -17,8 +17,6 @@ export const styles = {
         },
         width: '100vw',
         height: '100vh',
-        overflow: 'hidden',
-        position: 'relative',
     },
     webcam: {
         display: 'flex',
@@ -26,26 +24,24 @@ export const styles = {
             xs: 'column',
             sm: 'row'
         },
-        height: '100%',
-        width: '100%',
         alignItems: 'center',
         justifyContent: {
             xs: 'flex-start',
             sm: 'center'
-        },
-        padding: {
         },
         gap: {
             xs: 2,
             sm: 4
         },
         position: 'relative',
-        overflow: 'hidden',
     },
     container: {
         position: 'relative',
-        width: '100%',
-        height: '100%',
+        width: {
+            xs: 'auto',
+            sm: '100vw'
+        },
+        height: 'auto',
         canvas: {
             top: 0,
             left: 0,
@@ -57,12 +53,12 @@ export const styles = {
                 sm: 'calc(100vh - 100px)'
             },
             width: {
-                xs: '60%',
+                xs: '95%',
                 sm: 'auto'
             },
             height: {
                 xs: 'auto',
-                sm: '70vh'
+                sm: '80vh'
             },
         },
     },
@@ -77,12 +73,12 @@ export const styles = {
             sm: 'calc(100vh - 100px)'
         },
         width: {
-            xs: '60%',
+            xs: '95%',
             sm: 'auto'
         },
         height: {
             xs: 'auto',
-            sm: '70vh'
+            sm: '80vh'
         },
     },
     zoomInfo: {
@@ -107,8 +103,11 @@ export const styles = {
             sm: 'column',
         },
         justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
+        alignItems: {
+            xs: 'center',
+            sm: 'start',
+        },
+        width: '70%',
         height: {
             xs: '20%',
             sm: '100%',

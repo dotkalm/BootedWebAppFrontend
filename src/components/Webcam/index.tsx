@@ -93,8 +93,8 @@ export default function WebcamCapture({
     if (!ctx) return;
 
     // Set canvas dimensions to match video
-    canvas.width = video.videoWidth || width;
-    canvas.height = video.videoHeight || height;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -171,11 +171,11 @@ export default function WebcamCapture({
               </Typography>
             )}
             {captureError && (
-              <Typography sx={{ 
-                color: 'red', 
-                textAlign: 'center', 
-                mt: 1, 
-                fontSize: '0.8rem' 
+              <Typography sx={{
+                color: 'red',
+                textAlign: 'center',
+                mt: 1,
+                fontSize: '0.8rem'
               }}>
                 {captureError}
               </Typography>
@@ -196,13 +196,13 @@ export default function WebcamCapture({
             ...styles.shutterContainer,
           }}>
             {/* Shutter button with click event to send current frame to api */}
-            <Box 
+            <Box
               sx={{
                 ...styles.shutter,
                 cursor: 'pointer',
                 opacity: isUploading ? 0.5 : 1,
                 transition: 'opacity 0.2s ease',
-              }} 
+              }}
               onClick={handleClick}
             />
             {/* Upload status indicator */}
@@ -214,11 +214,11 @@ export default function WebcamCapture({
               </Typography>
             )}
             {isUploading && (
-              <Typography sx={{ 
-                color: 'white', 
-                textAlign: 'center', 
-                mt: 1, 
-                fontSize: '0.8rem' 
+              <Typography sx={{
+                color: 'white',
+                textAlign: 'center',
+                mt: 1,
+                fontSize: '0.8rem'
               }}>
                 Uploading...
               </Typography>
