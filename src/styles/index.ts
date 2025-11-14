@@ -42,6 +42,30 @@ export const styles = {
         position: 'relative',
         overflow: 'hidden',
     },
+    container: {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        canvas: {
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+            position: 'absolute',
+            maxWidth: '100%',
+            maxHeight: {
+                xs: 'calc(100vh - 350px)',
+                sm: 'calc(100vh - 100px)'
+            },
+            width: {
+                xs: '60%',
+                sm: 'auto'
+            },
+            height: {
+                xs: 'auto',
+                sm: '70vh'
+            },
+        },
+    },
     video: {
         borderRadius: '16px',
         border: '4px solid',

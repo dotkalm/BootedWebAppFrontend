@@ -30,6 +30,7 @@ export default function WebcamCapture({
   const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
 
   const isApplyingZoomRef = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { videoRef } = useWebcam({
     advanced: [{ zoom: zoomLevel }],
@@ -81,6 +82,38 @@ export default function WebcamCapture({
     setOrientation(newOrientation);
   }, [isLandscape]);
 
+  // Draw bounding boxes on canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+
+    if (!canvas || !video) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth || width;
+    canvas.height = video.videoHeight || height;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw red circles for each bounding box
+    boundingBoxes.forEach((box) => {
+      const centerX = (box.x1 + box.x2) / 2;
+      const centerY = (box.y1 + box.y2) / 2;
+      const radiusX = box.width / 2;
+      const radiusY = box.height / 2;
+
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    });
+  }, [boundingBoxes, videoRef, width, height]);
+
   const handleSliderChange = (event: Event, value: unknown) => {
     const newZoom = value as number;
     // Update UI state immediately for responsive slider
@@ -107,14 +140,19 @@ export default function WebcamCapture({
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
-        <Box
-          component="video"
-          ref={videoRef}
-          playsInline
-          muted
-          autoPlay
-          sx={styles.video}
-        />
+        <Box sx={styles.container}>
+          <Box
+            component="video"
+            ref={videoRef}
+            playsInline
+            muted
+            autoPlay
+            sx={styles.video}
+          />
+          <canvas
+            ref={canvasRef}
+          />
+        </Box>
         <Slider
           max={maxZoom}
           min={1}
