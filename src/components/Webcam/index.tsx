@@ -22,6 +22,7 @@ export default function WebcamCapture({
   height = 480,
 }: WebcamCaptureProps) {
   const isLandscape = useMediaQuery('(orientation: landscape)');
+  const [mounted, setMounted] = useState(false);
   const [totalCars, setTotalCars] = useState<number>(0);
   const [orientation, setOrientation] = useState<Orientation>(Orientation.PORTRAIT);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -76,6 +77,10 @@ export default function WebcamCapture({
       isApplyingZoomRef.current = false;
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const newOrientation = isLandscape ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
@@ -149,9 +154,11 @@ export default function WebcamCapture({
             autoPlay
             sx={styles.video}
           />
-          <canvas
-            ref={canvasRef}
-          />
+          {mounted && (
+            <canvas
+              ref={canvasRef}
+            />
+          )}
         </Box>
         <Slider
           max={maxZoom}
