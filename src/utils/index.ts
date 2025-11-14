@@ -1,1 +1,2 @@
-export * from './makeBlob'
+export * from './makeBlob';
+export * from './confidenceChecker';

@@ -91,7 +91,7 @@ export const styles = {
         },
         gap: {
             xs: '1vh',
-            sm: '20vh',
+            sm: '10vh',
         }
     },
     shutter: {

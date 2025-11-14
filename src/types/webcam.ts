@@ -1,3 +1,5 @@
+import { type FrameUploadResponse } from "@/types";
+
 export interface WebcamCaptureProps {
   width?: number;
   height?: number;
@@ -18,7 +20,7 @@ export interface UseFrameCaptureOptions {
 }
 
 export interface UseFrameCaptureReturn {
-  captureFrame: () => Promise<void>;
+  captureFrame: () => Promise<FrameUploadResponse | undefined>;
   isUploading: boolean;
   error: string | null;
   lastCaptureTime: Date | null;

@@ -1,2 +1,3 @@
-export * from './webcam'
-export * from './enum'
+export * from './webcam';
+export * from './enum';
+export * from './response';

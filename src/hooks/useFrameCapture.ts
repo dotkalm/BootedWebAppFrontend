@@ -75,6 +75,8 @@ export function useFrameCapture({
             // Clean up temporary canvas
             canvas.remove();
 
+            return result;
+
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : 'Failed to capture frame';
             console.error('Frame capture error:', err);

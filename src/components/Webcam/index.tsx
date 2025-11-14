@@ -8,9 +8,9 @@ import { useMediaQuery } from '@mui/material';
 
 import { useWebcam } from '@/hooks/useWebcam';
 import { useFrameCapture } from '@/hooks/useFrameCapture';
-import { type WebcamCaptureProps } from '@/types';
-import { Orientation } from '@/types/enum';
+import { Orientation, type Detection, type WebcamCaptureProps } from '@/types';
 import { styles } from '@/styles';
+import { makeConfidenceChecker } from '@/utils';
 
 export default function WebcamCapture({
   width = 640,
@@ -20,6 +20,7 @@ export default function WebcamCapture({
   const [orientation, setOrientation] = useState<Orientation>(Orientation.PORTRAIT);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [maxZoom, setMaxZoom] = useState(3);
+  const [ detections, setDetections ] = useState<Detection[]>([]);
   const isApplyingZoomRef = useRef(false);
 
   const { videoRef } = useWebcam({
@@ -85,6 +86,13 @@ export default function WebcamCapture({
     applyZoomToCamera(newZoom);
   };
 
+  const handleClick = async () => {
+    const response = await captureFrame();
+    const { detections } = response || {};
+    if (detections) {
+      setDetections(detections);
+    }
+  }
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
@@ -123,6 +131,11 @@ export default function WebcamCapture({
                 {captureError}
               </Typography>
             )}
+            {detections.map(({confidence}: Detection, index: number) => (
+              <Box key={index}>
+                {makeConfidenceChecker(confidence)} 
+              </Box>
+            ))}
           </Box>
           <Box sx={{
             ...styles.shutterContainer,
@@ -135,7 +148,7 @@ export default function WebcamCapture({
                 opacity: isUploading ? 0.5 : 1,
                 transition: 'opacity 0.2s ease',
               }} 
-              onClick={captureFrame}
+              onClick={handleClick}
             />
             {/* Upload status indicator */}
           </Box>
