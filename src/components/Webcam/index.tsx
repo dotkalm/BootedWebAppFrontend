@@ -1,133 +1,50 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Slider from '@mui/material/Slider';
-import Typography from '@mui/material/Typography';
-import { useMediaQuery } from '@mui/material';
 
-import { useWebcam } from '@/hooks/useWebcam';
-import { useFrameCapture } from '@/hooks/useFrameCapture';
+import Controls from '@/components/Controls';
 import { 
-  Orientation, 
-  type CarDetection, 
-  type WebcamCaptureProps, 
+  useBoundingBoxCanvas,
+  useFrameCapture,
+  useMounted,
+  useOrientation,
+  useWebcam,
+} from '@/hooks';
+import {
   type BoundingBox,
+  type CarDetection,
+  type WebcamCaptureProps,
 } from '@/types';
 import { styles } from '@/styles';
-import { getBoundingBoxes } from '@/utils';
+import { applyZoomToCamera, getBoundingBoxes } from '@/utils';
 
 export default function WebcamCapture({
   width = 640,
   height = 480,
 }: WebcamCaptureProps) {
-  const isLandscape = useMediaQuery('(orientation: landscape)');
-  const [mounted, setMounted] = useState(false);
-  const [totalCars, setTotalCars] = useState<number>(0);
-  const [orientation, setOrientation] = useState<Orientation>(Orientation.PORTRAIT);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [maxZoom, setMaxZoom] = useState(3);
-  const [detections, setDetections] = useState<CarDetection[]>([]);
   const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
+  const [detections, setDetections] = useState<CarDetection[]>([]);
+  const [maxZoom, setMaxZoom] = useState(3);
+  const [totalCars, setTotalCars] = useState<number>(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
-  const isApplyingZoomRef = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isApplyingZoomRef = useRef(false);
 
-  const { videoRef } = useWebcam({
-    advanced: [{ zoom: zoomLevel }],
-    facingMode: 'environment',
-    height,
-    width,
-  });
+  const mounted = useMounted();
+  const { orientation, isLandscape } = useOrientation();
+  const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
+  const { captureFrame, isUploading, error: captureError } = useFrameCapture({ height, videoRef, width });
+  useBoundingBoxCanvas({ boundingBoxes, canvasRef, videoRef });
 
-  const { 
-    captureFrame, isUploading,
-    error: captureError,
-  } = useFrameCapture({
-    videoRef,
-    width,
-    height,
-  });
 
-  const applyZoomToCamera = async (newZoom: number) => {
-    if (!videoRef.current?.srcObject || isApplyingZoomRef.current) return;
-
-    const stream = videoRef.current.srcObject as MediaStream;
-    const videoTrack = stream.getVideoTracks()[0];
-
-    if (!videoTrack) return;
-
-    isApplyingZoomRef.current = true;
-
-    try {
-      const capabilities = videoTrack.getCapabilities();
-      if (capabilities.zoom) {
-        setMaxZoom(capabilities.zoom.max || 3);
-
-        // Apply zoom constraint
-        await videoTrack.applyConstraints({
-          advanced: [{ zoom: newZoom }] as any
-        });
-
-        console.log('Zoom applied successfully:', newZoom);
-      }
-    } catch (err) {
-      console.error('Error applying zoom:', err);
-    } finally {
-      isApplyingZoomRef.current = false;
-    }
+  const handleSliderChange = (_: Event, value: unknown) => {
+    setZoomLevel(value as number);
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const newOrientation = isLandscape ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-    setOrientation(newOrientation);
-  }, [isLandscape]);
-
-  // Draw bounding boxes on canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-
-    if (!canvas || !video) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas dimensions to match video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw red circles for each bounding box
-    boundingBoxes.forEach((box) => {
-      const centerX = (box.x1 + box.x2) / 2;
-      const centerY = (box.y1 + box.y2) / 2;
-      const radiusX = box.width / 2;
-      const radiusY = box.height / 2;
-
-      ctx.beginPath();
-      ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    });
-  }, [boundingBoxes, videoRef, width, height]);
-
-  const handleSliderChange = (event: Event, value: unknown) => {
-    const newZoom = value as number;
-    // Update UI state immediately for responsive slider
-    setZoomLevel(newZoom);
-  };
-
-  const handleSliderChangeCommitted = (event: Event | React.SyntheticEvent, value: unknown) => {
-    const newZoom = value as number;
-    applyZoomToCamera(newZoom);
+  const handleSliderChangeCommitted = (_: Event | React.SyntheticEvent, value: unknown) => {
+    applyZoomToCamera({ isApplyingZoomRef, newZoom: value as number, setMaxZoom, videoRef });
   };
 
   const handleClick = async () => {
@@ -160,78 +77,19 @@ export default function WebcamCapture({
             />
           )}
         </Box>
-        <Slider
-          max={maxZoom}
-          min={1}
-          onChange={handleSliderChange}
-          onChangeCommitted={handleSliderChangeCommitted}
-          orientation={isLandscape ? 'vertical' : 'horizontal'}
-          step={0.1}
-          sx={isLandscape ? styles.sliderVertical : styles.sliderHorizontal}
-          value={zoomLevel}
+        <Controls
+          captureError={captureError}
+          detections={detections}
+          handleClick={handleClick}
+          handleSliderChange={handleSliderChange}
+          handleSliderChangeCommitted={handleSliderChangeCommitted}
+          isLandscape={isLandscape}
+          isUploading={isUploading}
+          maxZoom={maxZoom}
+          orientation={orientation}
+          totalCars={totalCars}
+          zoomLevel={zoomLevel}
         />
-        <Box sx={styles.zoomInfoContainer}>
-          <Box sx={styles.shutterContainer}>
-            {orientation === Orientation.PORTRAIT && (
-              <Typography sx={styles.zoomInfo}>
-                Camera Zoom: {zoomLevel.toFixed(1)}x
-              </Typography>
-            )}
-            {captureError && (
-              <Typography sx={{
-                color: 'red',
-                textAlign: 'center',
-                mt: 1,
-                fontSize: '0.8rem'
-              }}>
-                {captureError}
-              </Typography>
-            )}
-            {totalCars > 0 && `Total Cars Detected: ${totalCars}`}
-            {detections.map(({ wheel_count }: CarDetection, index: number) => (
-              <>
-                {wheel_count > 0 && (
-                  <Box key={index}>
-                    {`car ${index + 1}: ${wheel_count} wheel(s) detected`}
-                  </Box>
-                )
-                }
-              </>
-            ))}
-          </Box>
-          <Box sx={{
-            ...styles.shutterContainer,
-          }}>
-            {/* Shutter button with click event to send current frame to api */}
-            <Box
-              sx={{
-                ...styles.shutter,
-                cursor: 'pointer',
-                opacity: isUploading ? 0.5 : 1,
-                transition: 'opacity 0.2s ease',
-              }}
-              onClick={handleClick}
-            />
-            {/* Upload status indicator */}
-          </Box>
-          <Box sx={styles.shutterContainer}>
-            {orientation === Orientation.LANDSCAPE && (
-              <Typography sx={styles.zoomInfo}>
-                Camera Zoom: {zoomLevel.toFixed(1)}x
-              </Typography>
-            )}
-            {isUploading && (
-              <Typography sx={{
-                color: 'white',
-                textAlign: 'center',
-                mt: 1,
-                fontSize: '0.8rem'
-              }}>
-                Uploading...
-              </Typography>
-            )}
-          </Box>
-        </Box>
       </Paper>
     </Box>
   );
