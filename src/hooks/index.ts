@@ -3,3 +3,4 @@ export * from './useOrientation';
 export * from './useFrameCapture';
 export * from './useMounted';
 export * from './useBoundingBoxCanvas';
+export * from './useThreeScene';

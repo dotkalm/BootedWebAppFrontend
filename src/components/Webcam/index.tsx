@@ -4,11 +4,12 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
 import Controls from '@/components/Controls';
-import { 
+import {
   useBoundingBoxCanvas,
   useFrameCapture,
   useMounted,
   useOrientation,
+  useThreeScene,
   useWebcam,
 } from '@/hooks';
 import {
@@ -30,13 +31,19 @@ export default function WebcamCapture({
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const threeCanvasRef = useRef<HTMLCanvasElement>(null);
   const isApplyingZoomRef = useRef(false);
 
   const mounted = useMounted();
   const { orientation, isLandscape } = useOrientation();
   const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
   const { captureFrame, isUploading, error: captureError } = useFrameCapture({ height, videoRef, width });
+
+  // 2D bounding box overlay (for testing)
   useBoundingBoxCanvas({ boundingBoxes, canvasRef, videoRef });
+
+  // 3D tire boot model overlay
+  useThreeScene({ boundingBoxes, canvasRef: threeCanvasRef, videoRef });
 
 
   const handleSliderChange = (_: Event, value: unknown) => {
@@ -72,9 +79,16 @@ export default function WebcamCapture({
             sx={styles.video}
           />
           {mounted && (
-            <canvas
-              ref={canvasRef}
-            />
+            <>
+              <canvas
+                ref={canvasRef}
+                style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+              />
+              <canvas
+                ref={threeCanvasRef}
+                style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+              />
+            </>
           )}
         </Box>
         <Controls
