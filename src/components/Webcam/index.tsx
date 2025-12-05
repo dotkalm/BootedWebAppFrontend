@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
 import Controls from '@/components/Controls';
+import Viewer from '@/components/Viewer';
 import {
   useBoundingBoxCanvas,
   useFrameCapture,
@@ -29,6 +30,7 @@ export default function WebcamCapture({
   const [maxZoom, setMaxZoom] = useState(3);
   const [totalCars, setTotalCars] = useState<number>(0);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const threeCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,6 +57,23 @@ export default function WebcamCapture({
   };
 
   const handleClick = async () => {
+    // Capture a data URL locally so we can display immediately in Viewer
+    if (videoRef.current) {
+      try {
+        const tempCanvas = document.createElement('canvas');
+        const ctx = tempCanvas.getContext('2d');
+        if (ctx) {
+          tempCanvas.width = videoRef.current.videoWidth || width;
+          tempCanvas.height = videoRef.current.videoHeight || height;
+          ctx.drawImage(videoRef.current, 0, 0, tempCanvas.width, tempCanvas.height);
+          const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
+          setCapturedFrame(dataUrl);
+        }
+      } catch (err) {
+        console.error('Local capture failed', err);
+      }
+    }
+
     const response = await captureFrame();
     const { detections, total_cars } = response || {};
     if( total_cars !== undefined ) {
@@ -91,6 +110,11 @@ export default function WebcamCapture({
             </>
           )}
         </Box>
+        {capturedFrame && (
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+            <Viewer src={capturedFrame} detections={detections} />
+          </Box>
+        )}
         <Controls
           captureError={captureError}
           detections={detections}
