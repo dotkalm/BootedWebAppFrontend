@@ -85,6 +85,7 @@ export default function WebcamCapture({
     }
   }
 
+  console.log(capturedFrame)
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
