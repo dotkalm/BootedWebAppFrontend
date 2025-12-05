@@ -34,7 +34,6 @@ export const WithDetections = () => {
       mounted = false;
     };
   }, []);
-  console.log(dataUrl)
 
   if (!dataUrl) return <div>Loading fixture image…</div>;
 

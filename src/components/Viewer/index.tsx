@@ -11,7 +11,6 @@ interface ViewerProps {
 export default function Viewer({ src, detections = [], className }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  console.log({src});
   useEffect(() => {
     const img = imgRef.current;
     const canvas = canvasRef.current;
