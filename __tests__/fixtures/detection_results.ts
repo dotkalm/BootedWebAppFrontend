@@ -1,0 +1,47 @@
+export const detectionResults = {
+    total_cars: 1,
+    detections: [
+        {
+            car_id: 0,
+            car: {
+                class: "car",
+                confidence: 0.851,
+                bbox: {
+                    x1: 6,
+                    y1: 191,
+                    x2: 561,
+                    y2: 376,
+                    width: 554,
+                    height: 184
+                }
+            },
+            wheels: [
+                {
+                    class: "wheel",
+                    confidence: 0.873,
+                    bbox: {
+                        x1: 139,
+                        y1: 285,
+                        x2: 228,
+                        y2: 372,
+                        width: 89,
+                        height: 87
+                    }
+                },
+                {
+                    class: "wheel",
+                    confidence: 0.859,
+                    bbox: {
+                        x1: 459,
+                        y1: 267,
+                        x2: 525,
+                        y2: 339,
+                        width: 66,
+                        height: 72
+                    }
+                }
+            ],
+            wheel_count: 2
+        }
+    ]
+}
