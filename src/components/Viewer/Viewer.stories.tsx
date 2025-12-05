@@ -11,31 +11,36 @@ const meta: Meta<typeof Viewer> = {
 export default meta;
 
 export const WithDetections = () => {
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
+    const [dataUrl, setDataUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    // Storybook serves files from .storybook staticDirs at the root
-    fetch('/output_image_no_ext.jpg')
-      .then((res) => res.blob())
-      .then((blob) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (!mounted) return;
-          setDataUrl(reader.result as string);
+    useEffect(() => {
+        let mounted = true;
+        // Storybook serves files from .storybook staticDirs at the root
+        fetch('/output_image_no_ext.jpg')
+            .then((res) => res.blob())
+            .then((blob) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (!mounted) return;
+                    setDataUrl(reader.result as string);
+                };
+                reader.readAsDataURL(blob);
+            })
+            .catch((err) => {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load fixture image for story', err);
+            });
+        return () => {
+            mounted = false;
         };
-        reader.readAsDataURL(blob);
-      })
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load fixture image for story', err);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    }, []);
 
-  if (!dataUrl) return <div>Loading fixture image…</div>;
+    if (!dataUrl) return <div>Loading fixture image…</div>;
 
-  return <Viewer src={dataUrl} detections={detectionResults.detections} />;
+    return (
+        <Viewer
+            src={dataUrl}
+            detections={detectionResults.detections}
+        />
+    );
 };

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
+import Box from '@mui/material/Box';
+import Image from 'next/image';
 import { type CarDetection, type BoundingBox } from '@/types';
 import { getBoundingBoxes } from '@/utils';
 
 interface ViewerProps {
   src: string;
   detections?: CarDetection[];
-  className?: string;
 }
 
-export default function Viewer({ src, detections = [], className }: ViewerProps) {
+export default function Viewer({ src, detections = [] }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
@@ -43,12 +44,23 @@ export default function Viewer({ src, detections = [], className }: ViewerProps)
   }, [src, detections]);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }} className={className}>
-      <img
+    <Box 
+        sx={{ 
+            position: 'relative', 
+            display: 'inline-block',
+            img: {
+                display: 'block',
+                maxWidth: '100%',
+                height: 'auto',
+            }
+        }} 
+    >
+      <Image
         ref={imgRef}
         src={src}
         alt="Captured frame"
-        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+        width={800}
+        height={800}
         onLoad={() => {
           // Trigger redraw on load
           const canvas = canvasRef.current;
@@ -63,6 +75,6 @@ export default function Viewer({ src, detections = [], className }: ViewerProps)
         ref={canvasRef}
         style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
       />
-    </div>
+    </Box>
   );
 }
