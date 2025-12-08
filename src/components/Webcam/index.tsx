@@ -6,47 +6,35 @@ import Paper from '@mui/material/Paper';
 import Controls from '@/components/Controls';
 import Viewer from '@/components/Viewer';
 import {
-  useBoundingBoxCanvas,
   useFrameCapture,
   useMounted,
   useOrientation,
-  useThreeScene,
   useWebcam,
 } from '@/hooks';
 import {
-  type BoundingBox,
   type CarDetection,
   type WebcamCaptureProps,
 } from '@/types';
 import { styles } from '@/styles';
-import { applyZoomToCamera, getBoundingBoxes } from '@/utils';
+import { applyZoomToCamera } from '@/utils';
 
 export default function WebcamCapture({
   width = 640,
   height = 480,
 }: WebcamCaptureProps) {
-  const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
   const [detections, setDetections] = useState<CarDetection[]>([]);
   const [maxZoom, setMaxZoom] = useState(3);
   const [totalCars, setTotalCars] = useState<number>(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
-  const [ showViewer, setShowViewer ] = useState(false);
+  const [showViewer, setShowViewer] = useState(false);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const threeCanvasRef = useRef<HTMLCanvasElement>(null);
   const isApplyingZoomRef = useRef(false);
 
   const mounted = useMounted();
   const { orientation, isLandscape } = useOrientation();
   const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
   const { captureFrame, isUploading, error: captureError } = useFrameCapture({ height, videoRef, width });
-
-  // 2D bounding box overlay (for testing)
-  useBoundingBoxCanvas({ boundingBoxes, canvasRef, videoRef });
-
-  // 3D tire boot model overlay
-  useThreeScene({ boundingBoxes, canvasRef: threeCanvasRef, videoRef });
 
 
   const handleSliderChange = (_: Event, value: unknown) => {
@@ -77,13 +65,9 @@ export default function WebcamCapture({
     }
 
     const response = await captureFrame();
-    const { detections, total_cars } = response || {};
-    if( total_cars !== undefined ) {
-      setTotalCars(total_cars);
-    }
-    if (detections) {
-      setDetections(detections);
-      setBoundingBoxes(getBoundingBoxes(detections));
+    if (response) {
+      setTotalCars(response.total_cars);
+      setDetections(response.detections);
     }
   }
 
@@ -91,7 +75,6 @@ export default function WebcamCapture({
     console.log('handleBack called - resetting state');
     setCapturedFrame(null);
     setDetections([]);
-    setBoundingBoxes([]);
     setShowViewer(false);
     setTotalCars(0);
   };
@@ -107,10 +90,7 @@ export default function WebcamCapture({
           mode="3d"
           objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
           mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
-          rotation={[-1.44159265358979, -0.041592653589793, -1.54159265358979]}
-          scale={0.07}
-          autoAlign={true}
-          detectionIndex={0}
+          selectedWheel="primary"
           setShowViewer={setShowViewer}
           onBack={handleBack}
         />
@@ -130,18 +110,6 @@ export default function WebcamCapture({
             autoPlay
             sx={styles.video}
           />
-          {mounted && (
-            <>
-              <canvas
-                ref={canvasRef}
-                style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-              />
-              <canvas
-                ref={threeCanvasRef}
-                style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-              />
-            </>
-          )}
         </Box>
         <Controls
           captureError={captureError}
