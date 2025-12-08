@@ -1,12 +1,13 @@
 import { useEffect, useRef, Suspense, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { type CarDetection, type BoundingBox } from '@/types';
 import { getBoundingBoxes } from '@/utils';
 import Model from '@/components/Model';
 import { useOrientation } from '@/hooks';
+import * as THREE from 'three';
 
 interface ViewerProps {
   src: string;
@@ -57,6 +58,75 @@ function pixel2DTo3D(
   return [worldX, worldY, worldZ];
 }
 
+// Component to rotate camera based on wheel axle angle
+function CameraController({ rotationZ }: { rotationZ: number }) {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    // Rotate camera around Z axis to align with wheel axle
+    camera.rotation.z = -rotationZ; // Negative to counter-rotate the view
+    camera.updateProjectionMatrix();
+  }, [camera, rotationZ]);
+
+  return null;
+}
+
+// Rotated axes to show the model's coordinate system (both positive and negative)
+function AlignedHelpers({
+  modelRotation,
+  position,
+  axleAngle
+}: {
+  modelRotation: [number, number, number];
+  position: [number, number, number];
+  axleAngle: number;
+}) {
+  const axisLength = 5;
+
+  return (
+    <group position={position} rotation={[0, 0, axleAngle]}>
+      {/* X axis - Red */}
+      <line>
+        <bufferGeometry attach="geometry">
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([-axisLength, 0, 0, axisLength, 0, 0])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial attach="material" color="red" />
+      </line>
+
+      {/* Y axis - Green */}
+      <line>
+        <bufferGeometry attach="geometry">
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([0, -axisLength, 0, 0, axisLength, 0])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial attach="material" color="green" />
+      </line>
+
+      {/* Z axis - Blue */}
+      <line>
+        <bufferGeometry attach="geometry">
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([0, 0, -axisLength, 0, 0, axisLength])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial attach="material" color="blue" />
+      </line>
+    </group>
+  );
+}
+
 export default function Viewer({
   src,
   detections = [],
@@ -67,13 +137,14 @@ export default function Viewer({
   position = [0, 0, 0],
   scale = 1,
   detectionIndex = 0,
+  autoAlign = false,
   setShowViewer,
   onBack
 }: ViewerProps) {
-  const autoAlign = true;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [calculatedPosition, setCalculatedPosition] = useState<[number, number, number]>(position);
+  const [cameraRotation, setCameraRotation] = useState<number>(0); // Rotation around Z axis in radians
   const { isLandscape } = useOrientation();
 
   // Debug logs
@@ -81,6 +152,7 @@ export default function Viewer({
     'viewer props': { mode, objPath, mtlPath, detections: detections?.length },
     'using manual position': position,
     'calculated 3d position': calculatedPosition,
+    'camera rotation': cameraRotation,
   });
   useEffect(() => {
     const img = imgRef.current;
@@ -99,6 +171,7 @@ export default function Viewer({
 
     const boxes: BoundingBox[] = getBoundingBoxes(detections || []);
 
+    // Draw ellipses around wheels
     boxes.forEach((box, index) => {
       const centerX = (box.x1 + box.x2) / 2;
       const centerY = (box.y1 + box.y2) / 2;
@@ -112,6 +185,31 @@ export default function Viewer({
       ctx.lineWidth = 3;
       ctx.stroke();
     });
+
+    // If we have exactly 2 wheels, draw the axle line between them
+    if (boxes.length === 2) {
+      const center1X = (boxes[0].x1 + boxes[0].x2) / 2;
+      const center1Y = (boxes[0].y1 + boxes[0].y2) / 2;
+      const center2X = (boxes[1].x1 + boxes[1].x2) / 2;
+      const center2Y = (boxes[1].y1 + boxes[1].y2) / 2;
+
+      // Draw line through both wheel centers
+      ctx.beginPath();
+      ctx.moveTo(center1X, center1Y);
+      ctx.lineTo(center2X, center2Y);
+      ctx.strokeStyle = 'yellow';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Calculate angle of the wheel axle line (in radians)
+      const axleAngle = Math.atan2(center2Y - center1Y, center2X - center1X);
+
+      // Negate the angle to align axes correctly with the wheel axle
+      console.log('Axle angle (radians):', axleAngle);
+      console.log('Axle angle (degrees):', axleAngle * 180 / Math.PI);
+
+      setCameraRotation(-axleAngle);
+    }
 
     // Calculate 3D position for the selected detection in 3D mode if autoAlign is enabled
     if (mode === '3d' && autoAlign && boxes.length > detectionIndex) {
@@ -208,6 +306,11 @@ export default function Viewer({
               style={{ background: 'transparent' }}
               onCreated={() => console.log('Three.js Canvas created successfully')}
             >
+              <AlignedHelpers
+                modelRotation={rotation}
+                position={calculatedPosition}
+                axleAngle={cameraRotation}
+              />
               <ambientLight intensity={0.5} />
               <directionalLight position={[10, 10, 5]} intensity={5} />
               <directionalLight position={[-10, -10, -5]} intensity={.5} />

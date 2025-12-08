@@ -52,6 +52,10 @@ const meta: Meta<typeof Viewer> = {
       control: { type: 'number', min: 0, max: 10, step: 1 },
       description: 'Which detection to align with (0-based index)',
     },
+    autoAlign: {
+      control: 'boolean',
+      description: 'Automatically align model with selected detection',
+    },
   },
 };
 
@@ -101,14 +105,15 @@ export const ThreeDModel: Story = {
         mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
         rotationX: -1.44159265358979,
         rotationY: -0.041592653589793,
-        rotationZ: -1.54159265358979,
+        rotationZ: -1.54159265358979 + 1.5707963267948966,
         positionX: 0,
         positionY: 0,
         positionZ: 0,
-        scale: 0.07,
+        scale: 0.02,
+        autoAlign: true,
         src: "/output_image_no_ext.jpg",
-        detectionIndex: 0,
-        
+        detectionIndex: 1,
+
     },
     render: (args) => {
         const rotation: [number, number, number] = [
@@ -154,12 +159,12 @@ export const ThreeDModel: Story = {
                 mode={args.mode}
                 objPath={args.objPath}
                 mtlPath={args.mtlPath}
-                rotation={[0,0,0]}
-                position={[0,0,0]}
+                rotation={rotation}
+                position={position}
                 scale={args.scale ?? 1}
                 detections={detectionResults.detections}
                 detectionIndex={args.detectionIndex ?? 0}
-                
+                autoAlign={args.autoAlign ?? false}
             />
         );
     },
@@ -225,7 +230,7 @@ export const AutoAlignedModel: Story = {
                     scale={args.scale ?? 1}
                     detections={detectionResults.detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    
+                    autoAlign={true}
                 />
             </div>
         );
@@ -300,7 +305,7 @@ export const LeftWheelAligned: Story = {
                     scale={args.scale ?? 0.07}
                     detections={leftWheelDetection}
                     detectionIndex={0}
-                    
+                    autoAlign={true}
                 />
             </div>
         );
