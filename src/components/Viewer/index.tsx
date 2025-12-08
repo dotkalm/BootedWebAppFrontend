@@ -1,10 +1,12 @@
 import { useEffect, useRef, Suspense, useState } from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { type CarDetection, type BoundingBox } from '@/types';
 import { getBoundingBoxes } from '@/utils';
 import Model from '@/components/Model';
+import { useOrientation } from '@/hooks';
 
 interface ViewerProps {
   src: string;
@@ -17,6 +19,8 @@ interface ViewerProps {
   scale?: number;
   detectionIndex?: number;
   autoAlign?: boolean;
+  setShowViewer?: (show: boolean) => void;
+  onBack?: () => void;
 }
 
 // Convert 2D pixel coordinates to 3D world coordinates
@@ -58,11 +62,18 @@ export default function Viewer({
   position = [0, 0, 0],
   scale = 1,
   detectionIndex = 0,
-  autoAlign = false
+  autoAlign = false,
+  setShowViewer,
+  onBack
 }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [calculatedPosition, setCalculatedPosition] = useState<[number, number, number]>(position);
+  const { isLandscape } = useOrientation();
+
+  // Debug logs
+  console.log('Viewer props:', { mode, objPath, mtlPath, detections: detections?.length });
+  console.log('Should show 3D?', mode === '3d' && !!objPath);
 
   useEffect(() => {
     const img = imgRef.current;
@@ -92,13 +103,28 @@ export default function Viewer({
       // Highlight the selected detection
       ctx.strokeStyle = index === detectionIndex ? 'blue' : 'red';
       ctx.lineWidth = 0;
+      ctx.stroke();
     });
 
     // Calculate 3D position for the selected detection in 3D mode if autoAlign is enabled
     if (mode === '3d' && autoAlign && boxes.length > detectionIndex) {
       const box = boxes[detectionIndex];
-      const centerX = (box.x1 + box.x2) / 2;
-      const centerY = (box.y1 + box.y2) / 2;
+
+      // Calculate scale factor between natural and rendered image size
+      const renderedWidth = img.clientWidth;
+      const renderedHeight = img.clientHeight;
+      const scaleX = img.naturalWidth / renderedWidth;
+      const scaleY = img.naturalHeight / renderedHeight;
+
+      // Scale the detection coordinates to match rendered image
+      const centerX = ((box.x1 + box.x2) / 2) / scaleX;
+      const centerY = ((box.y1 + box.y2) / 2) / scaleY;
+
+      console.log('Auto-aligning to detection:', { box });
+      console.log('Image - Natural:', { width: img.naturalWidth, height: img.naturalHeight });
+      console.log('Image - Rendered:', { width: renderedWidth, height: renderedHeight });
+      console.log('Scale factors:', { scaleX, scaleY });
+      console.log('Center (rendered px):', { centerX, centerY });
 
       const cameraPos: [number, number, number] = [0, 0.1, 5];
       const fov = 50;
@@ -107,16 +133,18 @@ export default function Viewer({
       const worldPos = pixel2DTo3D(
         centerX,
         centerY,
-        img.naturalWidth,
-        img.naturalHeight,
+        renderedWidth,
+        renderedHeight,
         cameraPos,
         fov,
         targetZ
       );
 
+      console.log('Calculated 3D position:', worldPos);
       setCalculatedPosition(worldPos);
     } else if (!autoAlign) {
       // Use manual position when autoAlign is off
+      console.log('Using manual position:', position);
       setCalculatedPosition(position);
     }
   }, [src, detections, mode, detectionIndex, autoAlign, position]);
@@ -124,68 +152,93 @@ export default function Viewer({
   return (
     <Box
       sx={{
-        position: 'relative',
-        display: 'inline-block',
-        img: {
-          display: 'block',
-          maxWidth: '100%',
-          height: 'auto',
-        }
+        display: 'flex',
+        flexDirection: isLandscape ? 'row' : 'column',
+        alignItems: isLandscape ? 'flex-start' : 'center',
+        gap: 2,
+        width: '100%',
       }}
     >
-      <img
-        ref={imgRef}
-        src={src}
-        alt="Captured frame"
-        onLoad={() => {
-          // Trigger redraw on load
-          const canvas = canvasRef.current;
-          const img = imgRef.current;
-          if (canvas && img) {
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'inline-block',
+          img: {
+            display: 'block',
+            maxWidth: '100%',
+            height: 'auto',
           }
         }}
-      />
-      <canvas
-        ref={canvasRef}
-        style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-      />
-      {mode === '3d' && objPath && (
-        <Box
+      >
+        <img
+          ref={imgRef}
+          src={src}
+          alt="Captured frame"
+          onLoad={() => {
+            // Trigger redraw on load
+            const canvas = canvasRef.current;
+            const img = imgRef.current;
+            if (canvas && img) {
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+            }
+          }}
+        />
+        <canvas
+          ref={canvasRef}
+          style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+        />
+        {mode === '3d' && objPath && (
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'auto',
+            }}
+          >
+            <Canvas
+              camera={{
+                position: [0, .1, 5],
+                fov: 50
+               }}
+              gl={{ alpha: true }}
+              style={{ background: 'transparent' }}
+              onCreated={() => console.log('Three.js Canvas created successfully')}
+            >
+              <ambientLight intensity={0.5} />
+              <directionalLight position={[10, 10, 5]} intensity={5} />
+              <directionalLight position={[-10, -10, -5]} intensity={.5} />
+              <Suspense fallback={null}>
+                <Model
+                  objPath={objPath}
+                  mtlPath={mtlPath}
+                  rotation={rotation}
+                  position={calculatedPosition}
+                  scale={scale}
+                />
+              </Suspense>
+              <OrbitControls target={[0, 0, 0]} />
+            </Canvas>
+          </Box>
+        )}
+      </Box>
+
+      {setShowViewer && (
+        <Button
+          variant="contained"
+          onClick={() => {
+            setShowViewer(false);
+            onBack?.();
+          }}
           sx={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'auto',
+            alignSelf: isLandscape ? 'flex-start' : 'center',
           }}
         >
-          <Canvas
-            camera={{
-              position: [0, .1, 5],
-              fov: 50
-
-             }}
-            gl={{ alpha: true }}
-            style={{ background: 'transparent' }}
-          >
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[10, 10, 5]} intensity={5} />
-            <directionalLight position={[-10, -10, -5]} intensity={.5} />
-            <Suspense fallback={null}>
-              <Model
-                objPath={objPath}
-                mtlPath={mtlPath}
-                rotation={rotation}
-                position={calculatedPosition}
-                scale={scale}
-              />
-            </Suspense>
-            <OrbitControls target={[0, 0, 0]} />
-          </Canvas>
-        </Box>
+          ← Back
+        </Button>
       )}
     </Box>
   );

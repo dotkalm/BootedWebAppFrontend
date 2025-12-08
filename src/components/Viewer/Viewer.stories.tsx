@@ -160,3 +160,426 @@ export const ThreeDModel: Story = {
         );
     },
 };
+
+export const AutoAlignedModel: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        src: "/output_image_no_ext.jpg",
+        detectionIndex: 0,
+        autoAlign: true
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        useEffect(() => {
+            let mounted = true;
+            fetch('/output_image_no_ext.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture image for story', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture image…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f0f0f0' }}>
+                    <h3>Auto-Alignment Debug Info</h3>
+                    <p>Detection Index: {args.detectionIndex}</p>
+                    <p>Auto-Align: {args.autoAlign ? 'ON' : 'OFF'}</p>
+                    <p>Check console for alignment calculations</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode={args.mode}
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 1}
+                    detections={detectionResults.detections}
+                    detectionIndex={args.detectionIndex ?? 0}
+                    autoAlign={args.autoAlign ?? true}
+                />
+            </div>
+        );
+    },
+};
+
+export const LeftWheelAligned: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        autoAlign: true,
+        detectionIndex: 0,
+        src: "/image_fixture_20251207_205932.jpg",
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        // Create a detection for just the left wheel
+        const leftWheelDetection = [{
+            car_id: 0,
+            car: detectionResults.detections[0].car,
+            wheels: [detectionResults.detections[0].wheels[0]], // Just left wheel
+            wheel_count: 1
+        }];
+
+        useEffect(() => {
+            let mounted = true;
+            fetch('/output_image_no_ext.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture image for story', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture image…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#e3f2fd' }}>
+                    <h3>Left Wheel Auto-Alignment Test</h3>
+                    <p>Wheel bbox: x1={detectionResults.detections[0].wheels[0].bbox.x1}, y1={detectionResults.detections[0].wheels[0].bbox.y1}, x2={detectionResults.detections[0].wheels[0].bbox.x2}, y2={detectionResults.detections[0].wheels[0].bbox.y2}</p>
+                    <p>Center: ({(detectionResults.detections[0].wheels[0].bbox.x1 + detectionResults.detections[0].wheels[0].bbox.x2) / 2}, {(detectionResults.detections[0].wheels[0].bbox.y1 + detectionResults.detections[0].wheels[0].bbox.y2) / 2})</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode="3d"
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 0.07}
+                    detections={leftWheelDetection}
+                    detectionIndex={0}
+                    autoAlign={true}
+                />
+            </div>
+        );
+    },
+};
+
+// Fixture 2 - Replace with your image and detection data
+export const Fixture2: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        autoAlign: true,
+        detectionIndex: 0
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        // TODO: Replace with your fixture data
+        const fixture2Detections = detectionResults.detections;
+
+        useEffect(() => {
+            let mounted = true;
+            // TODO: Replace with your image path
+            fetch('/fixture2.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture2 image', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture 2…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#fff3e0' }}>
+                    <h3>Fixture 2 - Auto-Alignment Test</h3>
+                    <p>Replace image at /fixture2.jpg and update detection data</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode="3d"
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 0.07}
+                    detections={fixture2Detections}
+                    detectionIndex={args.detectionIndex ?? 0}
+                    autoAlign={true}
+                />
+            </div>
+        );
+    },
+};
+
+// Fixture 3
+export const Fixture3: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        autoAlign: true,
+        detectionIndex: 0
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        // TODO: Replace with your fixture data
+        const fixture3Detections = detectionResults.detections;
+
+        useEffect(() => {
+            let mounted = true;
+            // TODO: Replace with your image path
+            fetch('/fixture3.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture3 image', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture 3…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#e8f5e9' }}>
+                    <h3>Fixture 3 - Auto-Alignment Test</h3>
+                    <p>Replace image at /fixture3.jpg and update detection data</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode="3d"
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 0.07}
+                    detections={fixture3Detections}
+                    detectionIndex={args.detectionIndex ?? 0}
+                    autoAlign={true}
+                />
+            </div>
+        );
+    },
+};
+
+// Fixture 4
+export const Fixture4: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        autoAlign: true,
+        detectionIndex: 0
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        // TODO: Replace with your fixture data
+        const fixture4Detections = detectionResults.detections;
+
+        useEffect(() => {
+            let mounted = true;
+            // TODO: Replace with your image path
+            fetch('/fixture4.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture4 image', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture 4…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f3e5f5' }}>
+                    <h3>Fixture 4 - Auto-Alignment Test</h3>
+                    <p>Replace image at /fixture4.jpg and update detection data</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode="3d"
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 0.07}
+                    detections={fixture4Detections}
+                    detectionIndex={args.detectionIndex ?? 0}
+                    autoAlign={true}
+                />
+            </div>
+        );
+    },
+};
+
+// Fixture 5
+export const Fixture5: Story = {
+    args: {
+        mode: '3d',
+        objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
+        mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
+        rotationX: -1.44159265358979,
+        rotationY: -0.041592653589793,
+        rotationZ: -1.54159265358979,
+        scale: 0.07,
+        autoAlign: true,
+        detectionIndex: 0
+    },
+    render: (args) => {
+        const rotation: [number, number, number] = [
+            args.rotationX ?? 0,
+            args.rotationY ?? 0,
+            args.rotationZ ?? 0,
+        ];
+        const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+        // TODO: Replace with your fixture data
+        const fixture5Detections = detectionResults.detections;
+
+        useEffect(() => {
+            let mounted = true;
+            // TODO: Replace with your image path
+            fetch('/fixture5.jpg')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (!mounted) return;
+                        setDataUrl(reader.result as string);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch((err) => {
+                    console.error('Failed to load fixture5 image', err);
+                });
+            return () => {
+                mounted = false;
+            };
+        }, []);
+
+        if (!dataUrl) return <div>Loading fixture 5…</div>;
+
+        return (
+            <div>
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#fce4ec' }}>
+                    <h3>Fixture 5 - Auto-Alignment Test</h3>
+                    <p>Replace image at /fixture5.jpg and update detection data</p>
+                </div>
+                <Viewer
+                    src={dataUrl}
+                    mode="3d"
+                    objPath={args.objPath}
+                    mtlPath={args.mtlPath}
+                    rotation={rotation}
+                    position={[0, 0, 0]}
+                    scale={args.scale ?? 0.07}
+                    detections={fixture5Detections}
+                    detectionIndex={args.detectionIndex ?? 0}
+                    autoAlign={true}
+                />
+            </div>
+        );
+    },
+};

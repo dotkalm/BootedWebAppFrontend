@@ -31,6 +31,7 @@ export default function WebcamCapture({
   const [totalCars, setTotalCars] = useState<number>(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
+  const [ showViewer, setShowViewer ] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const threeCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -68,6 +69,7 @@ export default function WebcamCapture({
           ctx.drawImage(videoRef.current, 0, 0, tempCanvas.width, tempCanvas.height);
           const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
           setCapturedFrame(dataUrl);
+          setShowViewer(true);
         }
       } catch (err) {
         console.error('Local capture failed', err);
@@ -83,6 +85,37 @@ export default function WebcamCapture({
       setDetections(detections);
       setBoundingBoxes(getBoundingBoxes(detections));
     }
+  }
+
+  const handleBack = () => {
+    console.log('handleBack called - resetting state');
+    setCapturedFrame(null);
+    setDetections([]);
+    setBoundingBoxes([]);
+    setShowViewer(false);
+    setTotalCars(0);
+  };
+
+  console.log('WebcamCapture render state:', { capturedFrame: !!capturedFrame, showViewer });
+
+  if(capturedFrame && showViewer) {
+    return (
+      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+        <Viewer
+          src={capturedFrame}
+          detections={detections}
+          mode="3d"
+          objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
+          mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
+          rotation={[-1.44159265358979, -0.041592653589793, -1.54159265358979]}
+          scale={0.07}
+          autoAlign={true}
+          detectionIndex={0}
+          setShowViewer={setShowViewer}
+          onBack={handleBack}
+        />
+      </Box>
+    );
   }
 
   return (
@@ -110,11 +143,6 @@ export default function WebcamCapture({
             </>
           )}
         </Box>
-        {capturedFrame && (
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-            <Viewer src={capturedFrame} detections={detections} />
-          </Box>
-        )}
         <Controls
           captureError={captureError}
           detections={detections}

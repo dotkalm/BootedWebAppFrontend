@@ -19,6 +19,8 @@ export default function Model({
   position = [-10, -10, -40],
   scale = .04
 }: ModelProps) {
+  console.log('Model loading:', { objPath, mtlPath, position, scale });
+
   // Load materials if MTL file is provided
   const materials = useLoader(
     MTLLoader,
