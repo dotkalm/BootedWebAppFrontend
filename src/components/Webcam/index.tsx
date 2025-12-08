@@ -109,7 +109,6 @@ export default function WebcamCapture({
           mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
           rotation={[-1.44159265358979, -0.041592653589793, -1.54159265358979]}
           scale={0.07}
-          autoAlign={true}
           detectionIndex={0}
           setShowViewer={setShowViewer}
           onBack={handleBack}

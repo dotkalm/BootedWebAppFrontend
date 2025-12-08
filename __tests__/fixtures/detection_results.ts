@@ -48,7 +48,7 @@ export const detectionResults = {
 
 export const detectionResultTwo = {
     total_cars: 3,
-    results: [
+    detections: [
         {
             car_id: 0,
             car: {
@@ -130,7 +130,7 @@ export const detectionResultTwo = {
 
 export const detectionResultsThree = {
     total_cars: 2,
-    results: [
+    detections: [
         {
         car_id: 0,
             car: {
@@ -195,7 +195,7 @@ export const detectionResultsThree = {
 
 export const detectionResultsFour = {
     total_cars: 1,
-    results: [
+    detections: [
         {
             car_id: 0,
             car: {
@@ -243,7 +243,7 @@ export const detectionResultsFour = {
 
 export const detectionResultsFive = {
     total_cars: 1,
-    results: [
+    detections: [
         {
             car_id: 0,
             car: {
@@ -291,7 +291,7 @@ export const detectionResultsFive = {
 
 export const detectionResultsSix = {
     total_cars: 3,
-    results: [
+    detections: [
         {
             car_id: 0,
             car: {
@@ -398,7 +398,7 @@ export const detectionResultsSix = {
 
 export const detectionResultsSeven = {
     total_cars: 1,
-    results: [
+    detections: [
         {
             car_id: 0,
             car: {

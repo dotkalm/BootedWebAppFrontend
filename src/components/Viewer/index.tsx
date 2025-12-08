@@ -14,11 +14,16 @@ interface ViewerProps {
   mode?: '2d' | '3d';
   objPath?: string;
   mtlPath?: string;
+  rotationX?: number;
+  rotationY?: number;
+  rotationZ?: number;
+  positionX?: number;
+  positionY?: number;
+  positionZ?: number;
   rotation?: [number, number, number];
   position?: [number, number, number];
   scale?: number;
   detectionIndex?: number;
-  autoAlign?: boolean;
   setShowViewer?: (show: boolean) => void;
   onBack?: () => void;
 }
@@ -35,7 +40,7 @@ function pixel2DTo3D(
 ): [number, number, number] {
   // Normalize pixel coordinates to -1 to 1 range
   const ndcX = (pixelX / imageWidth) * 2 - 1;
-  const ndcY = -((pixelY / imageHeight) * 2 - 1); // Flip Y axis
+  const ndcY = -((pixelY / imageHeight) * 2 - 1); // Flip Y axis - pixels increase downward, 3D Y increases upward
 
   // Calculate the visible height and width at the target Z plane
   const cameraZ = cameraPosition[2];
@@ -62,19 +67,21 @@ export default function Viewer({
   position = [0, 0, 0],
   scale = 1,
   detectionIndex = 0,
-  autoAlign = false,
   setShowViewer,
   onBack
 }: ViewerProps) {
+  const autoAlign = true;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [calculatedPosition, setCalculatedPosition] = useState<[number, number, number]>(position);
   const { isLandscape } = useOrientation();
 
   // Debug logs
-  console.log('Viewer props:', { mode, objPath, mtlPath, detections: detections?.length });
-  console.log('Should show 3D?', mode === '3d' && !!objPath);
-
+  console.log({
+    'viewer props': { mode, objPath, mtlPath, detections: detections?.length },
+    'using manual position': position,
+    'calculated 3d position': calculatedPosition,
+  });
   useEffect(() => {
     const img = imgRef.current;
     const canvas = canvasRef.current;
@@ -102,7 +109,7 @@ export default function Viewer({
       ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
       // Highlight the selected detection
       ctx.strokeStyle = index === detectionIndex ? 'blue' : 'red';
-      ctx.lineWidth = 0;
+      ctx.lineWidth = 3;
       ctx.stroke();
     });
 
@@ -110,41 +117,34 @@ export default function Viewer({
     if (mode === '3d' && autoAlign && boxes.length > detectionIndex) {
       const box = boxes[detectionIndex];
 
-      // Calculate scale factor between natural and rendered image size
-      const renderedWidth = img.clientWidth;
-      const renderedHeight = img.clientHeight;
-      const scaleX = img.naturalWidth / renderedWidth;
-      const scaleY = img.naturalHeight / renderedHeight;
+      // Detection coordinates are in natural image space - use them directly
+      const centerX = (box.x1 + box.x2) / 2;
+      const centerY = (box.y1 + box.y2) / 2;
 
-      // Scale the detection coordinates to match rendered image
-      const centerX = ((box.x1 + box.x2) / 2) / scaleX;
-      const centerY = ((box.y1 + box.y2) / 2) / scaleY;
-
-      console.log('Auto-aligning to detection:', { box });
-      console.log('Image - Natural:', { width: img.naturalWidth, height: img.naturalHeight });
-      console.log('Image - Rendered:', { width: renderedWidth, height: renderedHeight });
-      console.log('Scale factors:', { scaleX, scaleY });
-      console.log('Center (rendered px):', { centerX, centerY });
+      console.log({
+        'Auto-aligning to detection': { box },
+        'Image - Natural': { width: img.naturalWidth, height: img.naturalHeight },
+        'Center (natural px)': { x: centerX, y: centerY },
+      })
 
       const cameraPos: [number, number, number] = [0, 0.1, 5];
       const fov = 50;
       const targetZ = 0;
 
+      // Use natural dimensions - this is what was working in "THE BOOT!" commit
       const worldPos = pixel2DTo3D(
         centerX,
         centerY,
-        renderedWidth,
-        renderedHeight,
+        img.naturalWidth,
+        img.naturalHeight,
         cameraPos,
         fov,
         targetZ
       );
 
-      console.log('Calculated 3D position:', worldPos);
+      console.log('NEWLY CALCULATED worldPos:', worldPos);
       setCalculatedPosition(worldPos);
     } else if (!autoAlign) {
-      // Use manual position when autoAlign is off
-      console.log('Using manual position:', position);
       setCalculatedPosition(position);
     }
   }, [src, detections, mode, detectionIndex, autoAlign, position]);

@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import Viewer from './index';
-import { detectionResults } from '../../../__tests__/fixtures/detection_results';
+import {
+  detectionResults,
+  detectionResultTwo,
+  detectionResultsThree,
+  detectionResultsFour,
+  detectionResultsFive,
+  detectionResultsSix,
+  detectionResultsSeven
+} from '../../../__tests__/fixtures/detection_results';
 
 const meta: Meta<typeof Viewer> = {
   title: 'Components/Viewer',
@@ -43,10 +51,6 @@ const meta: Meta<typeof Viewer> = {
     detectionIndex: {
       control: { type: 'number', min: 0, max: 10, step: 1 },
       description: 'Which detection to align with (0-based index)',
-    },
-    autoAlign: {
-      control: 'boolean',
-      description: 'Automatically align model with selected detection',
     },
   },
 };
@@ -104,7 +108,7 @@ export const ThreeDModel: Story = {
         scale: 0.07,
         src: "/output_image_no_ext.jpg",
         detectionIndex: 0,
-        autoAlign: false
+        
     },
     render: (args) => {
         const rotation: [number, number, number] = [
@@ -150,12 +154,12 @@ export const ThreeDModel: Story = {
                 mode={args.mode}
                 objPath={args.objPath}
                 mtlPath={args.mtlPath}
-                rotation={rotation}
-                position={position}
+                rotation={[0,0,0]}
+                position={[0,0,0]}
                 scale={args.scale ?? 1}
                 detections={detectionResults.detections}
                 detectionIndex={args.detectionIndex ?? 0}
-                autoAlign={args.autoAlign ?? false}
+                
             />
         );
     },
@@ -172,7 +176,7 @@ export const AutoAlignedModel: Story = {
         scale: 0.07,
         src: "/output_image_no_ext.jpg",
         detectionIndex: 0,
-        autoAlign: true
+        
     },
     render: (args) => {
         const rotation: [number, number, number] = [
@@ -209,7 +213,6 @@ export const AutoAlignedModel: Story = {
                 <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f0f0f0' }}>
                     <h3>Auto-Alignment Debug Info</h3>
                     <p>Detection Index: {args.detectionIndex}</p>
-                    <p>Auto-Align: {args.autoAlign ? 'ON' : 'OFF'}</p>
                     <p>Check console for alignment calculations</p>
                 </div>
                 <Viewer
@@ -222,7 +225,7 @@ export const AutoAlignedModel: Story = {
                     scale={args.scale ?? 1}
                     detections={detectionResults.detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    autoAlign={args.autoAlign ?? true}
+                    
                 />
             </div>
         );
@@ -238,7 +241,7 @@ export const LeftWheelAligned: Story = {
         rotationY: -0.041592653589793,
         rotationZ: -1.54159265358979,
         scale: 0.07,
-        autoAlign: true,
+        
         detectionIndex: 0,
         src: "/image_fixture_20251207_205932.jpg",
     },
@@ -297,7 +300,7 @@ export const LeftWheelAligned: Story = {
                     scale={args.scale ?? 0.07}
                     detections={leftWheelDetection}
                     detectionIndex={0}
-                    autoAlign={true}
+                    
                 />
             </div>
         );
@@ -314,7 +317,7 @@ export const Fixture2: Story = {
         rotationY: -0.041592653589793,
         rotationZ: -1.54159265358979,
         scale: 0.07,
-        autoAlign: true,
+        
         detectionIndex: 0
     },
     render: (args) => {
@@ -367,7 +370,7 @@ export const Fixture2: Story = {
                     scale={args.scale ?? 0.07}
                     detections={fixture2Detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    autoAlign={true}
+                    
                 />
             </div>
         );
@@ -384,7 +387,7 @@ export const Fixture3: Story = {
         rotationY: -0.041592653589793,
         rotationZ: -1.54159265358979,
         scale: 0.07,
-        autoAlign: true,
+        
         detectionIndex: 0
     },
     render: (args) => {
@@ -437,7 +440,7 @@ export const Fixture3: Story = {
                     scale={args.scale ?? 0.07}
                     detections={fixture3Detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    autoAlign={true}
+                    
                 />
             </div>
         );
@@ -454,7 +457,7 @@ export const Fixture4: Story = {
         rotationY: -0.041592653589793,
         rotationZ: -1.54159265358979,
         scale: 0.07,
-        autoAlign: true,
+        
         detectionIndex: 0
     },
     render: (args) => {
@@ -507,7 +510,7 @@ export const Fixture4: Story = {
                     scale={args.scale ?? 0.07}
                     detections={fixture4Detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    autoAlign={true}
+                    
                 />
             </div>
         );
@@ -524,7 +527,7 @@ export const Fixture5: Story = {
         rotationY: -0.041592653589793,
         rotationZ: -1.54159265358979,
         scale: 0.07,
-        autoAlign: true,
+        
         detectionIndex: 0
     },
     render: (args) => {
@@ -577,7 +580,7 @@ export const Fixture5: Story = {
                     scale={args.scale ?? 0.07}
                     detections={fixture5Detections}
                     detectionIndex={args.detectionIndex ?? 0}
-                    autoAlign={true}
+                    
                 />
             </div>
         );
