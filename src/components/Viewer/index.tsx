@@ -97,14 +97,32 @@ export default function Viewer({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { isLandscape } = useOrientation();
 
-  // Get the target wheel transform
-  const selectedTransform = detections[0]
+  // Get the target wheel transform and ellipse
+  const detection = detections[0];
+  const selectedTransform = detection
     ? selectedWheel === 'rear'
-      ? detections[0].rear_wheel_transform
+      ? detection.rear_wheel_transform
       : selectedWheel === 'front'
-        ? detections[0].front_wheel_transform
-        : getPrimaryWheelTransform(detections[0])
+        ? detection.front_wheel_transform
+        : getPrimaryWheelTransform(detection)
     : null;
+  
+  // Get the corresponding ellipse for the selected wheel
+  const selectedEllipse = detection
+    ? selectedWheel === 'rear'
+      ? detection.rear_wheel_ellipse
+      : selectedWheel === 'front'
+        ? detection.front_wheel_ellipse
+        : detection.rear_wheel_ellipse // primary defaults to rear
+    : null;
+  
+  // Compute target radius in normalized coordinates from ellipse
+  // Ellipse axes are in pixels, normalize by image half-width (320 for 640px image)
+  // Use the average of the two axes for the target radius
+  const imageHalfWidth = 320; // TODO: get from detection.image_dimensions
+  const targetRadius = selectedEllipse
+    ? ((selectedEllipse.axes[0] + selectedEllipse.axes[1]) / 2) / imageHalfWidth
+    : 0.1;
 
   // Draw 2D overlay (bounding boxes and debug info)
   useEffect(() => {
@@ -298,7 +316,8 @@ export default function Viewer({
                     selectedTransform.position.y,
                     0 // Place on z=0 plane
                   ]}
-                  scale={scale || selectedTransform.scale.uniform * 0.1}
+                  scale={scale}
+                  targetRadius={targetRadius}
                 />
               </Suspense>
 
