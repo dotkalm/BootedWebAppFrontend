@@ -14,7 +14,26 @@ interface ModelProps {
   position?: [number, number, number];
   scale?: number;
   targetRadius?: number; // Target radius in normalized coords to match ellipse
+  ellipseAxes?: [number, number]; // [semi-major, semi-minor] in pixels
+  ellipseAngle?: number; // Ellipse rotation angle in degrees
+  imageWidth?: number; // Image width in pixels for normalization
+  // New: use standard Three.js coordinates (not normalized [-1,1])
+  useStandardCoords?: boolean;
+  // Conversion factor when using standard coords: 1 pixel = pixelToWorld units
+  pixelToWorld?: number;
 }
+
+// Default orientation offsets to align model's clamp with the wheel plane
+// These values position the model so its circular clamp faces the camera
+const DEFAULT_ROTATION_OFFSETS = {
+  z: Math.PI * 0.55,  // ~99° on Z
+  y: Math.PI * 0.55,  // ~99° on Y  
+  x: Math.PI * 0.05,  // ~9° on X
+};
+
+// Fixed scale that works well with this model at normalized coordinates
+// Tuned to fit ~26px semi-minor axis ellipse
+const BASE_SCALE = 0.009;
 
 export default function Model({
   objPath,
@@ -24,12 +43,17 @@ export default function Model({
   quaternion,
   position = [0, 0, 0],
   scale,
-  targetRadius
+  targetRadius,
+  ellipseAxes,
+  ellipseAngle = 0,
+  imageWidth = 640,
+  useStandardCoords = false,
+  pixelToWorld = 0.01,
 }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const [computedScale, setComputedScale] = useState<number>(scale || 0.01);
-  
-  console.log('Model loading:', { objPath, mtlPath, position, scale, targetRadius, basisVectors, quaternion });
+  const [computedScale, setComputedScale] = useState<number>(scale || BASE_SCALE);
+  const [modelRadius, setModelRadius] = useState<number>(0);
+  const [modelSize, setModelSize] = useState<THREE.Vector3 | null>(null);
 
   // Load materials if MTL file is provided
   const materials = useLoader(
@@ -53,8 +77,7 @@ export default function Model({
     }
   });
 
-  // Hide tire parts and ensure claw is full opacity
-  // Also center the geometry and compute scale to match target radius
+  // Hide tire parts, center geometry, and measure model radius
   useEffect(() => {
     const tirePartNames = ['wheel', 'rim', 'disk'];
 
@@ -63,22 +86,11 @@ export default function Model({
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
-    // The model's "radius" is roughly half the max of width/height
-    // (assuming the circular clamp is in XY plane of the model)
-    const modelRadius = Math.max(size.x, size.y) / 2;
-    
-    // If we have a target radius, compute scale to match it
-    // The targetRadius is already in normalized coords, modelRadius is in model units
-    // We need a reasonable scale that works for this model size
-    if (targetRadius && modelRadius > 0) {
-      // Don't recompute if we already have a reasonable scale
-      // The model is very large, so we use a fixed small scale
-      const newScale = 0.01;
-      console.log('Model scale calculation:', { modelRadius, targetRadius, newScale, size });
-      setComputedScale(newScale);
-    } else if (scale) {
-      setComputedScale(scale);
-    }
+    // The model's circular clamp radius (assuming it's in the XY plane of the model)
+    // After rotation, this should align with the visible wheel ellipse
+    const radius = Math.max(size.x, size.y) / 2;
+    setModelRadius(radius);
+    setModelSize(size);
     
     obj.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -104,25 +116,82 @@ export default function Model({
         }
       }
     });
-  }, [obj, targetRadius, scale]);
+  }, [obj]);
 
-  // Apply rotation from quaternion or basis vectors
-  // Priority: quaternion > basisVectors > euler rotation
-  // The schema recommends quaternion as most reliable for Three.js
+  // Compute scale - use BASE_SCALE as the working default
+  // Scale must stay within 0.004 - 0.017 range to look correct (for normalized coords)
+  const MIN_SCALE = 0.004;
+  const MAX_SCALE = 0.017;
+  
+  useEffect(() => {
+    if (!modelRadius || modelRadius === 0) return;
+    
+    let newScale: number;
+    
+    if (useStandardCoords && ellipseAxes && ellipseAxes[0] > 0 && ellipseAxes[1] > 0) {
+      // STANDARD COORDINATES MODE
+      // Convert ellipse semi-minor axis from pixels to world units
+      const semiMinorPixels = Math.min(ellipseAxes[0], ellipseAxes[1]);
+      const targetWorldRadius = semiMinorPixels * pixelToWorld;
+      
+      // Scale model so its radius matches the target world radius
+      newScale = targetWorldRadius / modelRadius;
+      
+      console.log('Model debug (standard coords):', { 
+        props: { objPath, position, ellipseAxes, ellipseAngle, pixelToWorld },
+        geometry: { modelRadius },
+        scaleCalc: { semiMinorPixels, targetWorldRadius, newScale }
+      });
+      
+      setComputedScale(newScale);
+    } else {
+      // NORMALIZED COORDINATES MODE (legacy)
+      newScale = scale || BASE_SCALE;
+      
+      // If ellipse data is available, scale proportionally from BASE_SCALE
+      // Reference: BASE_SCALE works for ~26px semi-minor axis
+      if (ellipseAxes && ellipseAxes[0] > 0 && ellipseAxes[1] > 0) {
+        const semiMinorPixels = Math.min(ellipseAxes[0], ellipseAxes[1]);
+        const referenceAxisPixels = 26;
+        const scaleFactor = semiMinorPixels / referenceAxisPixels;
+        newScale = BASE_SCALE * scaleFactor;
+      }
+      
+      // Clamp to valid range
+      const clampedScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+      
+      console.log('Model debug (normalized coords):', { 
+        props: { objPath, mtlPath, position, scale, targetRadius, ellipseAxes, imageWidth, basisVectors, quaternion },
+        geometry: { modelRadius, modelSize: modelSize ? { x: modelSize.x, y: modelSize.y, z: modelSize.z } : null },
+        scaleCalc: { BASE_SCALE, MIN_SCALE, MAX_SCALE, newScale, clampedScale },
+        rotation: DEFAULT_ROTATION_OFFSETS,
+        computedScale: clampedScale
+      });
+      
+      setComputedScale(clampedScale);
+    }
+  }, [modelRadius, modelSize, ellipseAxes, targetRadius, scale, imageWidth, objPath, mtlPath, position, basisVectors, quaternion, useStandardCoords, pixelToWorld, ellipseAngle]);
+
+  // Apply rotation: default orientation + ellipse angle to match the wheel tilt
   useEffect(() => {
     if (!groupRef.current) return;
     
+    // Convert ellipse angle from degrees to radians
+    // The ellipse angle describes how the wheel appears tilted in the image
+    const ellipseAngleRad = (ellipseAngle * Math.PI) / 180;
+    
+    // Start with default orientation that aligns clamp to face camera
+    groupRef.current.rotation.set(0, 0, 0);
+    
     if (quaternion) {
-      // Use quaternion (recommended by schema)
+      // Apply quaternion from detection (for wheel orientation)
       groupRef.current.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-      // Apply additional 180° rotation on Z axis
-      groupRef.current.rotateZ(Math.PI*.55);
-      groupRef.current.rotateY(Math.PI*.55);
-      groupRef.current.rotateX(Math.PI*.05);
+      // Then apply our default offsets to align the model's clamp
+      groupRef.current.rotateZ(DEFAULT_ROTATION_OFFSETS.z);
+      groupRef.current.rotateY(DEFAULT_ROTATION_OFFSETS.y);
+      groupRef.current.rotateX(DEFAULT_ROTATION_OFFSETS.x);
     } else if (basisVectors) {
       // Build rotation matrix from basis vectors
-      // Basis vectors define the wheel's local coordinate system:
-      // x_axis = wheel axle (into car), y_axis = up, z_axis = forward (tangent)
       const matrix = new THREE.Matrix4();
       matrix.makeBasis(
         new THREE.Vector3(...basisVectors.x_axis),
@@ -130,13 +199,21 @@ export default function Model({
         new THREE.Vector3(...basisVectors.z_axis)
       );
       groupRef.current.setRotationFromMatrix(matrix);
-      // Apply additional 180° rotation on Z axis
-      groupRef.current.rotateZ(Math.PI);
+      // Apply default offsets
+      groupRef.current.rotateZ(DEFAULT_ROTATION_OFFSETS.z);
+      groupRef.current.rotateY(DEFAULT_ROTATION_OFFSETS.y);
+      groupRef.current.rotateX(DEFAULT_ROTATION_OFFSETS.x);
     } else {
-      // Apply 180° rotation on Z axis for default case
-      groupRef.current.rotation.z = Math.PI;
+      // No detection rotation data, just use default orientation
+      groupRef.current.rotateZ(DEFAULT_ROTATION_OFFSETS.z);
+      groupRef.current.rotateY(DEFAULT_ROTATION_OFFSETS.y);
+      groupRef.current.rotateX(DEFAULT_ROTATION_OFFSETS.x);
     }
-  }, [basisVectors, quaternion]);
+    
+    // Finally, rotate on Z axis (turntable) to match the ellipse angle
+    // This aligns the model's circular clamp with the ellipse tilt
+    groupRef.current.rotateZ(ellipseAngleRad);
+  }, [basisVectors, quaternion, ellipseAngle]);
 
   return (
     <group ref={groupRef} position={position}>

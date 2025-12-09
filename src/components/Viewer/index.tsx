@@ -1,12 +1,9 @@
-import { useEffect, useRef, Suspense, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-import { type CarDetection, type WheelTransform, type BasisVectors } from '@/types';
+import { type CarDetection } from '@/types';
 import { getPrimaryWheelTransform, getAllWheelTransforms } from '@/utils';
-import Model from '@/components/Model';
+import BootOverlay from '@/components/BootOverlay';
 import { useOrientation } from '@/hooks';
 
 interface ViewerProps {
@@ -19,67 +16,6 @@ interface ViewerProps {
   selectedWheel?: 'rear' | 'front' | 'primary'; // Which wheel to target
   setShowViewer?: (show: boolean) => void;
   onBack?: () => void;
-}
-
-// Draw 3D axes using basis vectors from backend
-// Backend coordinate system for wheel:
-// - x_axis: Wheel axle direction (points into the car, perpendicular to wheel face)
-// - y_axis: Up direction (world up, adjusted for ground tilt)
-// - z_axis: Forward direction (car's direction of travel, tangent to wheel)
-function AxesVisualization({
-  basisVectors,
-  position,
-  showWorldAxes = true
-}: {
-  basisVectors: BasisVectors;
-  position: [number, number, number];
-  showWorldAxes?: boolean;
-}) {
-  const axisLength = 0.5;
-
-  return (
-    <group position={position}>
-      {/* World/Three.js standard axes (dimmer, for reference) */}
-      {showWorldAxes && (
-        <axesHelper args={[axisLength * 0.5]} />
-      )}
-      
-      {/* Backend basis vectors - the actual wheel coordinate system */}
-      {/* X-axis (Red) - Wheel axle direction (into car) */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.x_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0xff0000,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-      {/* Y-axis (Green) - Up direction */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.y_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0x00ff00,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-      {/* Z-axis (Blue) - Forward direction (tangent to wheel) */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.z_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0x0000ff,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-    </group>
-  );
 }
 
 export default function Viewer({
@@ -96,6 +32,9 @@ export default function Viewer({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { isLandscape } = useOrientation();
+  
+  // State for the rendered boot overlay image
+  const [bootImageData, setBootImageData] = useState<string | null>(null);
 
   // Get the target wheel transform and ellipse
   const detection = detections[0];
@@ -123,6 +62,11 @@ export default function Viewer({
   const targetRadius = selectedEllipse
     ? ((selectedEllipse.axes[0] + selectedEllipse.axes[1]) / 2) / imageHalfWidth
     : 0.1;
+  
+  // Callback to receive rendered boot image from BootOverlay
+  const handleBootRender = useCallback((imageData: string) => {
+    setBootImageData(imageData);
+  }, []);
 
   // Draw 2D overlay (bounding boxes and debug info)
   useEffect(() => {
@@ -217,7 +161,29 @@ export default function Viewer({
       ctx.lineWidth = 3;
       ctx.stroke();
     }
-  }, [src, detections, selectedTransform]);
+    
+    // Draw the rendered boot image at the wheel position
+    if (bootImageData && selectedEllipse && mode === '3d') {
+      const bootImg = new Image();
+      bootImg.onload = () => {
+        // Calculate position to center the boot image on the ellipse center
+        const [cx, cy] = selectedEllipse.center;
+        
+        // The boot image is square, centered on the 3D model
+        // We need to scale it based on the ellipse size
+        const maxEllipseAxis = Math.max(selectedEllipse.axes[0], selectedEllipse.axes[1]);
+        // The rendered image has the model filling roughly half the canvas
+        // So we scale the image to be about 4x the ellipse size
+        const drawSize = maxEllipseAxis * 4;
+        
+        const drawX = cx - drawSize / 2;
+        const drawY = cy - drawSize / 2;
+        
+        ctx.drawImage(bootImg, drawX, drawY, drawSize, drawSize);
+      };
+      bootImg.src = bootImageData;
+    }
+  }, [src, detections, selectedTransform, bootImageData, selectedEllipse, mode]);
 
   console.log({
     'Viewer - Selected transform': selectedTransform,
@@ -264,66 +230,18 @@ export default function Viewer({
           ref={canvasRef}
           style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
         />
-        {mode === '3d' && objPath && selectedTransform && (
-          <Box
-            sx={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'auto',
-            }}
-          >
-            <Canvas
-              orthographic
-              camera={{
-                // Orthographic camera matching normalized coordinates [-1, 1]
-                position: [0, 0, 10],
-                zoom: 1,
-                left: -1,
-                right: 1,
-                top: 1,
-                bottom: -1,
-                near: 0.1,
-                far: 100
-              }}
-              gl={{ alpha: true }}
-              style={{ background: 'transparent' }}
-            >
-              {/* Visualize the 3D axes from backend */}
-              <AxesVisualization
-                basisVectors={selectedTransform.rotation.basis_vectors}
-                position={[
-                  selectedTransform.position.x,
-                  selectedTransform.position.y,
-                  0 // Keep axes on z=0 plane for visibility
-                ]}
-              />
-
-              <ambientLight intensity={0.5} />
-              <directionalLight position={[10, 10, 5]} intensity={5} />
-              <directionalLight position={[-10, -10, -5]} intensity={.5} />
-
-              <Suspense fallback={null}>
-                <Model
-                  objPath={objPath}
-                  mtlPath={mtlPath}
-                  quaternion={selectedTransform.rotation.quaternion}
-                  basisVectors={selectedTransform.rotation.basis_vectors}
-                  position={[
-                    selectedTransform.position.x,
-                    selectedTransform.position.y,
-                    0 // Place on z=0 plane
-                  ]}
-                  scale={scale}
-                  targetRadius={targetRadius}
-                />
-              </Suspense>
-
-              <OrbitControls target={[0, 0, 0]} />
-            </Canvas>
-          </Box>
+        
+        {/* Off-screen 3D renderer - captures boot model and composites onto 2D canvas */}
+        {mode === '3d' && objPath && selectedTransform && selectedEllipse && (
+          <BootOverlay
+            ellipse={selectedEllipse}
+            basisVectors={selectedTransform.rotation.basis_vectors}
+            quaternion={selectedTransform.rotation.quaternion}
+            objPath={objPath}
+            mtlPath={mtlPath}
+            onRender={handleBootRender}
+            renderSize={512}
+          />
         )}
       </Box>
 
