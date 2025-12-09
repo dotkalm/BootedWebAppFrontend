@@ -181,7 +181,7 @@ export default function Viewer({
                 mtlPath={mtlPath}
                 position={[0, 0, 0]}
                 scale={1}
-                rotation={[.05, 1, .02]}
+                rotation={[.08, 1, .01]}
                 baseRotation={[-Math.PI / 2, 0, 0]}
               />
             </Suspense>
