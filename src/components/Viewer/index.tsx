@@ -1,4 +1,4 @@
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import Box from '@mui/material/Box';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -20,6 +20,7 @@ export default function Viewer({
 }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
 
   // Draw 2D overlay: ellipses and basis vectors
   useEffect(() => {
@@ -77,6 +78,54 @@ export default function Viewer({
       ctx.fillStyle = '#ff00ff';
       ctx.fill();
     }
+
+    // Draw line between tire centers and calculate angle
+    if (detection.rear_wheel_ellipse && detection.front_wheel_ellipse) {
+      const [rearX, rearY] = detection.rear_wheel_ellipse.center;
+      const [frontX, frontY] = detection.front_wheel_ellipse.center;
+
+      // Calculate angle of line from rear to front wheel
+      // atan2(dy, dx) gives angle in radians from positive x-axis
+      const dx = frontX - rearX;
+      const dy = frontY - rearY;
+      const angleRad = Math.atan2(dy, dx);
+      const angleDeg = (angleRad * 180) / Math.PI;
+
+      // Store angle in state
+      setTireCenterlineAngle(angleRad);
+
+      // Draw line between centers
+      ctx.beginPath();
+      ctx.moveTo(rearX, rearY);
+      ctx.lineTo(frontX, frontY);
+      ctx.strokeStyle = '#ffff00';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Display angle text at midpoint
+      const midX = (rearX + frontX) / 2;
+      const midY = (rearY + frontY) / 2;
+      ctx.fillStyle = '#ffff00';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText(`${angleDeg.toFixed(1)}°`, midX + 10, midY - 10);
+    }
+
+    // Consolidated debug log
+    console.log('=== VIEWER DEBUG INFO ===', {
+      detection: {
+        rear_wheel_ellipse: detection.rear_wheel_ellipse,
+        front_wheel_ellipse: detection.front_wheel_ellipse,
+        rear_wheel_transform: detection.rear_wheel_transform,
+      },
+      tireCenterlineAngle: tireCenterlineAngle ? {
+        radians: tireCenterlineAngle,
+        degrees: (tireCenterlineAngle * 180) / Math.PI,
+      } : null,
+      canvas: {
+        width: canvas.width,
+        height: canvas.height,
+      },
+    });
 
     // Draw basis vectors for rear wheel
     if (detection.rear_wheel_transform) {
@@ -183,6 +232,7 @@ export default function Viewer({
                 scale={1}
                 rotation={[.08, 1, .01]}
                 baseRotation={[-Math.PI / 2, 0, 0]}
+                tireCenterlineAngle={tireCenterlineAngle}
               />
             </Suspense>
 

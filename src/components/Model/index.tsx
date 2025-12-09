@@ -12,6 +12,7 @@ interface ModelProps {
   baseRotation?: [number, number, number]; // normalizes model orientation first
   scale?: number;
   showBoundingBox?: boolean;
+  tireCenterlineAngle?: number | null; // angle in radians from rear to front tire
 }
 
 interface ModelInfo {
@@ -31,6 +32,7 @@ export default function Model({
   baseRotation = [-Math.PI / 2, 0, 0], // Default: convert Z-up to Y-up
   scale = 1,
   showBoundingBox = true,
+  tireCenterlineAngle,
 }: ModelProps) {
   const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   
