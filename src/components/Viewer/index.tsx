@@ -32,7 +32,7 @@ function CanvasCapture({
       return;
     }
 
-    // Small delay to ensure 3D scene is fully rendered
+    // Longer delay for mobile devices to ensure everything is ready
     let timer: ReturnType<typeof setTimeout> | null = null;
     
     timer = setTimeout(() => {
@@ -41,12 +41,31 @@ function CanvasCapture({
       const canvas3D = gl.domElement;
       const base2DImage = base2DImageRef.current;
       
-      if (!canvas2D || !canvas3D || !img || !base2DImage) return;
+      if (!canvas2D || !canvas3D || !img || !base2DImage) {
+        console.log('Missing canvas elements:', {
+          canvas2D: !!canvas2D,
+          canvas3D: !!canvas3D,
+          img: !!img,
+          base2DImage: !!base2DImage
+        });
+        return;
+      }
+
+      // Check if base2DImage has content
+      if (base2DImage.width === 0 || base2DImage.height === 0) {
+        console.log('Base 2D canvas not ready yet (no dimensions)');
+        return;
+      }
 
       const ctx = canvas2D.getContext('2d');
       if (!ctx) return;
 
       try {
+        console.log('Starting composite...', {
+          base2DImageSize: { width: base2DImage.width, height: base2DImage.height },
+          canvas3DSize: { width: canvas3D.width, height: canvas3D.height }
+        });
+
         // Clear the canvas
         ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
         
@@ -92,7 +111,7 @@ function CanvasCapture({
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);
       }
-    }, 500);
+    }, 1000);
 
     return () => {
       if (timer) clearTimeout(timer);
