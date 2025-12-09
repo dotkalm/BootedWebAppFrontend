@@ -1,42 +1,43 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
-import { type BasisVectors, type Quaternion } from '@/types';
 
 interface ModelProps {
   objPath: string;
   mtlPath?: string;
-  rotation?: [number, number, number];
-  basisVectors?: BasisVectors;
-  quaternion?: Quaternion;
   position?: [number, number, number];
+  rotation?: [number, number, number]; // [x, y, z] in radians - applied AFTER baseRotation
+  baseRotation?: [number, number, number]; // [x, y, z] in radians - normalizes model orientation first
   scale?: number;
-  targetRadius?: number; // Target radius in normalized coords to match ellipse
+  showBoundingBox?: boolean;
+}
+
+interface ModelInfo {
+  originalCenter: THREE.Vector3;
+  originalSize: THREE.Vector3;
+  originalMin: THREE.Vector3;
+  originalMax: THREE.Vector3;
+  meshNames: string[];
 }
 
 export default function Model({
   objPath,
   mtlPath,
-  rotation = [0, 0, 0],
-  basisVectors,
-  quaternion,
   position = [0, 0, 0],
-  scale,
-  targetRadius
+  rotation = [0, 0, 0],
+  baseRotation = [-Math.PI / 2, 0, 0], // Default: convert Z-up to Y-up
+  scale = 1,
+  showBoundingBox = true,
 }: ModelProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const [computedScale, setComputedScale] = useState<number>(scale || 0.01);
+  const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   
-  console.log('Model loading:', { objPath, mtlPath, position, scale, targetRadius, basisVectors, quaternion });
-
   // Load materials if MTL file is provided
   const materials = useLoader(
     MTLLoader,
     mtlPath || '',
     (loader) => {
-      // Set the resource path for textures
       if (mtlPath) {
         const basePath = mtlPath.substring(0, mtlPath.lastIndexOf('/') + 1);
         loader.setResourcePath(basePath);
@@ -53,98 +54,93 @@ export default function Model({
     }
   });
 
-  // Hide tire parts and ensure claw is full opacity
-  // Also center the geometry and compute scale to match target radius
+  // Analyze and center the model
   useEffect(() => {
     const tirePartNames = ['wheel', 'rim', 'disk'];
+    const meshNames: string[] = [];
 
-    // Compute bounding box to center the model and determine its size
-    const box = new THREE.Box3().setFromObject(obj);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    
-    // The model's "radius" is roughly half the max of width/height
-    // (assuming the circular clamp is in XY plane of the model)
-    const modelRadius = Math.max(size.x, size.y) / 2;
-    
-    // If we have a target radius, compute scale to match it
-    // The targetRadius is already in normalized coords, modelRadius is in model units
-    // We need a reasonable scale that works for this model size
-    if (targetRadius && modelRadius > 0) {
-      // Don't recompute if we already have a reasonable scale
-      // The model is very large, so we use a fixed small scale
-      const newScale = 0.01;
-      console.log('Model scale calculation:', { modelRadius, targetRadius, newScale, size });
-      setComputedScale(newScale);
-    } else if (scale) {
-      setComputedScale(scale);
-    }
-    
+    // Compute ORIGINAL bounding box before any modifications
+    const originalBox = new THREE.Box3().setFromObject(obj);
+    const originalCenter = originalBox.getCenter(new THREE.Vector3());
+    const originalSize = originalBox.getSize(new THREE.Vector3());
+    const originalMin = originalBox.min.clone();
+    const originalMax = originalBox.max.clone();
+
+    // Log detailed model info
+    console.log('=== MODEL GEOMETRY INFO ===');
+    console.log('Original Bounding Box:');
+    console.log('  Min:', { x: originalMin.x, y: originalMin.y, z: originalMin.z });
+    console.log('  Max:', { x: originalMax.x, y: originalMax.y, z: originalMax.z });
+    console.log('  Center:', { x: originalCenter.x, y: originalCenter.y, z: originalCenter.z });
+    console.log('  Size:', { x: originalSize.x, y: originalSize.y, z: originalSize.z });
+
     obj.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        // Check if the mesh name includes any tire part keywords
+        meshNames.push(child.name || '(unnamed)');
         const meshNameLower = child.name.toLowerCase();
         const isTirePart = tirePartNames.some(part => meshNameLower.includes(part));
 
         if (isTirePart) {
-          // Hide tire parts
           child.visible = false;
-        } else if (child.material) {
-          // Ensure claw parts are full opacity
+          console.log('  Hidden (tire part):', child.name);
+        } else {
+          console.log('  Visible mesh:', child.name);
+        }
+
+        if (child.material) {
           const materials = Array.isArray(child.material) ? child.material : [child.material];
           materials.forEach((mat) => {
             mat.transparent = false;
             mat.opacity = 1.0;
           });
         }
-        
-        // Center the geometry
+
+        // Center the geometry so model origin is at its center
         if (child.geometry) {
-          child.geometry.translate(-center.x, -center.y, -center.z);
+          child.geometry.translate(-originalCenter.x, -originalCenter.y, -originalCenter.z);
         }
       }
     });
-  }, [obj, targetRadius, scale]);
 
-  // Apply rotation from quaternion or basis vectors
-  // Priority: quaternion > basisVectors > euler rotation
-  // The schema recommends quaternion as most reliable for Three.js
-  useEffect(() => {
-    if (!groupRef.current) return;
-    
-    if (quaternion) {
-      // Use quaternion (recommended by schema)
-      groupRef.current.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-      // Apply additional 180° rotation on Z axis
-      groupRef.current.rotateZ(Math.PI*.55);
-      groupRef.current.rotateY(Math.PI*.55);
-      groupRef.current.rotateX(Math.PI*.05);
-    } else if (basisVectors) {
-      // Build rotation matrix from basis vectors
-      // Basis vectors define the wheel's local coordinate system:
-      // x_axis = wheel axle (into car), y_axis = up, z_axis = forward (tangent)
-      const matrix = new THREE.Matrix4();
-      matrix.makeBasis(
-        new THREE.Vector3(...basisVectors.x_axis),
-        new THREE.Vector3(...basisVectors.y_axis),
-        new THREE.Vector3(...basisVectors.z_axis)
-      );
-      groupRef.current.setRotationFromMatrix(matrix);
-      // Apply additional 180° rotation on Z axis
-      groupRef.current.rotateZ(Math.PI);
-    } else {
-      // Apply 180° rotation on Z axis for default case
-      groupRef.current.rotation.z = Math.PI;
-    }
-  }, [basisVectors, quaternion]);
+    console.log('Mesh names:', meshNames);
+    console.log('===========================');
+
+    setModelInfo({
+      originalCenter,
+      originalSize,
+      originalMin,
+      originalMax,
+      meshNames,
+    });
+  }, [obj]);
 
   return (
-    <group ref={groupRef} position={position}>
-      <primitive
-        object={obj}
-        rotation={quaternion || basisVectors ? undefined : rotation}
-        scale={computedScale}
-      />
+    <group position={position} rotation={rotation} scale={scale}>
+      {/* Inner group applies base rotation to normalize model orientation */}
+      <group rotation={baseRotation}>
+        <primitive object={obj} />
+      
+        {/* Bounding box visualization */}
+        {showBoundingBox && modelInfo && (
+          <box3Helper
+            args={[
+              new THREE.Box3(
+                new THREE.Vector3(
+                  -modelInfo.originalSize.x / 2,
+                  -modelInfo.originalSize.y / 2,
+                  -modelInfo.originalSize.z / 2
+                ),
+                new THREE.Vector3(
+                  modelInfo.originalSize.x / 2,
+                  modelInfo.originalSize.y / 2,
+                  modelInfo.originalSize.z / 2
+                )
+              ),
+              new THREE.Color(0xffff00)
+            ]}
+          />
+        )}
+      </group>
     </group>
   );
 }

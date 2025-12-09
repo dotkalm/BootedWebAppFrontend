@@ -32,7 +32,7 @@ function useImageDataUrl(path: string) {
   return dataUrl;
 }
 
-// 2D detection visualization
+// 2D only - image with ellipses and basis vectors
 export const TwoD = () => {
   const dataUrl = useImageDataUrl('/output_image_no_ext.jpg');
   if (!dataUrl) return <div>Loading…</div>;
@@ -40,25 +40,22 @@ export const TwoD = () => {
   return (
     <Viewer
       src={dataUrl}
-      mode="2d"
       detections={oneDetection.detections}
     />
   );
 };
 
-// 3D model on rear wheel - minimal props
-export const ThreeD = () => {
+// With 3D model viewer side-by-side
+export const With3DModel = () => {
   const dataUrl = useImageDataUrl('/output_image_no_ext.jpg');
   if (!dataUrl) return <div>Loading…</div>;
 
   return (
     <Viewer
       src={dataUrl}
-      mode="3d"
-      selectedWheel="rear"
+      detections={oneDetection.detections}
       objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
       mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
-      detections={oneDetection.detections}
     />
   );
 };

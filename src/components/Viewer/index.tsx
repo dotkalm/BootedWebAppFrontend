@@ -1,130 +1,27 @@
-import { useEffect, useRef, Suspense, useState } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-import { type CarDetection, type WheelTransform, type BasisVectors } from '@/types';
-import { getPrimaryWheelTransform, getAllWheelTransforms } from '@/utils';
+import { type CarDetection } from '@/types';
 import Model from '@/components/Model';
-import { useOrientation } from '@/hooks';
 
 interface ViewerProps {
   src: string;
   detections?: CarDetection[];
-  mode?: '2d' | '3d';
   objPath?: string;
   mtlPath?: string;
-  scale?: number;
-  selectedWheel?: 'rear' | 'front' | 'primary'; // Which wheel to target
-  setShowViewer?: (show: boolean) => void;
-  onBack?: () => void;
-}
-
-// Draw 3D axes using basis vectors from backend
-// Backend coordinate system for wheel:
-// - x_axis: Wheel axle direction (points into the car, perpendicular to wheel face)
-// - y_axis: Up direction (world up, adjusted for ground tilt)
-// - z_axis: Forward direction (car's direction of travel, tangent to wheel)
-function AxesVisualization({
-  basisVectors,
-  position,
-  showWorldAxes = true
-}: {
-  basisVectors: BasisVectors;
-  position: [number, number, number];
-  showWorldAxes?: boolean;
-}) {
-  const axisLength = 0.5;
-
-  return (
-    <group position={position}>
-      {/* World/Three.js standard axes (dimmer, for reference) */}
-      {showWorldAxes && (
-        <axesHelper args={[axisLength * 0.5]} />
-      )}
-      
-      {/* Backend basis vectors - the actual wheel coordinate system */}
-      {/* X-axis (Red) - Wheel axle direction (into car) */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.x_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0xff0000,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-      {/* Y-axis (Green) - Up direction */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.y_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0x00ff00,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-      {/* Z-axis (Blue) - Forward direction (tangent to wheel) */}
-      <arrowHelper
-        args={[
-          new THREE.Vector3(...basisVectors.z_axis).normalize(),
-          new THREE.Vector3(0, 0, 0),
-          axisLength,
-          0x0000ff,
-          axisLength * 0.2,
-          axisLength * 0.1
-        ]}
-      />
-    </group>
-  );
 }
 
 export default function Viewer({
   src,
   detections = [],
-  mode = '2d',
   objPath,
   mtlPath,
-  scale,
-  selectedWheel = 'primary',
-  setShowViewer,
-  onBack
 }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { isLandscape } = useOrientation();
 
-  // Get the target wheel transform and ellipse
-  const detection = detections[0];
-  const selectedTransform = detection
-    ? selectedWheel === 'rear'
-      ? detection.rear_wheel_transform
-      : selectedWheel === 'front'
-        ? detection.front_wheel_transform
-        : getPrimaryWheelTransform(detection)
-    : null;
-  
-  // Get the corresponding ellipse for the selected wheel
-  const selectedEllipse = detection
-    ? selectedWheel === 'rear'
-      ? detection.rear_wheel_ellipse
-      : selectedWheel === 'front'
-        ? detection.front_wheel_ellipse
-        : detection.rear_wheel_ellipse // primary defaults to rear
-    : null;
-  
-  // Compute target radius in normalized coordinates from ellipse
-  // Ellipse axes are in pixels, normalize by image half-width (320 for 640px image)
-  // Use the average of the two axes for the target radius
-  const imageHalfWidth = 320; // TODO: get from detection.image_dimensions
-  const targetRadius = selectedEllipse
-    ? ((selectedEllipse.axes[0] + selectedEllipse.axes[1]) / 2) / imageHalfWidth
-    : 0.1;
-
-  // Draw 2D overlay (bounding boxes and debug info)
+  // Draw 2D overlay: ellipses and basis vectors
   useEffect(() => {
     const img = imgRef.current;
     const canvas = canvasRef.current;
@@ -133,213 +30,166 @@ export default function Viewer({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Ensure canvas matches image natural size
+    // Match canvas size to image
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-
-    // Clear overlay
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Get all wheel transforms
-    const transforms = getAllWheelTransforms(detections);
+    const detection = detections[0];
+    if (!detection) return;
 
-    // Draw each wheel's bounding box
-    transforms.forEach((transform, index) => {
-      const bbox = transform.bounding_box;
-      const isSelected = transform === selectedTransform;
+    // Draw rear wheel ellipse (green)
+    if (detection.rear_wheel_ellipse) {
+      const ellipse = detection.rear_wheel_ellipse;
+      const [cx, cy] = ellipse.center;
+      const [semiMajor, semiMinor] = ellipse.axes;
+      const angleRad = (ellipse.angle * Math.PI) / 180;
 
-      // Draw bounding box
       ctx.beginPath();
-      ctx.rect(bbox.x1, bbox.y1, bbox.width, bbox.height);
-      ctx.strokeStyle = isSelected ? '#0000ff' : '#ff0000';
-      ctx.lineWidth = 3;
+      ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
       ctx.stroke();
 
       // Draw center point
       ctx.beginPath();
-      ctx.arc(transform.position.pixel_x, transform.position.pixel_y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = isSelected ? '#0000ff' : '#ff0000';
+      ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = '#00ff00';
       ctx.fill();
-
-      // Draw label
-      ctx.fillStyle = isSelected ? '#0000ff' : '#ff0000';
-      ctx.font = '16px monospace';
-      ctx.fillText(
-        transform.rotation.metadata.target_wheel,
-        bbox.x1,
-        bbox.y1 - 5
-      );
-    });
-
-    // Draw wheel ellipses if available
-    const detection = detections[0];
-    if (detection) {
-      // Draw rear wheel ellipse
-      if (detection.rear_wheel_ellipse) {
-        const ellipse = detection.rear_wheel_ellipse;
-        const [cx, cy] = ellipse.center;
-        const [semiMajor, semiMinor] = ellipse.axes;
-        const angleRad = (ellipse.angle * Math.PI) / 180;
-
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
-        ctx.strokeStyle = '#00ff00'; // Green for rear
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-
-      // Draw front wheel ellipse
-      if (detection.front_wheel_ellipse) {
-        const ellipse = detection.front_wheel_ellipse;
-        const [cx, cy] = ellipse.center;
-        const [semiMajor, semiMinor] = ellipse.axes;
-        const angleRad = (ellipse.angle * Math.PI) / 180;
-
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
-        ctx.strokeStyle = '#ff00ff'; // Magenta for front
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
     }
 
-    // Draw car direction vector if available
-    if (detections[0]?.car_geometry?.wheel_to_wheel_2d) {
-      const dir = detections[0].car_geometry.wheel_to_wheel_2d;
-      const carBox = detections[0].car.bbox;
-      const centerX = (carBox.x1 + carBox.x2) / 2;
-      const centerY = (carBox.y1 + carBox.y2) / 2;
+    // Draw front wheel ellipse (magenta)
+    if (detection.front_wheel_ellipse) {
+      const ellipse = detection.front_wheel_ellipse;
+      const [cx, cy] = ellipse.center;
+      const [semiMajor, semiMinor] = ellipse.axes;
+      const angleRad = (ellipse.angle * Math.PI) / 180;
 
       ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.lineTo(centerX + dir[0] * 100, centerY + dir[1] * 100);
-      ctx.strokeStyle = '#ffff00';
-      ctx.lineWidth = 3;
+      ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#ff00ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw center point
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ff00ff';
+      ctx.fill();
+    }
+
+    // Draw basis vectors for rear wheel
+    if (detection.rear_wheel_transform) {
+      const transform = detection.rear_wheel_transform;
+      const px = transform.position.pixel_x;
+      const py = transform.position.pixel_y;
+      const basis = transform.rotation.basis_vectors;
+      const axisLength = 50; // pixels
+
+      // X-axis (Red)
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px + basis.x_axis[0] * axisLength, py + basis.x_axis[1] * axisLength);
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Y-axis (Green)
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px + basis.y_axis[0] * axisLength, py - basis.y_axis[1] * axisLength); // flip Y for canvas
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Z-axis (Blue)
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px + basis.z_axis[0] * axisLength, py + basis.z_axis[1] * axisLength);
+      ctx.strokeStyle = '#0000ff';
+      ctx.lineWidth = 2;
       ctx.stroke();
     }
-  }, [src, detections, selectedTransform]);
-
-  console.log({
-    'Viewer - Selected transform': selectedTransform,
-    'Mode': mode,
-    'Detections count': detections.length,
-  });
+  }, [src, detections]);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: isLandscape ? 'row' : 'column',
-        alignItems: isLandscape ? 'flex-start' : 'center',
-        gap: 2,
-        width: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          position: 'relative',
-          display: 'inline-block',
-          img: {
-            display: 'block',
-            maxWidth: '100%',
-            height: 'auto',
+    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+      {/* Base image */}
+      <img
+        ref={imgRef}
+        src={src}
+        alt="Detection"
+        onLoad={() => {
+          const canvas = canvasRef.current;
+          const img = imgRef.current;
+          if (canvas && img) {
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
           }
         }}
-      >
-        <img
-          ref={imgRef}
-          src={src}
-          alt="Captured frame"
-          onLoad={() => {
-            // Trigger redraw on load
-            const canvas = canvasRef.current;
-            const img = imgRef.current;
-            if (canvas && img) {
-              canvas.width = img.naturalWidth;
-              canvas.height = img.naturalHeight;
-            }
-          }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-        />
-        {mode === '3d' && objPath && selectedTransform && (
-          <Box
-            sx={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'auto',
-            }}
-          >
-            <Canvas
-              orthographic
-              camera={{
-                // Orthographic camera matching normalized coordinates [-1, 1]
-                position: [0, 0, 10],
-                zoom: 1,
-                left: -1,
-                right: 1,
-                top: 1,
-                bottom: -1,
-                near: 0.1,
-                far: 100
-              }}
-              gl={{ alpha: true }}
-              style={{ background: 'transparent' }}
-            >
-              {/* Visualize the 3D axes from backend */}
-              <AxesVisualization
-                basisVectors={selectedTransform.rotation.basis_vectors}
-                position={[
-                  selectedTransform.position.x,
-                  selectedTransform.position.y,
-                  0 // Keep axes on z=0 plane for visibility
-                ]}
-              />
+        style={{ display: 'block', maxWidth: '100%' }}
+      />
 
-              <ambientLight intensity={0.5} />
-              <directionalLight position={[10, 10, 5]} intensity={5} />
-              <directionalLight position={[-10, -10, -5]} intensity={.5} />
+      {/* 2D Canvas overlay for ellipses and basis vectors */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+        }}
+      />
 
-              <Suspense fallback={null}>
-                <Model
-                  objPath={objPath}
-                  mtlPath={mtlPath}
-                  quaternion={selectedTransform.rotation.quaternion}
-                  basisVectors={selectedTransform.rotation.basis_vectors}
-                  position={[
-                    selectedTransform.position.x,
-                    selectedTransform.position.y,
-                    0 // Place on z=0 plane
-                  ]}
-                  scale={scale}
-                  targetRadius={targetRadius}
-                />
-              </Suspense>
-
-              <OrbitControls target={[0, 0, 0]} />
-            </Canvas>
-          </Box>
-        )}
-      </Box>
-
-      {setShowViewer && (
-        <Button
-          variant="contained"
-          onClick={() => {
-            setShowViewer(false);
-            onBack?.();
-          }}
+      {/* 3D Canvas overlay - transparent background */}
+      {objPath && (
+        <Box
           sx={{
-            alignSelf: isLandscape ? 'flex-start' : 'center',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
           }}
         >
-          ← Back
-        </Button>
+          <Canvas
+            gl={{ alpha: true }}
+            camera={{
+              position: [100, 10, 100],
+              fov: 50,
+              near: 0.1,
+              far: 1000,
+            }}
+            style={{ background: 'transparent' }}
+          >
+            {/* Grid to visualize the ground plane */}
+            <gridHelper args={[20, 20, '#666666', '#444444']} />
+            
+            {/* Standard Three.js axes helper - RGB = XYZ */}
+            <axesHelper args={[5]} />
+
+            {/* Lighting */}
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[10, 10, 10]} intensity={1} />
+
+            {/* 3D Model at origin */}
+            <Suspense fallback={null}>
+              <Model
+                objPath={objPath}
+                mtlPath={mtlPath}
+                position={[0, 0, 0]}
+                scale={1}
+                rotation={[.05, 1, .02]}
+                baseRotation={[-Math.PI / 2, 0, 0]}
+              />
+            </Suspense>
+
+            {/* Camera controls */}
+            <OrbitControls target={[0, 0, 0]} />
+          </Canvas>
+        </Box>
       )}
     </Box>
   );
