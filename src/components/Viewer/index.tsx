@@ -64,7 +64,7 @@ export default function Viewer({
   const canvas3DRef = useRef<HTMLCanvasElement | null>(null);
   const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
 
-  // Draw 2D overlay: ellipses and basis vectors
+  // Draw 2D overlay: car image, ellipses and basis vectors
   useEffect(() => {
     const img = imgRef.current;
     const canvas = canvasRef.current;
@@ -77,6 +77,9 @@ export default function Viewer({
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the car image first
+    ctx.drawImage(img, 0, 0);
 
     const detection = detections[0];
     if (!detection) return;
@@ -205,7 +208,7 @@ export default function Viewer({
 
   return (
     <Box sx={{ position: 'relative', display: 'inline-block' }}>
-      {/* Base image */}
+      {/* Base image - hidden, used as source for canvas */}
       <img
         ref={imgRef}
         src={src}
@@ -218,19 +221,17 @@ export default function Viewer({
             canvas.height = img.naturalHeight;
           }
         }}
-        style={{ display: 'block', maxWidth: '100%' }}
+        style={{ display: 'none' }}
       />
 
-      {/* 2D Canvas overlay for ellipses and basis vectors */}
+      {/* Main canvas - contains car image, 2D overlays, and 3D composite */}
       <canvas
         ref={canvasRef}
         style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
+          display: 'block',
+          maxWidth: '100%',
           width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
+          height: 'auto',
         }}
       />
 
