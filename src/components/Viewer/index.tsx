@@ -10,10 +10,14 @@ function CanvasCapture({
   canvas2DRef, 
   imgRef,
   base2DImageRef,
+  deltaX,
+  deltaY,
 }: { 
   canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
   imgRef: React.RefObject<HTMLImageElement | null>; 
   base2DImageRef: React.RefObject<HTMLCanvasElement | null>;
+  deltaX: number;
+  deltaY: number;
 }) {
   const { gl } = useThree();
   const [captured, setCaptured] = useState(false);
@@ -47,14 +51,14 @@ function CanvasCapture({
         const tempCtx = tempCanvas.getContext('2d');
         if (!tempCtx) return;
 
-        // Draw scaled 3D canvas
-        tempCtx.drawImage(canvas3D, 0, 0, tempCanvas.width, tempCanvas.height);
+        // Draw scaled 3D canvas with offset
+        tempCtx.drawImage(canvas3D, deltaX, deltaY, tempCanvas.width, tempCanvas.height);
 
         // Composite 3D render onto 2D canvas (on top of base content)
         ctx.drawImage(tempCanvas, 0, 0);
         
         setCaptured(true);
-        console.log('3D canvas captured and composited');
+        console.log('3D canvas captured and composited with offset:', { deltaX, deltaY });
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);
       }
@@ -83,6 +87,8 @@ export default function Viewer({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const base2DCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
+  const [deltaX, setDeltaX] = useState<number>(0);
+  const [deltaY, setDeltaY] = useState<number>(0);
 
   // Draw base 2D content: car image, ellipses and basis vectors (to offscreen canvas)
   useEffect(() => {
@@ -103,6 +109,32 @@ export default function Viewer({
 
     const detection = detections[0];
     if (!detection) return;
+
+    // Calculate image center
+    const imageCenterX = base2DCanvas.width / 2;
+    const imageCenterY = base2DCanvas.height / 2;
+
+    // Calculate deltaX and deltaY from image center to rear wheel (green ellipse) center
+    let offsetX = 0;
+    let offsetY = 0;
+    if (detection.rear_wheel_ellipse) {
+      const [rearX, rearY] = detection.rear_wheel_ellipse.center;
+      offsetX = rearX - imageCenterX;
+      offsetY = rearY - imageCenterY;
+      
+      // Store in state
+      setDeltaX(offsetX);
+      setDeltaY(offsetY);
+      
+      console.log('Image center to rear wheel offset:', {
+        imageCenterX,
+        imageCenterY,
+        rearWheelCenter: { x: rearX, y: rearY },
+        deltaX: offsetX,
+        deltaY: offsetY,
+        distance: Math.sqrt(offsetX * offsetX + offsetY * offsetY)
+      });
+    }
 
     // Draw rear wheel ellipse (green)
     if (detection.rear_wheel_ellipse) {
@@ -319,7 +351,13 @@ export default function Viewer({
             </Suspense>
 
             {/* Capture 3D canvas on each frame */}
-            <CanvasCapture canvas2DRef={canvasRef} imgRef={imgRef} base2DImageRef={base2DCanvasRef} />
+            <CanvasCapture 
+              canvas2DRef={canvasRef} 
+              imgRef={imgRef} 
+              base2DImageRef={base2DCanvasRef}
+              deltaX={deltaX}
+              deltaY={deltaY}
+            />
 
             {/* Camera controls */}
             <OrbitControls target={[0, 0, 0]} />
