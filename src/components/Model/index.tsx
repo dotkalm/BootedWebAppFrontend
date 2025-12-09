@@ -20,6 +20,7 @@ interface ModelInfo {
   originalMin: THREE.Vector3;
   originalMax: THREE.Vector3;
   meshNames: string[];
+  clampBoundingBox?: THREE.Box3;
 }
 
 export default function Model({
@@ -58,6 +59,7 @@ export default function Model({
   useEffect(() => {
     const tirePartNames = ['wheel', 'rim', 'disk'];
     const meshNames: string[] = [];
+    let clampMesh: THREE.Mesh | null = null;
 
     // Compute ORIGINAL bounding box before any modifications
     const originalBox = new THREE.Box3().setFromObject(obj);
@@ -79,6 +81,12 @@ export default function Model({
         meshNames.push(child.name || '(unnamed)');
         const meshNameLower = child.name.toLowerCase();
         const isTirePart = tirePartNames.some(part => meshNameLower.includes(part));
+
+        // Identify the circular clamp mesh
+        if (meshNameLower.includes('disk') || meshNameLower.includes('circle') || meshNameLower.includes('disk_out')) {
+          clampMesh = child;
+          console.log('  Found clamp mesh:', child.name);
+        }
 
         if (isTirePart) {
           child.visible = false;
@@ -103,6 +111,18 @@ export default function Model({
     });
 
     console.log('Mesh names:', meshNames);
+
+    // Compute clamp bounding box AFTER centering
+    let clampBox: THREE.Box3 | undefined;
+    if (clampMesh) {
+      clampBox = new THREE.Box3().setFromObject(clampMesh);
+      const clampCenter = clampBox.getCenter(new THREE.Vector3());
+      const clampSize = clampBox.getSize(new THREE.Vector3());
+      console.log('Clamp Bounding Box:');
+      console.log('  Center:', { x: clampCenter.x, y: clampCenter.y, z: clampCenter.z });
+      console.log('  Size:', { x: clampSize.x, y: clampSize.y, z: clampSize.z });
+    }
+
     console.log('===========================');
 
     setModelInfo({
@@ -111,6 +131,7 @@ export default function Model({
       originalMin,
       originalMax,
       meshNames,
+      clampBoundingBox: clampBox,
     });
   }, [obj]);
 
@@ -120,25 +141,34 @@ export default function Model({
       <group rotation={baseRotation}>
         <primitive object={obj} />
       
-        {/* Bounding box visualization */}
+        {/* Overall model bounding box visualization */}
         {showBoundingBox && modelInfo && (
-          <box3Helper
-            args={[
-              new THREE.Box3(
-                new THREE.Vector3(
-                  -modelInfo.originalSize.x / 2,
-                  -modelInfo.originalSize.y / 2,
-                  -modelInfo.originalSize.z / 2
+          <>
+            <box3Helper
+              args={[
+                new THREE.Box3(
+                  new THREE.Vector3(
+                    -modelInfo.originalSize.x / 2,
+                    -modelInfo.originalSize.y / 2,
+                    -modelInfo.originalSize.z / 2
+                  ),
+                  new THREE.Vector3(
+                    modelInfo.originalSize.x / 2,
+                    modelInfo.originalSize.y / 2,
+                    modelInfo.originalSize.z / 2
+                  )
                 ),
-                new THREE.Vector3(
-                  modelInfo.originalSize.x / 2,
-                  modelInfo.originalSize.y / 2,
-                  modelInfo.originalSize.z / 2
-                )
-              ),
-              new THREE.Color(0xffff00)
-            ]}
-          />
+                new THREE.Color(0xffff00)
+              ]}
+            />
+            
+            {/* Clamp mesh bounding box visualization */}
+            {modelInfo.clampBoundingBox && (
+              <box3Helper
+                args={[modelInfo.clampBoundingBox, new THREE.Color(0xff00ff)]}
+              />
+            )}
+          </>
         )}
       </group>
     </group>
