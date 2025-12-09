@@ -230,7 +230,7 @@ export default function Viewer({
                 mtlPath={mtlPath}
                 position={[0, 0, 0]}
                 scale={1}
-                rotation={[.08, 1, .01]}
+                rotation={[.08, 1, 0]}
                 baseRotation={[-Math.PI / 2, 0, 0]}
                 tireCenterlineAngle={tireCenterlineAngle}
               />

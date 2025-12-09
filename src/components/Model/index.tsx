@@ -121,41 +121,47 @@ export default function Model({
     });
   }, [obj]);
 
+  // Calculate vertical offset to align bottom of bounding box with y=0 (tire centerline plane)
+  const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
+
   return (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
       <group rotation={baseRotation}>
-        <primitive object={obj} />
-      
-        {/* Overall model bounding box visualization */}
-        {showBoundingBox && modelInfo && (
-          <>
-            <box3Helper
-              args={[
-                new THREE.Box3(
-                  new THREE.Vector3(
-                    -modelInfo.originalSize.x / 2,
-                    -modelInfo.originalSize.y / 2,
-                    -modelInfo.originalSize.z / 2
-                  ),
-                  new THREE.Vector3(
-                    modelInfo.originalSize.x / 2,
-                    modelInfo.originalSize.y / 2,
-                    modelInfo.originalSize.z / 2
-                  )
-                ),
-                new THREE.Color(0xffff00)
-              ]}
-            />
-            
-            {/* Clamp mesh bounding box visualization */}
-            {modelInfo.clampBoundingBox && (
+        {/* Lift model and bounding boxes so bottom sits at y=0 */}
+        <group position={[0, verticalOffset, 0]}>
+          <primitive object={obj} />
+        
+          {/* Overall model bounding box visualization */}
+          {showBoundingBox && modelInfo && (
+            <>
               <box3Helper
-                args={[modelInfo.clampBoundingBox, new THREE.Color(0xff00ff)]}
+                args={[
+                  new THREE.Box3(
+                    new THREE.Vector3(
+                      -modelInfo.originalSize.x / 2,
+                      -modelInfo.originalSize.y / 2,
+                      -modelInfo.originalSize.z / 2
+                    ),
+                    new THREE.Vector3(
+                      modelInfo.originalSize.x / 2,
+                      modelInfo.originalSize.y / 2,
+                      modelInfo.originalSize.z / 2
+                    )
+                  ),
+                  new THREE.Color(0xffff00)
+                ]}
               />
-            )}
-          </>
-        )}
+              
+              {/* Clamp mesh bounding box visualization */}
+              {modelInfo.clampBoundingBox && (
+                <box3Helper
+                  args={[modelInfo.clampBoundingBox, new THREE.Color(0xff00ff)]}
+                />
+              )}
+            </>
+          )}
+        </group>
       </group>
     </group>
   );
