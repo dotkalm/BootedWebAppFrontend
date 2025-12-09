@@ -127,7 +127,7 @@ export default function Model({
   return (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
-      <group rotation={baseRotation}>
+      <group rotation={baseRotation} position={[-13,0,0]}>
         {/* Lift model and bounding boxes so bottom sits at y=0 */}
         <group position={[0, verticalOffset, 0]}>
           <primitive object={obj} />

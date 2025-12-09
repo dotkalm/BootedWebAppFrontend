@@ -10,8 +10,8 @@ function CanvasCapture({
   canvas2DRef, 
   imgRef 
 }: { 
-  canvas2DRef: React.RefObject<HTMLCanvasElement>; 
-  imgRef: React.RefObject<HTMLImageElement>; 
+  canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
+  imgRef: React.RefObject<HTMLImageElement | null>; 
 }) {
   const { gl } = useThree();
   
@@ -36,29 +36,8 @@ function CanvasCapture({
       // Draw scaled 3D canvas
       tempCtx.drawImage(canvas3D, 0, 0, tempCanvas.width, tempCanvas.height);
 
-      // Get image data and invert colors
-      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-      const data = imageData.data;
-      
-      let nonTransparentPixels = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        // Skip transparent pixels
-        if (data[i + 3] > 0) {
-          nonTransparentPixels++;
-          data[i] = 255 - data[i];     // Invert red
-          data[i + 1] = 255 - data[i + 1]; // Invert green
-          data[i + 2] = 255 - data[i + 2]; // Invert blue
-        }
-      }
-      
-      tempCtx.putImageData(imageData, 0, 0);
-
-      // Composite inverted 3D render onto 2D canvas (after other overlays)
+      // Composite 3D render onto 2D canvas (after other overlays)
       ctx.drawImage(tempCanvas, 0, 0);
-      
-      if (nonTransparentPixels > 0) {
-        console.log('3D Canvas captured:', nonTransparentPixels, 'non-transparent pixels');
-      }
     } catch (error) {
       console.error('Error capturing 3D canvas:', error);
     }
@@ -264,6 +243,8 @@ export default function Viewer({
             top: 0,
             width: '100%',
             height: '100%',
+            visibility: 'hidden',
+            pointerEvents: 'none',
           }}
         >
           <Canvas
