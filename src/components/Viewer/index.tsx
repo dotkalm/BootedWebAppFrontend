@@ -1,9 +1,71 @@
 import { useEffect, useRef, useState, Suspense } from 'react';
 import Box from '@mui/material/Box';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { type CarDetection } from '@/types';
 import Model from '@/components/Model';
+
+// Component to capture 3D canvas on each frame
+function CanvasCapture({ 
+  canvas2DRef, 
+  imgRef 
+}: { 
+  canvas2DRef: React.RefObject<HTMLCanvasElement>; 
+  imgRef: React.RefObject<HTMLImageElement>; 
+}) {
+  const { gl } = useThree();
+  
+  useFrame(() => {
+    const canvas2D = canvas2DRef.current;
+    const img = imgRef.current;
+    const canvas3D = gl.domElement;
+    
+    if (!canvas2D || !canvas3D || !img) return;
+
+    const ctx = canvas2D.getContext('2d');
+    if (!ctx) return;
+
+    try {
+      // Create temp canvas for processing
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = img.naturalWidth;
+      tempCanvas.height = img.naturalHeight;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
+
+      // Draw scaled 3D canvas
+      tempCtx.drawImage(canvas3D, 0, 0, tempCanvas.width, tempCanvas.height);
+
+      // Get image data and invert colors
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
+      
+      let nonTransparentPixels = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        // Skip transparent pixels
+        if (data[i + 3] > 0) {
+          nonTransparentPixels++;
+          data[i] = 255 - data[i];     // Invert red
+          data[i + 1] = 255 - data[i + 1]; // Invert green
+          data[i + 2] = 255 - data[i + 2]; // Invert blue
+        }
+      }
+      
+      tempCtx.putImageData(imageData, 0, 0);
+
+      // Composite inverted 3D render onto 2D canvas (after other overlays)
+      ctx.drawImage(tempCanvas, 0, 0);
+      
+      if (nonTransparentPixels > 0) {
+        console.log('3D Canvas captured:', nonTransparentPixels, 'non-transparent pixels');
+      }
+    } catch (error) {
+      console.error('Error capturing 3D canvas:', error);
+    }
+  });
+  
+  return null;
+}
 
 interface ViewerProps {
   src: string;
@@ -20,6 +82,7 @@ export default function Viewer({
 }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvas3DRef = useRef<HTMLCanvasElement | null>(null);
   const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
 
   // Draw 2D overlay: ellipses and basis vectors
@@ -204,7 +267,7 @@ export default function Viewer({
           }}
         >
           <Canvas
-            gl={{ alpha: true }}
+            gl={{ alpha: true, preserveDrawingBuffer: true }}
             camera={{
               position: [100, 10, 100],
               fov: 50,
@@ -235,6 +298,9 @@ export default function Viewer({
                 tireCenterlineAngle={tireCenterlineAngle}
               />
             </Suspense>
+
+            {/* Capture 3D canvas on each frame */}
+            <CanvasCapture canvas2DRef={canvasRef} imgRef={imgRef} />
 
             {/* Camera controls */}
             <OrbitControls target={[0, 0, 0]} />
