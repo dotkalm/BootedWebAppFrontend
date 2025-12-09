@@ -1,47 +1,67 @@
 import { useEffect, useRef, useState, Suspense } from 'react';
 import Box from '@mui/material/Box';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { type CarDetection } from '@/types';
 import Model from '@/components/Model';
 
-// Component to capture 3D canvas on each frame
+// Component to capture 3D canvas once when ready
 function CanvasCapture({ 
   canvas2DRef, 
-  imgRef 
+  imgRef,
+  base2DImageRef,
 }: { 
   canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
   imgRef: React.RefObject<HTMLImageElement | null>; 
+  base2DImageRef: React.RefObject<HTMLCanvasElement | null>;
 }) {
   const { gl } = useThree();
+  const [captured, setCaptured] = useState(false);
   
-  useFrame(() => {
-    const canvas2D = canvas2DRef.current;
-    const img = imgRef.current;
-    const canvas3D = gl.domElement;
-    
-    if (!canvas2D || !canvas3D || !img) return;
+  useEffect(() => {
+    if (captured) return;
 
-    const ctx = canvas2D.getContext('2d');
-    if (!ctx) return;
+    // Small delay to ensure 3D scene is fully rendered
+    const timer = setTimeout(() => {
+      const canvas2D = canvas2DRef.current;
+      const img = imgRef.current;
+      const canvas3D = gl.domElement;
+      const base2DImage = base2DImageRef.current;
+      
+      if (!canvas2D || !canvas3D || !img || !base2DImage) return;
 
-    try {
-      // Create temp canvas for processing
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = img.naturalWidth;
-      tempCanvas.height = img.naturalHeight;
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) return;
+      const ctx = canvas2D.getContext('2d');
+      if (!ctx) return;
 
-      // Draw scaled 3D canvas
-      tempCtx.drawImage(canvas3D, 0, 0, tempCanvas.width, tempCanvas.height);
+      try {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
+        
+        // Draw the base 2D content (car image + overlays)
+        ctx.drawImage(base2DImage, 0, 0);
+        
+        // Create temp canvas for 3D processing
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.naturalWidth;
+        tempCanvas.height = img.naturalHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return;
 
-      // Composite 3D render onto 2D canvas (after other overlays)
-      ctx.drawImage(tempCanvas, 0, 0);
-    } catch (error) {
-      console.error('Error capturing 3D canvas:', error);
-    }
-  });
+        // Draw scaled 3D canvas
+        tempCtx.drawImage(canvas3D, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Composite 3D render onto 2D canvas (on top of base content)
+        ctx.drawImage(tempCanvas, 0, 0);
+        
+        setCaptured(true);
+        console.log('3D canvas captured and composited');
+      } catch (error) {
+        console.error('Error capturing 3D canvas:', error);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [gl, canvas2DRef, imgRef, base2DImageRef, captured]);
   
   return null;
 }
@@ -61,22 +81,22 @@ export default function Viewer({
 }: ViewerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const canvas3DRef = useRef<HTMLCanvasElement | null>(null);
+  const base2DCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
 
-  // Draw 2D overlay: car image, ellipses and basis vectors
+  // Draw base 2D content: car image, ellipses and basis vectors (to offscreen canvas)
   useEffect(() => {
     const img = imgRef.current;
-    const canvas = canvasRef.current;
-    if (!img || !canvas) return;
+    const base2DCanvas = base2DCanvasRef.current;
+    if (!img || !base2DCanvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = base2DCanvas.getContext('2d');
     if (!ctx) return;
 
     // Match canvas size to image
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    base2DCanvas.width = img.naturalWidth;
+    base2DCanvas.height = img.naturalHeight;
+    ctx.clearRect(0, 0, base2DCanvas.width, base2DCanvas.height);
 
     // Draw the car image first
     ctx.drawImage(img, 0, 0);
@@ -167,8 +187,8 @@ export default function Viewer({
         degrees: (tireCenterlineAngle * 180) / Math.PI,
       } : null,
       canvas: {
-        width: canvas.width,
-        height: canvas.height,
+        width: base2DCanvas.width,
+        height: base2DCanvas.height,
       },
     });
 
@@ -204,6 +224,17 @@ export default function Viewer({
       ctx.lineWidth = 2;
       ctx.stroke();
     }
+
+    // Copy base 2D to main canvas initially
+    const mainCanvas = canvasRef.current;
+    if (mainCanvas) {
+      mainCanvas.width = base2DCanvas.width;
+      mainCanvas.height = base2DCanvas.height;
+      const mainCtx = mainCanvas.getContext('2d');
+      if (mainCtx) {
+        mainCtx.drawImage(base2DCanvas, 0, 0);
+      }
+    }
   }, [src, detections]);
 
   return (
@@ -221,6 +252,12 @@ export default function Viewer({
             canvas.height = img.naturalHeight;
           }
         }}
+        style={{ display: 'none' }}
+      />
+
+      {/* Hidden canvas to store base 2D content */}
+      <canvas
+        ref={base2DCanvasRef}
         style={{ display: 'none' }}
       />
 
@@ -282,7 +319,7 @@ export default function Viewer({
             </Suspense>
 
             {/* Capture 3D canvas on each frame */}
-            <CanvasCapture canvas2DRef={canvasRef} imgRef={imgRef} />
+            <CanvasCapture canvas2DRef={canvasRef} imgRef={imgRef} base2DImageRef={base2DCanvasRef} />
 
             {/* Camera controls */}
             <OrbitControls target={[0, 0, 0]} />
