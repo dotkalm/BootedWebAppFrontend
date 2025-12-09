@@ -22,42 +22,60 @@ interface ViewerProps {
 }
 
 // Draw 3D axes using basis vectors from backend
+// Backend coordinate system for wheel:
+// - x_axis: Wheel axle direction (points into the car, perpendicular to wheel face)
+// - y_axis: Up direction (world up, adjusted for ground tilt)
+// - z_axis: Forward direction (car's direction of travel, tangent to wheel)
 function AxesVisualization({
   basisVectors,
-  position
+  position,
+  showWorldAxes = true
 }: {
   basisVectors: BasisVectors;
   position: [number, number, number];
+  showWorldAxes?: boolean;
 }) {
-  const axisLength = 2;
+  const axisLength = 0.5;
 
   return (
     <group position={position}>
-      {/* X-axis (Red) - Wheel axle direction */}
+      {/* World/Three.js standard axes (dimmer, for reference) */}
+      {showWorldAxes && (
+        <axesHelper args={[axisLength * 0.5]} />
+      )}
+      
+      {/* Backend basis vectors - the actual wheel coordinate system */}
+      {/* X-axis (Red) - Wheel axle direction (into car) */}
       <arrowHelper
         args={[
-          new THREE.Vector3(...basisVectors.x_axis),
+          new THREE.Vector3(...basisVectors.x_axis).normalize(),
           new THREE.Vector3(0, 0, 0),
           axisLength,
-          0xff0000
+          0xff0000,
+          axisLength * 0.2,
+          axisLength * 0.1
         ]}
       />
       {/* Y-axis (Green) - Up direction */}
       <arrowHelper
         args={[
-          new THREE.Vector3(...basisVectors.y_axis),
+          new THREE.Vector3(...basisVectors.y_axis).normalize(),
           new THREE.Vector3(0, 0, 0),
           axisLength,
-          0x00ff00
+          0x00ff00,
+          axisLength * 0.2,
+          axisLength * 0.1
         ]}
       />
-      {/* Z-axis (Blue) - Forward direction */}
+      {/* Z-axis (Blue) - Forward direction (tangent to wheel) */}
       <arrowHelper
         args={[
-          new THREE.Vector3(...basisVectors.z_axis),
+          new THREE.Vector3(...basisVectors.z_axis).normalize(),
           new THREE.Vector3(0, 0, 0),
           axisLength,
-          0x0000ff
+          0x0000ff,
+          axisLength * 0.2,
+          axisLength * 0.1
         ]}
       />
     </group>
@@ -135,9 +153,41 @@ export default function Viewer({
       );
     });
 
+    // Draw wheel ellipses if available
+    const detection = detections[0];
+    if (detection) {
+      // Draw rear wheel ellipse
+      if (detection.rear_wheel_ellipse) {
+        const ellipse = detection.rear_wheel_ellipse;
+        const [cx, cy] = ellipse.center;
+        const [semiMajor, semiMinor] = ellipse.axes;
+        const angleRad = (ellipse.angle * Math.PI) / 180;
+
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#00ff00'; // Green for rear
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Draw front wheel ellipse
+      if (detection.front_wheel_ellipse) {
+        const ellipse = detection.front_wheel_ellipse;
+        const [cx, cy] = ellipse.center;
+        const [semiMajor, semiMinor] = ellipse.axes;
+        const angleRad = (ellipse.angle * Math.PI) / 180;
+
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#ff00ff'; // Magenta for front
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+
     // Draw car direction vector if available
-    if (detections[0]?.car_geometry?.direction_2d) {
-      const dir = detections[0].car_geometry.direction_2d;
+    if (detections[0]?.car_geometry?.wheel_to_wheel_2d) {
+      const dir = detections[0].car_geometry.wheel_to_wheel_2d;
       const carBox = detections[0].car.bbox;
       const centerX = (carBox.x1 + carBox.x2) / 2;
       const centerY = (carBox.y1 + carBox.y2) / 2;
@@ -208,10 +258,18 @@ export default function Viewer({
             }}
           >
             <Canvas
+              orthographic
               camera={{
-                position: [0, 0, 5],
-                fov: 50
-               }}
+                // Orthographic camera matching normalized coordinates [-1, 1]
+                position: [0, 0, 10],
+                zoom: 1,
+                left: -1,
+                right: 1,
+                top: 1,
+                bottom: -1,
+                near: 0.1,
+                far: 100
+              }}
               gl={{ alpha: true }}
               style={{ background: 'transparent' }}
             >
@@ -221,7 +279,7 @@ export default function Viewer({
                 position={[
                   selectedTransform.position.x,
                   selectedTransform.position.y,
-                  selectedTransform.position.z
+                  0 // Keep axes on z=0 plane for visibility
                 ]}
               />
 
@@ -233,17 +291,14 @@ export default function Viewer({
                 <Model
                   objPath={objPath}
                   mtlPath={mtlPath}
-                  rotation={[
-                    selectedTransform.rotation.euler_angles.x,
-                    selectedTransform.rotation.euler_angles.y,
-                    selectedTransform.rotation.euler_angles.z
-                  ]}
+                  quaternion={selectedTransform.rotation.quaternion}
+                  basisVectors={selectedTransform.rotation.basis_vectors}
                   position={[
                     selectedTransform.position.x,
                     selectedTransform.position.y,
-                    selectedTransform.position.z
+                    0 // Place on z=0 plane
                   ]}
-                  scale={scale || selectedTransform.scale.uniform}
+                  scale={scale || selectedTransform.scale.uniform * 0.1}
                 />
               </Suspense>
 

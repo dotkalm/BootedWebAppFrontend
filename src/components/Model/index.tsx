@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { type BasisVectors, type Quaternion } from '@/types';
 
 interface ModelProps {
   objPath: string;
   mtlPath?: string;
   rotation?: [number, number, number];
+  basisVectors?: BasisVectors;
+  quaternion?: Quaternion;
   position?: [number, number, number];
   scale?: number;
 }
@@ -16,10 +19,13 @@ export default function Model({
   objPath,
   mtlPath,
   rotation = [0, 0, 0],
+  basisVectors,
+  quaternion,
   position = [-10, -10, -40],
   scale = .04
 }: ModelProps) {
-  console.log('Model loading:', { objPath, mtlPath, position, scale });
+  const groupRef = useRef<THREE.Group>(null);
+  console.log('Model loading:', { objPath, mtlPath, position, scale, basisVectors, quaternion });
 
   // Load materials if MTL file is provided
   const materials = useLoader(
@@ -44,9 +50,14 @@ export default function Model({
   });
 
   // Hide tire parts and ensure claw is full opacity
+  // Also center the geometry so the circular part is at origin
   useEffect(() => {
     const tirePartNames = ['wheel', 'rim', 'disk'];
 
+    // Compute bounding box to center the model
+    const box = new THREE.Box3().setFromObject(obj);
+    const center = box.getCenter(new THREE.Vector3());
+    
     obj.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         // Check if the mesh name includes any tire part keywords
@@ -64,16 +75,45 @@ export default function Model({
             mat.opacity = 1.0;
           });
         }
+        
+        // Center the geometry
+        if (child.geometry) {
+          child.geometry.translate(-center.x, -center.y, -center.z);
+        }
       }
     });
   }, [obj]);
 
+  // Apply rotation from quaternion or basis vectors
+  // Priority: quaternion > basisVectors > euler rotation
+  // The schema recommends quaternion as most reliable for Three.js
+  useEffect(() => {
+    if (!groupRef.current) return;
+    
+    if (quaternion) {
+      // Use quaternion (recommended by schema)
+      groupRef.current.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    } else if (basisVectors) {
+      // Build rotation matrix from basis vectors
+      // Basis vectors define the wheel's local coordinate system:
+      // x_axis = wheel axle (into car), y_axis = up, z_axis = forward (tangent)
+      const matrix = new THREE.Matrix4();
+      matrix.makeBasis(
+        new THREE.Vector3(...basisVectors.x_axis),
+        new THREE.Vector3(...basisVectors.y_axis),
+        new THREE.Vector3(...basisVectors.z_axis)
+      );
+      groupRef.current.setRotationFromMatrix(matrix);
+    }
+  }, [basisVectors, quaternion]);
+
   return (
-    <primitive
-      object={obj}
-      rotation={rotation}
-      position={position}
-      scale={scale}
-    />
+    <group ref={groupRef} position={position}>
+      <primitive
+        object={obj}
+        rotation={quaternion || basisVectors ? undefined : rotation}
+        scale={scale}
+      />
+    </group>
   );
 }

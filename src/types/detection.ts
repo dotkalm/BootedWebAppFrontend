@@ -52,9 +52,12 @@ export interface RotationMetadata {
   viewing_angle_deg: number;      // Angle viewing wheel face (degrees)
   ground_angle_rad: number;       // Ground tilt angle (radians)
   ground_angle_deg: number;       // Ground tilt angle (degrees)
-  car_direction_2d: [number, number]; // 2D car direction vector
+  wheel_to_wheel_2d: [number, number]; // 2D wheel-to-wheel direction vector
   viewing_side: "left" | "right"; // Which side of car is visible
   target_wheel: "front" | "rear"; // Which wheel this is for
+  ellipse_angle_deg: number;      // Ellipse orientation angle (degrees)
+  ellipse_viewing_angle_deg: number; // Ellipse-derived viewing angle (degrees)
+  used_ellipse: boolean;          // Whether ellipse data was used
 }
 
 // 3D Rotation (multiple representations)
@@ -89,9 +92,23 @@ export interface WheelPositions {
 
 // Car geometry information
 export interface CarGeometry {
-  direction_2d: [number, number]; // Car facing direction
+  wheel_to_wheel_2d: [number, number]; // Wheel-to-wheel direction vector
   ground_angle_deg: number;       // Ground tilt in degrees
   viewing_side: "left" | "right"; // Which side is visible
+}
+
+// Wheel ellipse fitting result
+export interface WheelEllipse {
+  center: [number, number];       // Ellipse center [x, y] in pixels
+  axes: [number, number];         // Semi-major and semi-minor axes
+  angle: number;                  // Ellipse rotation angle (degrees)
+  axis_ratio: number;             // Ratio of minor to major axis
+  viewing_angle_deg: number;      // Derived viewing angle (degrees)
+  confidence: number;             // Ellipse fit confidence
+  dark_ring_ratio: number;        // Ratio of dark ring pixels
+  avg_brightness: number;         // Average brightness in ellipse
+  has_dark_ring: boolean;         // Whether dark ring was detected
+  method: string;                 // Fitting method used
 }
 
 // Updated car detection with 3D transforms
@@ -102,7 +119,9 @@ export interface CarDetection {
   wheel_count: number;
   wheel_positions: WheelPositions;
   rear_wheel_transform: WheelTransform | null;   // Primary target
+  rear_wheel_ellipse?: WheelEllipse;             // Rear wheel ellipse fit
   front_wheel_transform: WheelTransform | null;
+  front_wheel_ellipse?: WheelEllipse;            // Front wheel ellipse fit
   car_geometry: CarGeometry;
 }
 
@@ -114,8 +133,8 @@ export interface ImageDimensions {
 
 // Complete API response
 export interface CarDetectionResponse {
-  source: string;
-  image_dimensions: ImageDimensions;
+  source?: string;
+  image_dimensions?: ImageDimensions;
   total_cars: number;
   detections: CarDetection[];
 }

@@ -75,8 +75,8 @@ export const ThreeDModelRearWheel: Story = {
     mode: '3d',
     objPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj',
     mtlPath: '/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl',
-    selectedWheel: 'rear',
-    src: '/output_image_no_ext.jpg',
+    selectedWheel: "rear",
+    src: "/one.jpg",
   },
   render: (args) => {
     const [dataUrl, setDataUrl] = useState<string | null>(null);
@@ -245,7 +245,7 @@ export const DebugTransforms: Story = {
           )}
 
           <h4>Car Geometry:</h4>
-          <p>Direction (2D): ({detection.car_geometry.direction_2d[0].toFixed(3)}, {detection.car_geometry.direction_2d[1].toFixed(3)})</p>
+          <p>Wheel-to-Wheel (2D): ({detection.car_geometry.wheel_to_wheel_2d[0].toFixed(3)}, {detection.car_geometry.wheel_to_wheel_2d[1].toFixed(3)})</p>
           <p>Ground Angle: {detection.car_geometry.ground_angle_deg.toFixed(1)}°</p>
           <p>Viewing Side: {detection.car_geometry.viewing_side}</p>
         </div>
