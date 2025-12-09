@@ -12,21 +12,30 @@ function CanvasCapture({
   base2DImageRef,
   deltaX,
   deltaY,
+  scale,
 }: { 
   canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
   imgRef: React.RefObject<HTMLImageElement | null>; 
   base2DImageRef: React.RefObject<HTMLCanvasElement | null>;
   deltaX: number;
   deltaY: number;
+  scale: number;
 }) {
   const { gl } = useThree();
-  const [captured, setCaptured] = useState(false);
   
   useEffect(() => {
-    if (captured) return;
+    console.log('CanvasCapture effect triggered:', { deltaX, deltaY, scale });
+    
+    // Wait for valid values before capturing
+    if (scale === 1 && deltaX === 0 && deltaY === 0) {
+      console.log('Waiting for scale and offset values to be calculated...');
+      return;
+    }
 
     // Small delay to ensure 3D scene is fully rendered
-    const timer = setTimeout(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    
+    timer = setTimeout(() => {
       const canvas2D = canvas2DRef.current;
       const img = imgRef.current;
       const canvas3D = gl.domElement;
@@ -51,21 +60,44 @@ function CanvasCapture({
         const tempCtx = tempCanvas.getContext('2d');
         if (!tempCtx) return;
 
-        // Draw scaled 3D canvas with offset
-        tempCtx.drawImage(canvas3D, deltaX, deltaY, tempCanvas.width, tempCanvas.height);
+        // Calculate scaled dimensions
+        const scaledWidth = canvas3D.width * scale;
+        const scaledHeight = canvas3D.height * scale;
+        
+        // Calculate center position with offset
+        const centerX = (tempCanvas.width / 2) + deltaX;
+        const centerY = (tempCanvas.height / 2) + deltaY;
+        
+        // Draw scaled 3D canvas centered on rear wheel
+        tempCtx.drawImage(
+          canvas3D,
+          centerX - scaledWidth / 2,
+          centerY - scaledHeight / 2,
+          scaledWidth,
+          scaledHeight
+        );
 
         // Composite 3D render onto 2D canvas (on top of base content)
         ctx.drawImage(tempCanvas, 0, 0);
         
-        setCaptured(true);
-        console.log('3D canvas captured and composited with offset:', { deltaX, deltaY });
+        console.log('✅ 3D canvas captured and composited successfully:', { 
+          deltaX, 
+          deltaY, 
+          scale,
+          scaledWidth,
+          scaledHeight,
+          centerX,
+          centerY
+        });
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);
       }
     }, 500);
 
-    return () => clearTimeout(timer);
-  }, [gl, canvas2DRef, imgRef, base2DImageRef, captured]);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [gl, canvas2DRef, imgRef, base2DImageRef, deltaX, deltaY, scale]);
   
   return null;
 }
@@ -89,6 +121,10 @@ export default function Viewer({
   const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number | null>(null);
   const [deltaX, setDeltaX] = useState<number>(0);
   const [deltaY, setDeltaY] = useState<number>(0);
+  const [overlayScale, setOverlayScale] = useState<number>(1);
+  
+  // Base radius for scale calculation
+  const BASE_WHEEL_RADIUS_PX = 100;
 
   // Draw base 2D content: car image, ellipses and basis vectors (to offscreen canvas)
   useEffect(() => {
@@ -113,6 +149,29 @@ export default function Viewer({
     // Calculate image center
     const imageCenterX = base2DCanvas.width / 2;
     const imageCenterY = base2DCanvas.height / 2;
+
+    // Calculate rear wheel ellipse width (major axis diameter) and scale
+    let rearWheelWidth = null;
+    let wheelRadius = null;
+    let scale = 1;
+    if (detection.rear_wheel_ellipse) {
+      const [semiMajor] = detection.rear_wheel_ellipse.axes;
+      wheelRadius = semiMajor; // Radius
+      rearWheelWidth = semiMajor * 2; // Full width is diameter
+
+      // Calculate scale: if wheel radius is 59px and base is 50px, scale = 1.18
+      scale = wheelRadius / BASE_WHEEL_RADIUS_PX;
+      
+      // Store in state
+      setOverlayScale(scale);
+      
+      console.log('Wheel scale calculation:', {
+        wheelRadius,
+        BASE_WHEEL_RADIUS_PX,
+        scale,
+        rearWheelWidth
+      });
+    }
 
     // Calculate deltaX and deltaY from image center to rear wheel (green ellipse) center
     let offsetX = 0;
@@ -357,6 +416,7 @@ export default function Viewer({
               base2DImageRef={base2DCanvasRef}
               deltaX={deltaX}
               deltaY={deltaY}
+              scale={overlayScale}
             />
 
             {/* Camera controls */}
