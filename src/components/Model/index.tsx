@@ -8,8 +8,8 @@ interface ModelProps {
   objPath: string;
   mtlPath?: string;
   position?: [number, number, number];
-  rotation?: [number, number, number]; // [x, y, z] in radians - applied AFTER baseRotation
-  baseRotation?: [number, number, number]; // [x, y, z] in radians - normalizes model orientation first
+  rotation?: [number, number, number]; 
+  baseRotation?: [number, number, number]; // normalizes model orientation first
   scale?: number;
   showBoundingBox?: boolean;
 }
@@ -61,20 +61,11 @@ export default function Model({
     const meshNames: string[] = [];
     let clampMesh: THREE.Mesh | null = null;
 
-    // Compute ORIGINAL bounding box before any modifications
     const originalBox = new THREE.Box3().setFromObject(obj);
     const originalCenter = originalBox.getCenter(new THREE.Vector3());
     const originalSize = originalBox.getSize(new THREE.Vector3());
     const originalMin = originalBox.min.clone();
     const originalMax = originalBox.max.clone();
-
-    // Log detailed model info
-    console.log('=== MODEL GEOMETRY INFO ===');
-    console.log('Original Bounding Box:');
-    console.log('  Min:', { x: originalMin.x, y: originalMin.y, z: originalMin.z });
-    console.log('  Max:', { x: originalMax.x, y: originalMax.y, z: originalMax.z });
-    console.log('  Center:', { x: originalCenter.x, y: originalCenter.y, z: originalCenter.z });
-    console.log('  Size:', { x: originalSize.x, y: originalSize.y, z: originalSize.z });
 
     obj.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -110,20 +101,13 @@ export default function Model({
       }
     });
 
-    console.log('Mesh names:', meshNames);
-
     // Compute clamp bounding box AFTER centering
     let clampBox: THREE.Box3 | undefined;
     if (clampMesh) {
       clampBox = new THREE.Box3().setFromObject(clampMesh);
       const clampCenter = clampBox.getCenter(new THREE.Vector3());
       const clampSize = clampBox.getSize(new THREE.Vector3());
-      console.log('Clamp Bounding Box:');
-      console.log('  Center:', { x: clampCenter.x, y: clampCenter.y, z: clampCenter.z });
-      console.log('  Size:', { x: clampSize.x, y: clampSize.y, z: clampSize.z });
     }
-
-    console.log('===========================');
 
     setModelInfo({
       originalCenter,

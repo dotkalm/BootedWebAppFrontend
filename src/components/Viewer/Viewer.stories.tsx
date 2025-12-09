@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import type { Meta } from '@storybook/react';
 import Viewer from './index';
-import { oneDetection } from '../../../__tests__/fixtures/one_detection';
+import { 
+  oneDetection,
+  twoDetection,
+} from '../../../__tests__/fixtures/one_detection';
 
 const meta: Meta<typeof Viewer> = {
   title: 'Components/Viewer',
@@ -54,6 +57,20 @@ export const With3DModel = () => {
     <Viewer
       src={dataUrl}
       detections={oneDetection.detections}
+      objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
+      mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
+    />
+  );
+};
+
+export const With3DModelTwo = () => {
+  const dataUrl = useImageDataUrl('/two.jpg');
+  if (!dataUrl) return <div>Loading…</div>;
+
+  return (
+    <Viewer
+      src={dataUrl}
+      detections={twoDetection.detections}
       objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
       mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
     />
