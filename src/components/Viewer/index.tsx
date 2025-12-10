@@ -23,24 +23,39 @@ function CanvasCapture({
 }) {
   const { gl } = useThree();
   const [captured, setCaptured] = useState(false);
-  // Base radius for scale calculation (can be tweaked)
   
   useEffect(() => {
     if (captured) return;
 
-    // Small delay to ensure 3D scene is fully rendered
+    // Wait longer for mobile devices
     const timer = setTimeout(() => {
       const canvas2D = canvas2DRef.current;
       const img = imgRef.current;
       const canvas3D = gl.domElement;
       const base2DImage = base2DImageRef.current;
       
-      if (!canvas2D || !canvas3D || !img || !base2DImage) return;
+      if (!canvas2D || !canvas3D || !img || !base2DImage) {
+        console.log('Missing canvas elements');
+        return;
+      }
+
+      // Check if base2D has content
+      if (base2DImage.width === 0 || base2DImage.height === 0) {
+        console.log('Base 2D canvas not ready');
+        return;
+      }
 
       const ctx = canvas2D.getContext('2d');
       if (!ctx) return;
 
       try {
+        // Check if WebGL context is valid
+        const glContext = gl.getContext();
+        if (glContext.isContextLost()) {
+          console.error('WebGL context is lost');
+          return;
+        }
+
         // Clear the canvas
         ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
         
@@ -62,14 +77,19 @@ function CanvasCapture({
         const centerX = (tempCanvas.width / 2) + deltaX;
         const centerY = (tempCanvas.height / 2) + deltaY;
         
-        // Draw scaled 3D canvas centered on rear wheel
-        tempCtx.drawImage(
-          canvas3D,
-          centerX - scaledWidth / 2,
-          centerY - scaledHeight / 2,
-          scaledWidth,
-          scaledHeight
-        );
+        // Try to draw scaled 3D canvas centered on rear wheel
+        try {
+          tempCtx.drawImage(
+            canvas3D,
+            centerX - scaledWidth / 2,
+            centerY - scaledHeight / 2,
+            scaledWidth,
+            scaledHeight
+          );
+        } catch (drawError) {
+          console.error('Failed to draw 3D canvas:', drawError);
+          return;
+        }
 
         // Composite 3D render onto 2D canvas (on top of base content)
         ctx.drawImage(tempCanvas, 0, 0);
@@ -87,10 +107,10 @@ function CanvasCapture({
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);
       }
-    }, 500);
+    }, 1500);
 
     return () => clearTimeout(timer);
-  }, [gl, canvas2DRef, imgRef, base2DImageRef, captured]);
+  }, [gl, canvas2DRef, imgRef, base2DImageRef, captured, deltaX, deltaY, scale]);
   
   return null;
 }
