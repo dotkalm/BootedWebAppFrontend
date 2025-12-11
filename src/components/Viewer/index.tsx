@@ -6,7 +6,7 @@ import { type ViewerProps } from '@/types';
 import Model from '@/components/Model';
 import { CanvasCapture } from '@/utils';
 import { useDrawDetections } from '@/hooks';
-import ThreeJsCanvas from './components/ThreeJsCanvas';
+import ThreeJsCanvas from './components/R3FiberCanvas';
 import HiddenImage from './components/HiddenImage';
 import MainCanvas from './components/MainCanvas';
 import OffScreenCanvas from './components/OffscreenCanvas';

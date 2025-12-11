@@ -3,18 +3,18 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Box from '@mui/material/Box';
 import Model from '@/components/Model';
-import { CanvasCapture } from '@/utils';
+import { useCanvasCapture as CanvasCapture } from '@/hooks';
 import type { ThreeJsCanvasProps } from '@/types';
 
 const ThreeJsCanvas = ({
+    base2DCanvasRef,
     canvasRef,
-    imgRef,
     deltaX,
     deltaY,
-    overlayScale,
-    base2DCanvasRef,
-    objPath,
+    imgRef,
     mtlPath,
+    objPath,
+    overlayScale,
 }: ThreeJsCanvasProps) => {
     return (
         <Box
