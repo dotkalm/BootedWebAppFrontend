@@ -13,7 +13,6 @@ export default function Model({
   baseRotation = [-Math.PI / 2, 0, 0],
   scale = 1,
   showBoundingBox = true,
-  tireCenterlineAngle,
 }: ModelProps) {
 
   const materials = useLoader(
@@ -28,18 +27,18 @@ export default function Model({
     }
   );
 
-  const obj = useLoader(OBJLoader, objPath, (loader) => {
+  const obj = objPath && useLoader(OBJLoader, objPath, (loader) => {
     if (materials) {
       materials.preload();
       loader.setMaterials(materials);
     }
   });
 
-  const modelInfo = useModelProcessor(obj);
+  const modelInfo = obj && useModelProcessor(obj);
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
 
-  return (
+  return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
       <group rotation={baseRotation} position={[-13,0,0]}>

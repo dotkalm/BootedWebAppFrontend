@@ -12,7 +12,6 @@ const ThreeJsCanvas = ({
     deltaX,
     deltaY,
     overlayScale,
-    tireCenterlineAngle,
     base2DCanvasRef,
     objPath,
     mtlPath,
@@ -58,7 +57,6 @@ const ThreeJsCanvas = ({
                 scale={1}
                 rotation={[0, 1, 0]}
                 baseRotation={[-Math.PI / 2, 0, 0]}
-                tireCenterlineAngle={tireCenterlineAngle}
               />
             </Suspense>
 

@@ -1,29 +1,18 @@
 import { useEffect } from 'react';
-import { type CarDetection } from '@/types';
+import { type UseDrawDetectionsProps } from '@/types';
 
-interface UseDrawDetectionsProps {
-  imgRef: React.RefObject<HTMLImageElement | null>;
-  base2DCanvasRef: React.RefObject<HTMLCanvasElement | null>;
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  detections: CarDetection[];
-  src: string;
-  BASE_WHEEL_RADIUS_PX: number;
-  onScaleCalculated: (scale: number) => void;
-  onOffsetCalculated: (deltaX: number, deltaY: number) => void;
-  onAngleCalculated: (angle: number) => void;
-}
 
 export function useDrawDetections({
-  imgRef,
   base2DCanvasRef,
   canvasRef,
   detections,
-  src,
-  BASE_WHEEL_RADIUS_PX,
-  onScaleCalculated,
-  onOffsetCalculated,
+  imgRef,
   onAngleCalculated,
+  onOffsetCalculated,
+  onScaleCalculated,
+  src,
 }: UseDrawDetectionsProps) {
+  const BASE_WHEEL_RADIUS_PX = 100;
   useEffect(() => {
     const img = imgRef.current;
     const base2DCanvas = base2DCanvasRef.current;
