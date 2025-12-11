@@ -1,4 +1,4 @@
-import { useRef, useState, Suspense } from 'react';
+import { useRef, useState, Suspense, type RefObject } from 'react';
 import Box from '@mui/material/Box';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -6,6 +6,7 @@ import { type ViewerProps } from '@/types';
 import Model from '@/components/Model';
 import { CanvasCapture } from '@/utils';
 import { useDrawDetections } from '@/hooks';
+import ThreeJsCanvas from './components/ThreeJsCanvas';
 
 export default function Viewer({
   src,
@@ -57,7 +58,26 @@ export default function Viewer({
         }}
         style={{ display: 'none' }}
       />
-
+      {(
+        base2DCanvasRef.current &&
+        canvasRef.current &&
+        imgRef.current &&
+        mtlPath &&
+        objPath && 
+        tireCenterlineAngle
+      ) &&
+        <ThreeJsCanvas
+          canvasRef={canvasRef as RefObject<HTMLCanvasElement>}
+          imgRef={imgRef as RefObject<HTMLImageElement>}
+          base2DCanvasRef={base2DCanvasRef as RefObject<HTMLCanvasElement>}
+          deltaX={deltaX}
+          deltaY={deltaY}
+          overlayScale={overlayScale}
+          tireCenterlineAngle={tireCenterlineAngle}
+          objPath={objPath}
+          mtlPath={mtlPath}
+        />
+      }
       {/* Hidden canvas to store base 2D content */}
       <canvas
         ref={base2DCanvasRef}
