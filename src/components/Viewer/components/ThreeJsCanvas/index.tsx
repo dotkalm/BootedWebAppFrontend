@@ -38,17 +38,10 @@ const ThreeJsCanvas = ({
             }}
             style={{ background: 'transparent' }}
           >
-            {/* Grid to visualize the ground plane */}
             <gridHelper args={[20, 20, '#666666', '#444444']} />
-            
-            {/* Standard Three.js axes helper - RGB = XYZ */}
             <axesHelper args={[5]} />
-
-            {/* Lighting */}
             <ambientLight intensity={0.5} />
             <directionalLight position={[10, 10, 10]} intensity={1} />
-
-            {/* 3D Model at origin */}
             <Suspense fallback={null}>
               <Model
                 objPath={objPath}
@@ -59,8 +52,6 @@ const ThreeJsCanvas = ({
                 baseRotation={[-Math.PI / 2, 0, 0]}
               />
             </Suspense>
-
-            {/* Capture 3D canvas on each frame */}
             <CanvasCapture 
               canvas2DRef={canvasRef} 
               imgRef={imgRef} 
@@ -69,8 +60,6 @@ const ThreeJsCanvas = ({
               deltaY={deltaY}
               scale={overlayScale}
             />
-
-            {/* Camera controls */}
             <OrbitControls target={[0, 0, 0]} />
           </Canvas>
         </Box>

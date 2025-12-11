@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { type UseDrawDetectionsProps } from '@/types';
-
+import { 
+  axisLength,
+  BASE_WHEEL_RADIUS_PX,
+} from '@/constants';
 
 export function useDrawDetections({
   base2DCanvasRef,
@@ -12,22 +15,21 @@ export function useDrawDetections({
   onScaleCalculated,
   src,
 }: UseDrawDetectionsProps) {
-  const BASE_WHEEL_RADIUS_PX = 100;
   useEffect(() => {
-    const img = imgRef.current;
+    const carImage = imgRef.current;
     const base2DCanvas = base2DCanvasRef.current;
-    if (!img || !base2DCanvas) return;
+    if (!carImage || !base2DCanvas) return;
 
     const ctx = base2DCanvas.getContext('2d');
     if (!ctx) return;
 
     // Match canvas size to image
-    base2DCanvas.width = img.naturalWidth;
-    base2DCanvas.height = img.naturalHeight;
+    base2DCanvas.width = carImage.naturalWidth;
+    base2DCanvas.height = carImage.naturalHeight;
     ctx.clearRect(0, 0, base2DCanvas.width, base2DCanvas.height);
 
     // Draw the car image first
-    ctx.drawImage(img, 0, 0);
+    ctx.drawImage(carImage, 0, 0);
 
     const detection = detections[0];
     if (!detection) return;
@@ -170,31 +172,19 @@ export function useDrawDetections({
       const px = transform.position.pixel_x;
       const py = transform.position.pixel_y;
       const basis = transform.rotation.basis_vectors;
-      const axisLength = 50; // pixels
 
-      // X-axis (Red)
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(px + basis.x_axis[0] * axisLength, py + basis.x_axis[1] * axisLength);
-      ctx.strokeStyle = '#ff0000';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      const makeLines = (axis: [number, number, number], color: string) => {
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px + axis[0] * axisLength, py + axis[1] * axisLength);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      };
 
-      // Y-axis (Green)
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(px + basis.y_axis[0] * axisLength, py - basis.y_axis[1] * axisLength); // flip Y for canvas
-      ctx.strokeStyle = '#00ff00';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Z-axis (Blue)
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(px + basis.z_axis[0] * axisLength, py + basis.z_axis[1] * axisLength);
-      ctx.strokeStyle = '#0000ff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      makeLines(basis.x_axis, '#ff0000');
+      makeLines(basis.y_axis, '#00ff00');
+      makeLines(basis.z_axis, '#0000ff');
     }
 
     // Copy base 2D to main canvas initially
@@ -207,5 +197,16 @@ export function useDrawDetections({
         mainCtx.drawImage(base2DCanvas, 0, 0);
       }
     }
-  }, [src, detections, imgRef, base2DCanvasRef, canvasRef, BASE_WHEEL_RADIUS_PX, onScaleCalculated, onOffsetCalculated, onAngleCalculated]);
+  }, [
+    axisLength,
+    BASE_WHEEL_RADIUS_PX, 
+    base2DCanvasRef, 
+    canvasRef, 
+    detections, 
+    imgRef, 
+    onAngleCalculated,
+    onOffsetCalculated, 
+    onScaleCalculated, 
+    src, 
+  ]);
 }
