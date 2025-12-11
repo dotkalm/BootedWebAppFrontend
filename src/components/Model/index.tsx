@@ -44,11 +44,11 @@ export default function Model({
   return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
-      <group rotation={baseRotation} position={[-13,0,0]}>
+      <group rotation={baseRotation} position={[-13, 0, 0]}>
         {/* Lift model and bounding boxes so bottom sits at y=0 */}
         <group position={[0, verticalOffset, 0]}>
           <primitive object={obj} />
-        
+
           {/* Overall model bounding box visualization */}
           {showBoundingBox && modelInfo && (
             <>
@@ -69,7 +69,7 @@ export default function Model({
                   new THREE.Color(0xffff00)
                 ]}
               />
-              
+
               {/* Clamp mesh bounding box visualization */}
               {modelInfo.clampBoundingBox && (
                 <box3Helper

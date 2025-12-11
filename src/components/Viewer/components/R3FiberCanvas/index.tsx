@@ -3,9 +3,9 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Box from '@mui/material/Box';
 import Model from '@/components/Model';
-import type { ThreeJsCanvasProps, TCanvasCaptureProps } from '@/types';
+import type { R3FiberCanvasProps, TCanvasCaptureProps } from '@/types';
 
-const ThreeJsCanvas = ({
+const R3FiberCanvas = ({
     base2DCanvasRef,
     canvasRef,
     deltaX,
@@ -14,7 +14,7 @@ const ThreeJsCanvas = ({
     mtlPath,
     objPath,
     overlayScale,
-}: ThreeJsCanvasProps) => {
+}: R3FiberCanvasProps) => {
 
   const canvasCaptureProps: TCanvasCaptureProps = {
     base2DImageRef: base2DCanvasRef,
@@ -68,4 +68,4 @@ const ThreeJsCanvas = ({
   );
 }
 
-export default ThreeJsCanvas;
+export default R3FiberCanvas;

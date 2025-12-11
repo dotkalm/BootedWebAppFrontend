@@ -8,7 +8,7 @@ export interface ViewerProps {
   src: string;
 }
 
-export interface ThreeJsCanvasProps {
+export interface R3FiberCanvasProps {
   base2DCanvasRef: RefObject<HTMLCanvasElement>;
   canvasRef: RefObject<HTMLCanvasElement>;
   deltaX: number;
