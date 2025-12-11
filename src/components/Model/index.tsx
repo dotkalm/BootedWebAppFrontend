@@ -2,7 +2,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useModelProcessor } from '@/hooks';
+import { useModelProcessor, useCanvasCapture } from '@/hooks';
 import type { ModelProps } from '@/types';
 
 export default function Model({
@@ -13,7 +13,10 @@ export default function Model({
   baseRotation = [-Math.PI / 2, 0, 0],
   scale = 1,
   showBoundingBox = true,
+  canvasCaptureProps,
 }: ModelProps) {
+
+  useCanvasCapture(canvasCaptureProps);
 
   const materials = useLoader(
     MTLLoader,

@@ -33,3 +33,12 @@ export interface MainCanvasProps {
 export interface OffscreenCanvasProps {
   base2dCanvasRef: RefObject<HTMLCanvasElement>;
 }
+
+export interface TCanvasCaptureProps {
+  base2DImageRef: React.RefObject<HTMLCanvasElement | null>;
+  canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
+  deltaX: number;
+  deltaY: number;
+  imgRef: React.RefObject<HTMLImageElement | null>; 
+  scale: number;
+}

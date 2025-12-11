@@ -1,5 +1,8 @@
+import { type TCanvasCaptureProps } from '@/types';
+
 export interface ModelProps {
   baseRotation?: [number, number, number];
+  canvasCaptureProps: TCanvasCaptureProps;
   mtlPath?: string;
   objPath?: string;
   position?: [number, number, number];
