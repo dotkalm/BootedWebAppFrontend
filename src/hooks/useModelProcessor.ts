@@ -35,14 +35,11 @@ export function useModelProcessor(obj: THREE.Object3D | null) {
         // Identify the circular clamp mesh
         if (meshNameLower.includes('disk') || meshNameLower.includes('circle') || meshNameLower.includes('disk_out')) {
           clampMesh = child;
-          console.log('  Found clamp mesh:', child.name);
         }
 
         if (isTirePart) {
           child.visible = false;
-          console.log('  Hidden (tire part):', child.name);
         } else {
-          console.log('  Visible mesh:', child.name);
         }
 
         if (child.material) {

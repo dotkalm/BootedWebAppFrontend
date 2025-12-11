@@ -52,13 +52,6 @@ export function useDrawDetections({
       
       // Notify parent
       onScaleCalculated(scale);
-      
-      console.log('Wheel scale calculation:', {
-        wheelRadius,
-        BASE_WHEEL_RADIUS_PX,
-        scale,
-        rearWheelWidth
-      });
     }
 
     // Calculate deltaX and deltaY from image center to rear wheel (green ellipse) center
@@ -71,15 +64,6 @@ export function useDrawDetections({
       
       // Notify parent
       onOffsetCalculated(offsetX, offsetY);
-      
-      console.log('Image center to rear wheel offset:', {
-        imageCenterX,
-        imageCenterY,
-        rearWheelCenter: { x: rearX, y: rearY },
-        deltaX: offsetX,
-        deltaY: offsetY,
-        distance: Math.sqrt(offsetX * offsetX + offsetY * offsetY)
-      });
     }
 
     // Draw rear wheel ellipse (green)
@@ -153,20 +137,6 @@ export function useDrawDetections({
       ctx.fillText(`${angleDeg.toFixed(1)}°`, midX + 10, midY - 10);
     }
 
-    // Consolidated debug log
-    console.log('=== VIEWER DEBUG INFO ===', {
-      detection: {
-        rear_wheel_ellipse: detection.rear_wheel_ellipse,
-        front_wheel_ellipse: detection.front_wheel_ellipse,
-        rear_wheel_transform: detection.rear_wheel_transform,
-      },
-      canvas: {
-        width: base2DCanvas.width,
-        height: base2DCanvas.height,
-      },
-    });
-
-    // Draw basis vectors for rear wheel
     if (detection.rear_wheel_transform) {
       const transform = detection.rear_wheel_transform;
       const px = transform.position.pixel_x;

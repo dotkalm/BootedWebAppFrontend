@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import Box from '@mui/material/Box';
 import Model from '@/components/Model';
 import type { R3FiberCanvasProps, TCanvasCaptureProps } from '@/types';
@@ -62,7 +61,6 @@ const R3FiberCanvas = ({
             canvasCaptureProps={canvasCaptureProps}
           />
         </Suspense>
-        <OrbitControls target={[0, 0, 0]} />
       </Canvas>
     </Box>
   );
