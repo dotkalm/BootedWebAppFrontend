@@ -1,19 +1,11 @@
-import { useEffect, useRef, useState, Suspense } from 'react';
+import { useRef, useState, Suspense } from 'react';
 import Box from '@mui/material/Box';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { type CarDetection } from '@/types';
+import { type ViewerProps } from '@/types';
 import Model from '@/components/Model';
 import { CanvasCapture } from '@/utils';
 import { useDrawDetections } from '@/hooks';
-
-
-interface ViewerProps {
-  src: string;
-  detections?: CarDetection[];
-  objPath?: string;
-  mtlPath?: string;
-}
 
 export default function Viewer({
   src,

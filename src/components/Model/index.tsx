@@ -3,17 +3,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useModelProcessor } from '@/hooks';
-
-interface ModelProps {
-  objPath: string;
-  mtlPath?: string;
-  position?: [number, number, number];
-  rotation?: [number, number, number]; 
-  baseRotation?: [number, number, number];
-  scale?: number;
-  showBoundingBox?: boolean;
-  tireCenterlineAngle?: number | null;
-}
+import type { ModelProps } from '@/types';
 
 export default function Model({
   objPath,
@@ -90,4 +80,4 @@ export default function Model({
       </group>
     </group>
   );
-}
+};
