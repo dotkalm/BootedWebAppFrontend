@@ -37,6 +37,8 @@ const R3FiberCanvas = ({
       }}
     >
       <Canvas
+        frameloop="demand"
+        dpr={1}
         gl={{ alpha: true, preserveDrawingBuffer: true }}
         camera={{
           position: [100, 10, 100],
