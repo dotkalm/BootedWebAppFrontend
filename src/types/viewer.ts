@@ -3,8 +3,6 @@ import { type CarDetection } from '@/types';
 
 export interface ViewerProps {
   detections?: CarDetection[];
-  mtlPath?: string;
-  objPath?: string;
   src: string;
 }
 

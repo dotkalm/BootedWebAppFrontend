@@ -1,13 +1,12 @@
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import { useLoader } from '@react-three/fiber';
+import { useLoader, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useModelProcessor, useCanvasCapture } from '@/hooks';
 import type { ModelProps } from '@/types';
+import { mod } from 'three/tsl';
 
 export default function Model({
-  objPath,
-  mtlPath,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   baseRotation = [-Math.PI / 2, 0, 0],
@@ -15,6 +14,8 @@ export default function Model({
   showBoundingBox = true,
   canvasCaptureProps,
 }: ModelProps) {
+  const objPath = "/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj";
+  const mtlPath = "/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
 
   useCanvasCapture(canvasCaptureProps);
 
@@ -40,6 +41,7 @@ export default function Model({
   const modelInfo = obj && useModelProcessor(obj);
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
+  console.log(objPath, mtlPath, obj, modelInfo, showBoundingBox)
 
   return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>

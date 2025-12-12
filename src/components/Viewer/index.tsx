@@ -1,12 +1,8 @@
-import { useRef, useState, Suspense, type RefObject } from 'react';
+import { useRef, useState, type RefObject } from 'react';
 import Box from '@mui/material/Box';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import { type ViewerProps } from '@/types';
-import Model from '@/components/Model';
-import { CanvasCapture } from '@/utils';
 import { useDrawDetections } from '@/hooks';
-import ThreeJsCanvas from './components/R3FiberCanvas';
+import R3FiberCanvas from './components/R3FiberCanvas';
 import HiddenImage from './components/HiddenImage';
 import MainCanvas from './components/MainCanvas';
 import OffScreenCanvas from './components/OffscreenCanvas';
@@ -14,8 +10,6 @@ import OffScreenCanvas from './components/OffscreenCanvas';
 export default function Viewer({
   src,
   detections = [],
-  objPath,
-  mtlPath,
 }: ViewerProps) {
 
   const [deltaX, setDeltaX] = useState<number>(0);
@@ -26,9 +20,9 @@ export default function Viewer({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const handleOffsetCalculated = (x: number,y: number) => {
-      setDeltaX(x);
-      setDeltaY(y);
+  const handleOffsetCalculated = (x: number, y: number) => {
+    setDeltaX(x);
+    setDeltaY(y);
   };
 
   useDrawDetections({
@@ -48,28 +42,26 @@ export default function Viewer({
 
   return (
     <Box sx={{ position: 'relative', display: 'inline-block' }}>
-        <HiddenImage
-          canvasRef={mainCanvasRef}
-          imgRef={hiddenImageRef}
-          src={src}
-        />
-          <OffScreenCanvas
-            base2dCanvasRef={baseCanvasRef}
-          />
-          <MainCanvas
-            canvasRef={mainCanvasRef}
-          />
-          <ThreeJsCanvas
-            base2DCanvasRef={base2DCanvasRef as RefObject<HTMLCanvasElement>}
-            canvasRef={mainCanvasRef}
-            deltaX={deltaX}
-            deltaY={deltaY}
-            imgRef={hiddenImageRef}
-            mtlPath={mtlPath}
-            objPath={objPath}
-            overlayScale={overlayScale}
-            tireCenterlineAngle={tireCenterlineAngle}
-          />
+      <HiddenImage
+        canvasRef={mainCanvasRef}
+        imgRef={hiddenImageRef}
+        src={src}
+      />
+      <OffScreenCanvas
+        base2dCanvasRef={baseCanvasRef}
+      />
+      <MainCanvas
+        canvasRef={mainCanvasRef}
+      />
+      <R3FiberCanvas
+        base2DCanvasRef={base2DCanvasRef as RefObject<HTMLCanvasElement>}
+        canvasRef={mainCanvasRef}
+        deltaX={deltaX}
+        deltaY={deltaY}
+        imgRef={hiddenImageRef}
+        overlayScale={overlayScale}
+        tireCenterlineAngle={tireCenterlineAngle}
+      />
     </Box>
   );
 }

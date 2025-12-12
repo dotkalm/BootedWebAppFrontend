@@ -79,20 +79,12 @@ export default function WebcamCapture({
     setTotalCars(0);
   };
 
-  console.log('WebcamCapture render state:', { capturedFrame: !!capturedFrame, showViewer });
-
   if(capturedFrame && showViewer) {
     return (
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
         <Viewer
           src={capturedFrame}
           detections={detections}
-          mode="3d"
-          objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
-          mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
-          selectedWheel="primary"
-          setShowViewer={setShowViewer}
-          onBack={handleBack}
         />
       </Box>
     );

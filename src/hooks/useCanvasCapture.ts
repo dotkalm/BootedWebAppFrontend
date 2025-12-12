@@ -15,7 +15,6 @@ export function useCanvasCapture({
 
   useEffect(() => {
     if (captured) return;
-    console.log(base2DImageRef);
     const canvas2D = canvas2DRef.current;
     const img = imgRef.current;
     const canvas3D = gl.domElement;
