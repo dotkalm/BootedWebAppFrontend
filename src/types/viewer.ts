@@ -38,6 +38,6 @@ export interface TCanvasCaptureProps {
   deltaX: number;
   deltaY: number;
   imgRef: React.RefObject<HTMLImageElement | null>; 
+  modelLoaded: boolean;
   scale: number;
-  verticalOffset: number;
 }

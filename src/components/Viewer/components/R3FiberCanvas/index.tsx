@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Box from '@mui/material/Box';
 import Model from '@/components/Model';
@@ -15,7 +15,7 @@ const R3FiberCanvas = ({
     overlayScale,
 }: R3FiberCanvasProps) => {
 
-  const canvasCaptureProps: Omit<TCanvasCaptureProps, 'verticalOffset'> = {
+  const canvasCaptureProps: Omit<TCanvasCaptureProps, 'modelLoaded'> = {
     base2DImageRef: base2DCanvasRef,
     canvas2DRef: canvasRef,
     deltaX,
@@ -23,6 +23,30 @@ const R3FiberCanvas = ({
     imgRef,
     scale: overlayScale,
   };
+  
+  useEffect(() => {
+    console.log({
+      base2DCanvasRef,
+      canvasCaptureProps,
+      canvasRef,
+      deltaX,
+      deltaY,
+      imgRef,
+      mtlPath,
+      objPath,
+      overlayScale,
+    })
+  }, [
+    base2DCanvasRef,
+    canvasCaptureProps,
+    canvasRef,
+    deltaX,
+    deltaY,
+    imgRef,
+    mtlPath,
+    objPath,
+    overlayScale,
+  ])
 
   return (
     <Box

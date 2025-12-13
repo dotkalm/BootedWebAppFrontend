@@ -30,7 +30,10 @@ function useImageDataUrl(path: string) {
       })
       .catch(console.error);
     return () => { mounted = false; };
-  }, [path]);
+  }, [
+    path,
+    setDataUrl,
+  ]);
 
   return dataUrl;
 }
@@ -57,8 +60,6 @@ export const With3DModel = () => {
     <Viewer
       src={dataUrl}
       detections={oneDetection.detections}
-      objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
-      mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
     />
   );
 };
@@ -71,8 +72,6 @@ export const With3DModelTwo = () => {
     <Viewer
       src={dataUrl}
       detections={twoDetection.detections}
-      objPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj"
-      mtlPath="/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
     />
   );
 };

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { useLoader } from '@react-three/fiber';
@@ -14,20 +15,19 @@ export default function Model({
   showBoundingBox = true,
   canvasCaptureProps,
 }: ModelProps) {
+  const [ modelLoaded, setModelLoaded ] = useState<boolean>(false);
 
   const materials = useLoader(
     MTLLoader,
-    mtlPath || '',
+    mtlPath,
     (loader) => {
-      if (mtlPath) {
-        const basePath = mtlPath.substring(0, mtlPath.lastIndexOf('/') + 1);
-        loader.setResourcePath(basePath);
-        loader.setMaterialOptions({ side: THREE.DoubleSide });
-      }
+      const basePath = mtlPath.substring(0, mtlPath.lastIndexOf('/') + 1);
+      loader.setResourcePath(basePath);
+      loader.setMaterialOptions({ side: THREE.DoubleSide });
     }
   );
 
-  const obj = objPath && useLoader(OBJLoader, objPath, (loader) => {
+  const obj = useLoader(OBJLoader, objPath, (loader) => {
     if (materials) {
       materials.preload();
       loader.setMaterials(materials);
@@ -37,7 +37,10 @@ export default function Model({
   const modelInfo = obj && useModelProcessor(obj);
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
-  useCanvasCapture({ ...canvasCaptureProps, verticalOffset});
+  useEffect(() => { 
+    modelInfo && setModelLoaded(true);
+  }, [ modelInfo ])
+  useCanvasCapture({ ...canvasCaptureProps, modelLoaded });
 
   return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>

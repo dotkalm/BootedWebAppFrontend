@@ -3,13 +3,13 @@ import { useThree } from '@react-three/fiber';
 import { type TCanvasCaptureProps } from '@/types';
 
 export function useCanvasCapture({
-  canvas2DRef, 
-  imgRef,
   base2DImageRef,
+  canvas2DRef, 
   deltaX,
   deltaY,
+  imgRef,
+  modelLoaded,
   scale,
-  verticalOffset,
 }: TCanvasCaptureProps){
   const { gl } = useThree();
   const [captured, setCaptured] = useState(false);
@@ -96,7 +96,7 @@ export function useCanvasCapture({
         console.error('Error capturing 3D canvas:', error);
       }
     }
-    setTimeout(renderModel, 500)
+    modelLoaded && renderModel();
   }, [
     base2DImageRef,
     canvas2DRef,
@@ -105,6 +105,7 @@ export function useCanvasCapture({
     deltaY,
     gl,
     imgRef,
+    modelLoaded,
     scale,
     setCaptured,
   ]);
