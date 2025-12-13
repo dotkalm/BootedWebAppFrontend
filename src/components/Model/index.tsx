@@ -1,10 +1,10 @@
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import { useLoader, useThree } from '@react-three/fiber';
+import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useModelProcessor, useCanvasCapture } from '@/hooks';
+import { useModelProcessor, useCanvasCapture, } from '@/hooks';
+import { basePosition, mtlPath, objPath } from '@/constants';
 import type { ModelProps } from '@/types';
-import { mod } from 'three/tsl';
 
 export default function Model({
   position = [0, 0, 0],
@@ -14,10 +14,6 @@ export default function Model({
   showBoundingBox = true,
   canvasCaptureProps,
 }: ModelProps) {
-  const objPath = "/models/tire-boot/Security_Tire_Claw_Boot_max_convert.obj";
-  const mtlPath = "/models/tire-boot/Security_Tire_Claw_Boot_max_convert.mtl"
-
-  useCanvasCapture(canvasCaptureProps);
 
   const materials = useLoader(
     MTLLoader,
@@ -41,12 +37,12 @@ export default function Model({
   const modelInfo = obj && useModelProcessor(obj);
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
-  console.log(objPath, mtlPath, obj, modelInfo, showBoundingBox)
+  useCanvasCapture({ ...canvasCaptureProps, verticalOffset});
 
   return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
-      <group rotation={baseRotation} position={[-13, 0, 0]}>
+      <group rotation={baseRotation} position={basePosition}>
         {/* Lift model and bounding boxes so bottom sits at y=0 */}
         <group position={[0, verticalOffset, 0]}>
           <primitive object={obj} />

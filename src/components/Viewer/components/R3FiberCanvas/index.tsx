@@ -15,7 +15,7 @@ const R3FiberCanvas = ({
     overlayScale,
 }: R3FiberCanvasProps) => {
 
-  const canvasCaptureProps: TCanvasCaptureProps = {
+  const canvasCaptureProps: Omit<TCanvasCaptureProps, 'verticalOffset'> = {
     base2DImageRef: base2DCanvasRef,
     canvas2DRef: canvasRef,
     deltaX,
@@ -37,7 +37,6 @@ const R3FiberCanvas = ({
       }}
     >
       <Canvas
-        frameloop="demand"
         dpr={1}
         gl={{ alpha: true, preserveDrawingBuffer: true }}
         camera={{
