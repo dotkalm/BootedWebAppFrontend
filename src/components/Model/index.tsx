@@ -12,7 +12,6 @@ export default function Model({
   rotation = [0, 0, 0],
   baseRotation = [-Math.PI / 2, 0, 0],
   scale = 1,
-  showBoundingBox = true,
   canvasCaptureProps,
 }: ModelProps) {
   const [ modelLoaded, setModelLoaded ] = useState<boolean>(false);
@@ -37,9 +36,11 @@ export default function Model({
   const modelInfo = obj && useModelProcessor(obj);
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
+
   useEffect(() => { 
     modelInfo && setModelLoaded(true);
-  }, [ modelInfo ])
+  }, [ modelInfo, modelLoaded ]);
+
   useCanvasCapture({ ...canvasCaptureProps, modelLoaded });
 
   return !obj ? null : (
@@ -51,7 +52,7 @@ export default function Model({
           <primitive object={obj} />
 
           {/* Overall model bounding box visualization */}
-          {showBoundingBox && modelInfo && (
+          {modelInfo && modelLoaded && (
             <>
               <box3Helper
                 args={[

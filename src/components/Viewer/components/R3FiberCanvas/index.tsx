@@ -24,30 +24,6 @@ const R3FiberCanvas = ({
     scale: overlayScale,
   };
   
-  useEffect(() => {
-    console.log({
-      base2DCanvasRef,
-      canvasCaptureProps,
-      canvasRef,
-      deltaX,
-      deltaY,
-      imgRef,
-      mtlPath,
-      objPath,
-      overlayScale,
-    })
-  }, [
-    base2DCanvasRef,
-    canvasCaptureProps,
-    canvasRef,
-    deltaX,
-    deltaY,
-    imgRef,
-    mtlPath,
-    objPath,
-    overlayScale,
-  ])
-
   return (
     <Box
       sx={{
@@ -70,6 +46,7 @@ const R3FiberCanvas = ({
           far: 1000,
         }}
         style={{ background: 'transparent' }}
+        frameloop="demand"
       >
         <gridHelper args={[20, 20, '#666666', '#444444']} />
         <axesHelper args={[5]} />

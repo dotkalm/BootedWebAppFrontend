@@ -81,22 +81,13 @@ export function useCanvasCapture({
 
         // Composite 3D render onto 2D canvas (on top of base content)
         ctx.drawImage(tempCanvas, 0, 0);
-
         setCaptured(true);
-        console.log('3D canvas captured and composited:', {
-          deltaX,
-          deltaY,
-          scale,
-          scaledWidth,
-          scaledHeight,
-          centerX,
-          centerY,
-        });
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);
       }
     }
-    modelLoaded && renderModel();
+    // modelLoaded && renderModel();
+    modelLoaded && setTimeout(renderModel, 1500);
   }, [
     base2DImageRef,
     canvas2DRef,
