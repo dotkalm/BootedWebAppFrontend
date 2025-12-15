@@ -10,8 +10,9 @@ export function useCanvasCapture({
   imgRef,
   modelLoaded,
   scale,
-}: TCanvasCaptureProps): {invalidate: RootState['invalidate']} {
-  const { gl, invalidate } = useThree();
+  verticalOffset,
+}: TCanvasCaptureProps) {
+  const { gl } = useThree();
   const [captured, setCaptured] = useState(false);
 
   useEffect(() => {
@@ -77,7 +78,8 @@ export function useCanvasCapture({
         console.error('Error capturing 3D canvas:', error);
       }
     }
-    modelLoaded && setTimeout(renderModel, 1500);
+    modelLoaded && renderModel();
+    // setTimeout(renderModel, 300);
   }, [
     base2DImageRef,
     canvas2DRef,
@@ -89,7 +91,11 @@ export function useCanvasCapture({
     modelLoaded,
     scale,
     setCaptured,
+    verticalOffset,
   ]);
-  
-  return { invalidate };
+
+  return {
+    captured,
+    setCaptured,
+  };
 }

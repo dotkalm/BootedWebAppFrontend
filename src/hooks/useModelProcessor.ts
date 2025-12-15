@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
+import type { ModelInfo } from '@/types';
 
-interface ModelInfo {
-  originalCenter: THREE.Vector3;
-  originalSize: THREE.Vector3;
-  originalMin: THREE.Vector3;
-  originalMax: THREE.Vector3;
-  meshNames: string[];
-  clampBoundingBox?: THREE.Box3;
-}
-
-export function useModelProcessor(obj: THREE.Object3D | null) {
+export function useModelProcessor(obj: THREE.Object3D | null): ModelInfo | undefined{
   const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
 
   useEffect(() => {
@@ -61,8 +53,6 @@ export function useModelProcessor(obj: THREE.Object3D | null) {
     let clampBox: THREE.Box3 | undefined;
     if (clampMesh) {
       clampBox = new THREE.Box3().setFromObject(clampMesh);
-      const clampCenter = clampBox.getCenter(new THREE.Vector3());
-      const clampSize = clampBox.getSize(new THREE.Vector3());
     }
 
     setModelInfo({
@@ -75,5 +65,5 @@ export function useModelProcessor(obj: THREE.Object3D | null) {
     });
   }, [obj]);
 
-  return modelInfo;
+  if(modelInfo) return modelInfo;
 }

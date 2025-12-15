@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import { useLoader } from '@react-three/fiber';
+import { useLoader, addTail } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useModelProcessor, useCanvasCapture, } from '@/hooks';
-import { basePosition, mtlPath, objPath } from '@/constants';
+import { 
+  useCanvasCapture,
+  useModelProcessor,
+} from '@/hooks';
+import { 
+  basePosition,
+  mtlPath,
+  objPath,
+} from '@/constants';
 import type { ModelProps } from '@/types';
 
 export default function Model({
@@ -33,20 +40,24 @@ export default function Model({
     }
   });
 
-  const modelInfo = obj && useModelProcessor(obj);
+  const modelInfo = useModelProcessor(obj);
 
-  const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
+  const verticalOffset = modelInfo?.originalSize?.y ? modelInfo?.originalSize?.y / 2 : 0;
 
-  const { invalidate } = useCanvasCapture({ ...canvasCaptureProps, modelLoaded });
 
-  useEffect(() => { 
-    if (modelInfo && !modelLoaded) {
-      invalidate();
+  useEffect(() => {
+    if (!modelLoaded && modelInfo) {
       setModelLoaded(true);
     }
-  }, [ modelInfo, modelLoaded ]);
+  }, [ 
+    modelInfo, 
+    modelLoaded, 
+    setModelLoaded,
+  ]);
 
-  return !obj ? null : (
+  useCanvasCapture({ ...canvasCaptureProps, modelLoaded, verticalOffset });
+
+  return (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Inner group applies base rotation to normalize model orientation */}
       <group rotation={baseRotation} position={basePosition}>

@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import { type CarDetection } from '@/types';
+import { invalidate } from '@react-three/fiber';
 
 export interface ViewerProps {
   detections?: CarDetection[];
@@ -38,4 +39,6 @@ export interface TCanvasCaptureProps {
   imgRef: React.RefObject<HTMLImageElement | null>; 
   modelLoaded: boolean;
   scale: number;
+  verticalOffset?: number;
+  invalidatedOnce?: boolean;
 }
