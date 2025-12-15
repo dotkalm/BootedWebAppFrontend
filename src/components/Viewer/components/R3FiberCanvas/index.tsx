@@ -44,7 +44,6 @@ const R3FiberCanvas = ({
           position: [100, 10, 100],
         }}
         style={{ background: 'transparent' }}
-        frameloop="demand"
       >
         <gridHelper args={[20, 20, '#666666', '#444444']} />
         <axesHelper args={[5]} />

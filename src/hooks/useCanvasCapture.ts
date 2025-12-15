@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useThree, type RootState } from '@react-three/fiber';
+import { useThree, useFrame } from '@react-three/fiber';
 import { type TCanvasCaptureProps } from '@/types';
 
 export function useCanvasCapture({
@@ -12,13 +12,19 @@ export function useCanvasCapture({
   scale,
   verticalOffset,
 }: TCanvasCaptureProps) {
-  const { gl } = useThree();
+  const { gl, scene, camera } = useThree();
   const [captured, setCaptured] = useState(false);
+  const [readyToCapture, setReadyToCapture] = useState(false);
 
   useEffect(() => {
-    const renderModel = () => {
-      if (captured) return;
+    if (modelLoaded && !readyToCapture) {
+      setReadyToCapture(true);
+    }
+  }, [modelLoaded, readyToCapture]);
 
+  useFrame(() => {
+    const renderModel = () => {
+      if (!readyToCapture || captured) return;
       const base2DImage = base2DImageRef.current;
       const canvas2D = canvas2DRef.current;
       const canvas3D = gl.domElement;
@@ -43,6 +49,8 @@ export function useCanvasCapture({
           console.error('WebGL context is lost');
           return;
         }
+
+        gl.render(scene, camera);
 
         ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
         ctx.drawImage(base2DImage, 0, 0);
@@ -78,21 +86,9 @@ export function useCanvasCapture({
         console.error('Error capturing 3D canvas:', error);
       }
     }
-    modelLoaded && renderModel();
+    renderModel();
     // setTimeout(renderModel, 300);
-  }, [
-    base2DImageRef,
-    canvas2DRef,
-    captured,
-    deltaX,
-    deltaY,
-    gl,
-    imgRef,
-    modelLoaded,
-    scale,
-    setCaptured,
-    verticalOffset,
-  ]);
+  });
 
   return {
     captured,
