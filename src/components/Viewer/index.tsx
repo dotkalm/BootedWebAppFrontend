@@ -1,4 +1,4 @@
-import { useRef, useState, type RefObject } from 'react';
+import { useRef, type RefObject } from 'react';
 import Box from '@mui/material/Box';
 import { type ViewerProps } from '@/types';
 import { useDrawDetections } from '@/hooks';
