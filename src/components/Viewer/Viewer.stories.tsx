@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Meta } from '@storybook/react';
 import Viewer from './index';
 import { 
+  fixtureFromScreenshot,
   oneDetection,
   twoDetection,
 } from '../../../__tests__/fixtures/one_detection';
@@ -71,6 +72,18 @@ export const With3DModelTwo = () => {
     <Viewer
       src={dataUrl}
       detections={twoDetection.detections}
+    />
+  );
+};
+
+export const With3DModelFromScreenshot = () => {
+  const dataUrl = useImageDataUrl('/fixture_from_screenshot.jpg');
+  if (!dataUrl) return <div>Loading…</div>;
+
+  return (
+    <Viewer
+      src={dataUrl}
+      detections={fixtureFromScreenshot.detections}
     />
   );
 };
