@@ -12,8 +12,6 @@ export interface R3FiberCanvasProps {
   deltaX: number;
   deltaY: number;
   imgRef: RefObject<HTMLImageElement>;
-  mtlPath?: string;
-  objPath?: string;
   overlayScale: number;
   tireCenterlineAngle?: number;
 }

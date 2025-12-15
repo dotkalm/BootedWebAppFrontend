@@ -12,5 +12,4 @@ export interface TUseDetectionsReturn {
   deltaX: number;
   deltaY: number;
   overlayScale: number;
-  tireCenterLineAngle: number;
 }

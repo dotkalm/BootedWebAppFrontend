@@ -37,11 +37,14 @@ export default function Model({
 
   const verticalOffset = modelInfo ? modelInfo.originalSize.y / 2 : 0;
 
-  useEffect(() => { 
-    modelInfo && setModelLoaded(true);
-  }, [ modelInfo, modelLoaded ]);
+  const { invalidate } = useCanvasCapture({ ...canvasCaptureProps, modelLoaded });
 
-  useCanvasCapture({ ...canvasCaptureProps, modelLoaded });
+  useEffect(() => { 
+    if (modelInfo && !modelLoaded) {
+      invalidate();
+      setModelLoaded(true);
+    }
+  }, [ modelInfo, modelLoaded ]);
 
   return !obj ? null : (
     <group position={position} rotation={rotation} scale={scale}>

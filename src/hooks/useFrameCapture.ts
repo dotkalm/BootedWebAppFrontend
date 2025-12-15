@@ -61,19 +61,14 @@ export function useFrameCapture({
                 method: 'POST',
                 body: formData,
             });
-            console.log('Upload response status:', response);
 
             if (!response.ok) {
                 throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
             }
 
             const result = await response.json();
-            console.log('Frame uploaded successfully:', result);
-
             setLastCaptureTime(new Date());
-
-            // Clean up temporary canvas
-            canvas.remove();
+            canvas.remove(); // Clean up temporary canvas
 
             return result;
 

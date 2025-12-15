@@ -10,8 +10,6 @@ const R3FiberCanvas = ({
     deltaX,
     deltaY,
     imgRef,
-    mtlPath,
-    objPath,
     overlayScale,
 }: R3FiberCanvasProps) => {
 
@@ -27,23 +25,23 @@ const R3FiberCanvas = ({
   return (
     <Box
       sx={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        width: '100%',
         height: '100%',
-        visibility: 'hidden',
+        left: 0,
         pointerEvents: 'none',
+        position: 'absolute',
+        top: 0,
+        visibility: 'hidden',
+        width: '100%',
       }}
     >
       <Canvas
         dpr={1}
         gl={{ alpha: true, preserveDrawingBuffer: true }}
         camera={{
-          position: [100, 10, 100],
+          far: 1000,
           fov: 50,
           near: 0.1,
-          far: 1000,
+          position: [100, 10, 100],
         }}
         style={{ background: 'transparent' }}
         frameloop="demand"
@@ -54,13 +52,11 @@ const R3FiberCanvas = ({
         <directionalLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>
           <Model
-            objPath={objPath}
-            mtlPath={mtlPath}
-            position={[0, 0, 0]}
-            scale={1}
-            rotation={[0, 1, 0]}
             baseRotation={[-Math.PI / 2, 0, 0]}
             canvasCaptureProps={canvasCaptureProps}
+            position={[0, 0, 0]}
+            rotation={[0, 1, 0]}
+            scale={1}
           />
         </Suspense>
       </Canvas>

@@ -5,9 +5,9 @@ const MainCanvas = ({ canvasRef }: MainCanvasProps) => (
         ref={canvasRef}
         style={{
             display: 'block',
+            height: 'auto',
             maxWidth: '100%',
             width: '100%',
-            height: 'auto',
         }}
     />
 );

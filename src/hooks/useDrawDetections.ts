@@ -68,8 +68,8 @@ export function useDrawDetections({
       offsetX = rearX - imageCenterX;
       offsetY = rearY - imageCenterY;
       
-      // Notify parent
-      handleOffsetCalculated(offsetX, offsetY);
+      setDeltaX(offsetX);
+      setDeltaY(offsetY);
     }
 
     // Draw rear wheel ellipse (green)
@@ -172,17 +172,18 @@ export function useDrawDetections({
     }
   }, [
     axisLength,
-    BASE_WHEEL_RADIUS_PX, 
-    base2DCanvasRef, 
-    canvasRef, 
-    detections, 
-    imgRef, 
-    src, 
+    BASE_WHEEL_RADIUS_PX,
+    base2DCanvasRef,
+    canvasRef,
+    detections,
+    imgRef,
+    src,
+    tireCenterLineAngle,
+    setTireCenterlineAngle,
   ]);
   return {
     deltaX,
     deltaY,
     overlayScale,
-    tireCenterLineAngle,
   }
 }

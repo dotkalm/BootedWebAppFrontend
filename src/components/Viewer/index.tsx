@@ -20,7 +20,6 @@ export default function Viewer({
     deltaX,
     deltaY,
     overlayScale,
-    tireCenterLineAngle,
   } = useDrawDetections({
     base2DCanvasRef,
     canvasRef,
@@ -53,7 +52,6 @@ export default function Viewer({
         deltaY={deltaY}
         imgRef={hiddenImageRef}
         overlayScale={overlayScale}
-        tireCenterlineAngle={tireCenterLineAngle}
       />
     </Box>
   );
