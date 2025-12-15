@@ -12,27 +12,20 @@ export default function Viewer({
   detections = [],
 }: ViewerProps) {
 
-  const [deltaX, setDeltaX] = useState<number>(0);
-  const [deltaY, setDeltaY] = useState<number>(0);
-  const [overlayScale, setOverlayScale] = useState<number>(1);
-  const [tireCenterlineAngle, setTireCenterlineAngle] = useState<number>();
   const base2DCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const handleOffsetCalculated = (x: number, y: number) => {
-    setDeltaX(x);
-    setDeltaY(y);
-  };
-
-  useDrawDetections({
+  const {
+    deltaX,
+    deltaY,
+    overlayScale,
+    tireCenterLineAngle,
+  } = useDrawDetections({
     base2DCanvasRef,
     canvasRef,
     detections,
     imgRef,
-    onAngleCalculated: setTireCenterlineAngle,
-    onOffsetCalculated: handleOffsetCalculated,
-    onScaleCalculated: setOverlayScale,
     src,
   });
 
@@ -60,7 +53,7 @@ export default function Viewer({
         deltaY={deltaY}
         imgRef={hiddenImageRef}
         overlayScale={overlayScale}
-        tireCenterlineAngle={tireCenterlineAngle}
+        tireCenterlineAngle={tireCenterLineAngle}
       />
     </Box>
   );

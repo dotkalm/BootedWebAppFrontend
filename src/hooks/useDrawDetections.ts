@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { type UseDrawDetectionsProps } from '@/types';
+import { useEffect, useState, } from 'react';
+import { type TUseDetectionsReturn, type UseDrawDetectionsProps } from '@/types';
 import { 
   axisLength,
   BASE_WHEEL_RADIUS_PX,
@@ -10,12 +10,18 @@ export function useDrawDetections({
   canvasRef,
   detections,
   imgRef,
-  onAngleCalculated,
-  onOffsetCalculated,
-  onScaleCalculated,
   src,
-}: UseDrawDetectionsProps) {
+}: UseDrawDetectionsProps): TUseDetectionsReturn {
+  const [deltaX, setDeltaX] = useState<number>(0);
+  const [deltaY, setDeltaY] = useState<number>(0);
+  const [overlayScale, setOverlayScale] = useState<number>(1);
+  const [tireCenterLineAngle, setTireCenterlineAngle] = useState<number>(180);
+
   useEffect(() => {
+    const handleOffsetCalculated = (x: number, y: number) => {
+      setDeltaX(x);
+      setDeltaY(y);
+    };
     const carImage = imgRef.current;
     const base2DCanvas = base2DCanvasRef.current;
     if (!carImage || !base2DCanvas) return;
@@ -51,7 +57,7 @@ export function useDrawDetections({
       scale = wheelRadius / BASE_WHEEL_RADIUS_PX;
       
       // Notify parent
-      onScaleCalculated(scale);
+      setOverlayScale(scale);
     }
 
     // Calculate deltaX and deltaY from image center to rear wheel (green ellipse) center
@@ -63,7 +69,7 @@ export function useDrawDetections({
       offsetY = rearY - imageCenterY;
       
       // Notify parent
-      onOffsetCalculated(offsetX, offsetY);
+      handleOffsetCalculated(offsetX, offsetY);
     }
 
     // Draw rear wheel ellipse (green)
@@ -111,15 +117,12 @@ export function useDrawDetections({
       const [rearX, rearY] = detection.rear_wheel_ellipse.center;
       const [frontX, frontY] = detection.front_wheel_ellipse.center;
 
-      // Calculate angle of line from rear to front wheel
-      // atan2(dy, dx) gives angle in radians from positive x-axis
       const dx = frontX - rearX;
       const dy = frontY - rearY;
       const angleRad = Math.atan2(dy, dx);
       const angleDeg = (angleRad * 180) / Math.PI;
 
-      // Notify parent
-      onAngleCalculated(angleRad);
+      setTireCenterlineAngle(angleRad);
 
       // Draw line between centers
       ctx.beginPath();
@@ -174,9 +177,12 @@ export function useDrawDetections({
     canvasRef, 
     detections, 
     imgRef, 
-    onAngleCalculated,
-    onOffsetCalculated, 
-    onScaleCalculated, 
     src, 
   ]);
+  return {
+    deltaX,
+    deltaY,
+    overlayScale,
+    tireCenterLineAngle,
+  }
 }

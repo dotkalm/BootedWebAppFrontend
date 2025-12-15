@@ -7,7 +7,6 @@ import Controls from '@/components/Controls';
 import Viewer from '@/components/Viewer';
 import {
   useFrameCapture,
-  useMounted,
   useOrientation,
   useWebcam,
 } from '@/hooks';
@@ -31,10 +30,17 @@ export default function WebcamCapture({
 
   const isApplyingZoomRef = useRef(false);
 
-  const mounted = useMounted();
   const { orientation, isLandscape } = useOrientation();
   const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
-  const { captureFrame, isUploading, error: captureError } = useFrameCapture({ height, videoRef, width });
+  const { 
+    captureFrame, 
+    isUploading, 
+    error: captureError,
+  } = useFrameCapture({ 
+    height, 
+    videoRef, 
+    width,
+  });
 
 
   const handleSliderChange = (_: Event, value: unknown) => {
@@ -46,7 +52,6 @@ export default function WebcamCapture({
   };
 
   const handleClick = async () => {
-    // Capture a data URL locally so we can display immediately in Viewer
     if (videoRef.current) {
       try {
         const tempCanvas = document.createElement('canvas');

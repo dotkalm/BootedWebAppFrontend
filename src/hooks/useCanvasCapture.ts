@@ -86,7 +86,6 @@ export function useCanvasCapture({
         console.error('Error capturing 3D canvas:', error);
       }
     }
-    // modelLoaded && renderModel();
     modelLoaded && setTimeout(renderModel, 1500);
   }, [
     base2DImageRef,

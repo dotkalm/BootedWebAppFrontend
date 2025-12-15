@@ -5,8 +5,12 @@ export interface UseDrawDetectionsProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   detections: CarDetection[];
   imgRef: React.RefObject<HTMLImageElement | null>;
-  onAngleCalculated: (angle: number) => void;
-  onOffsetCalculated: (deltaX: number, deltaY: number) => void;
-  onScaleCalculated: (scale: number) => void;
   src: string;
+};
+
+export interface TUseDetectionsReturn {
+  deltaX: number;
+  deltaY: number;
+  overlayScale: number;
+  tireCenterLineAngle: number;
 }

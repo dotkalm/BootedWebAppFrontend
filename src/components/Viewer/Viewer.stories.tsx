@@ -38,7 +38,6 @@ function useImageDataUrl(path: string) {
   return dataUrl;
 }
 
-// 2D only - image with ellipses and basis vectors
 export const TwoD = () => {
   const dataUrl = useImageDataUrl('/output_image_no_ext.jpg');
   if (!dataUrl) return <div>Loading…</div>;
