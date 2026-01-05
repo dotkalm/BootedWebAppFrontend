@@ -14,7 +14,7 @@ export interface R3FiberCanvasProps {
   deltaY: number;
   imgRef: RefObject<HTMLImageElement>;
   overlayScale: number;
-  tireCenterlineAngle?: number;
+  tireCenterLineAngle: number;
 }
 
 export interface HiddenImageProps {

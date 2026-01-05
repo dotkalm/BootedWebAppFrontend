@@ -11,6 +11,7 @@ const R3FiberCanvas = ({
     deltaY,
     imgRef,
     overlayScale,
+    tireCenterLineAngle,
 }: R3FiberCanvasProps) => {
 
   const canvasCaptureProps: Omit<TCanvasCaptureProps, 'modelLoaded'> = {
@@ -51,10 +52,10 @@ const R3FiberCanvas = ({
         <directionalLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>
           <Model
-            baseRotation={[-Math.PI / 2, .03, 0]}
+            baseRotation={[-Math.PI / 2, 0, 0]}
             canvasCaptureProps={canvasCaptureProps}
             position={[3, -5, 0]}
-            rotation={[0, 1, 0]}
+            rotation={[0, .6, -tireCenterLineAngle]}
             scale={.5}
           />
         </Suspense>

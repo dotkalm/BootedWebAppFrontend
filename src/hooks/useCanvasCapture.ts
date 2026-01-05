@@ -68,13 +68,17 @@ export function useCanvasCapture({
         const centerY = (tempCanvas.height / 2) + deltaY;
 
         try {
+          tempCtx.save();
+          tempCtx.translate(centerX, centerY);
+          tempCtx.rotate(Math.PI);
           tempCtx.drawImage(
             canvas3D,
-            centerX - scaledWidth / 2,
-            centerY - scaledHeight / 2,
+            -scaledWidth / 2,
+            -scaledHeight / 2,
             scaledWidth,
             scaledHeight
           );
+          tempCtx.restore();
         } catch (drawError) {
           console.error('Failed to draw 3D canvas:', drawError);
           return;

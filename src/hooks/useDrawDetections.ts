@@ -184,6 +184,5 @@ export function useDrawDetections({
   return {
     deltaX,
     deltaY,
-    overlayScale,
-  }
+    overlayScale,    tireCenterLineAngle,  }
 }
