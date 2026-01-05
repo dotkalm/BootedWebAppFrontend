@@ -17,6 +17,7 @@ export const styles = {
         },
         width: '100vw',
         height: '100vh',
+        overflow: 'hidden',
     },
     webcam: {
         display: 'flex',
@@ -29,11 +30,10 @@ export const styles = {
             xs: 'flex-start',
             sm: 'center'
         },
-        gap: {
-            xs: 2,
-            sm: 4
-        },
+        padding: 0,
         position: 'relative',
+        height: '100vh',
+        width: '100vw',
     },
     containerNoCanvas: {
         position: 'relative',

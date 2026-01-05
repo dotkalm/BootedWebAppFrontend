@@ -27,10 +27,10 @@ export default function RootLayout({
         style={{
           margin: 0,
           padding: 0,
-          minHeight: '100vh',
+          height: '100vh',
+          overflow: 'hidden',
           overscrollBehaviorY: 'none',
           overscrollBehavior: 'none',
-          overflowY: 'auto',
         }}
       >
         {children}

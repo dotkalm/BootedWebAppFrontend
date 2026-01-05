@@ -103,7 +103,7 @@ export default function WebcamCapture({
       <Paper elevation={3} sx={styles.webcam}>
         <Box sx={styles.container}>
           <Box sx={{
-            width: '100dvw',
+            width: '100%',
             height: 'calc(100vh - 350px)',
             borderRadius: 1,
             border: '4px solid #fff',
@@ -140,45 +140,53 @@ export default function WebcamCapture({
               />
             )}
           </Box>
-          
-          {(capturedFrame && showViewer) && (
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 2,
-            }}>
-              <Button
-                variant="contained"
-                onClick={handleBack}
+        </Box>
+        {!(capturedFrame && showViewer) ? (
+          <Controls
+            detections={detections}
+            handleClick={handleClick}
+            handleSliderChange={handleSliderChange}
+            handleSliderChangeCommitted={handleSliderChangeCommitted}
+            isLandscape={isLandscape}
+            isUploading={isUploading}
+            maxZoom={maxZoom}
+            orientation={orientation}
+            totalCars={totalCars}
+            zoomLevel={zoomLevel}
+            captureError={captureError}
+          />
+        ) : (
+          <Box sx={styles.zoomInfoContainer}>
+            <Box sx={styles.shutterContainer} />
+            <Box sx={styles.shutterContainer}>
+              <Box
                 sx={{
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
                   backgroundColor: '#1976d2',
+                  borderColor: '#0d47a1',
+                  borderWidth: '2px',
+                  borderStyle: 'solid',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  color: 'white',
+                  fontWeight: 'bold',
                   '&:hover': {
                     backgroundColor: '#1565c0',
                   },
-                  padding: '12px 24px',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
                 }}
+                onClick={handleBack}
               >
-                ← Back to Camera
-              </Button>
+                ←
+              </Box>
             </Box>
-          )}
-        </Box>
-        <Controls
-          detections={detections}
-          handleClick={handleClick}
-          handleSliderChange={handleSliderChange}
-          handleSliderChangeCommitted={handleSliderChangeCommitted}
-          isLandscape={isLandscape}
-          isUploading={isUploading}
-          maxZoom={maxZoom}
-          orientation={orientation}
-          totalCars={totalCars}
-          zoomLevel={zoomLevel}
-          captureError={captureError}
-        />
+            <Box sx={styles.shutterContainer} />
+          </Box>
+        )}
       </Paper>
     </Box>
   );
