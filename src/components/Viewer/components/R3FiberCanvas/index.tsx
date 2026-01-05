@@ -55,7 +55,7 @@ const R3FiberCanvas = ({
             canvasCaptureProps={canvasCaptureProps}
             position={[3, -5, 0]}
             rotation={[0, 1, 0]}
-            scale={1}
+            scale={.5}
           />
         </Suspense>
       </Canvas>

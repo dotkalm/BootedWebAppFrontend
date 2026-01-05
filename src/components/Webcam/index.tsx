@@ -111,6 +111,7 @@ export default function WebcamCapture({
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
+            overflow: 'visible',
           }}>
 
             {(capturedFrame && showLoader && showViewer) && (

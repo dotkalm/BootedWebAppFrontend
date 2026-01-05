@@ -39,7 +39,7 @@ export default function Viewer({
       borderRadius: '16px',
       border: '4px solid',
       borderColor: 'white',
-      overflow: 'hidden',
+      overflow: 'visible',
       maxWidth: '100%',
       maxHeight: {
         xs: 'calc(100vh - 350px)',
