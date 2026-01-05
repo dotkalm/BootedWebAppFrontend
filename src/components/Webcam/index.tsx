@@ -1,7 +1,9 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 
 import Controls from '@/components/Controls';
 import Viewer from '@/components/Viewer';
@@ -27,6 +29,7 @@ export default function WebcamCapture({
   const [zoomLevel, setZoomLevel] = useState(1);
   const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
   const [showViewer, setShowViewer] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   const isApplyingZoomRef = useRef(false);
 
@@ -42,6 +45,13 @@ export default function WebcamCapture({
     width,
   });
 
+  useEffect(() => {
+    if (captureError) {
+      setShowLoader(false);
+    }
+  }, [captureError]);
+
+
 
   const handleSliderChange = (_: Event, value: unknown) => {
     setZoomLevel(value as number);
@@ -52,6 +62,7 @@ export default function WebcamCapture({
   };
 
   const handleClick = async () => {
+    setShowLoader(true);
     if (videoRef.current) {
       try {
         const tempCanvas = document.createElement('canvas');
@@ -63,10 +74,13 @@ export default function WebcamCapture({
           const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
           setCapturedFrame(dataUrl);
           setShowViewer(true);
+          setShowLoader(false);
         }
       } catch (err) {
         console.error('Local capture failed', err);
       }
+    }else{
+      setShowLoader(false);
     }
 
     const response = await captureFrame();
@@ -84,32 +98,76 @@ export default function WebcamCapture({
     setTotalCars(0);
   };
 
-  if(capturedFrame && showViewer) {
-    return (
-      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-        <Viewer
-          src={capturedFrame}
-          detections={detections}
-        />
-      </Box>
-    );
-  }
-
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
         <Box sx={styles.container}>
-          <Box
-            component="video"
-            ref={videoRef}
-            playsInline
-            muted
-            autoPlay
-            sx={styles.video}
-          />
+          <Box sx={{
+            width: '100dvw',
+            height: 'calc(100vh - 350px)',
+            borderRadius: 1,
+            border: '4px solid #fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+          }}>
+
+            {(capturedFrame && showLoader && showViewer) && (
+              <CircularProgress
+                sx={{
+                  width: '8rem !important',
+                  height: '8rem !important',
+                }}
+              />
+            )}
+            
+            <Box
+              component="video"
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              sx={{
+                ...styles.video,
+                display: (capturedFrame && showViewer) ? 'none' : 'block',
+              }}
+            />
+            
+            {(capturedFrame && !showLoader && showViewer) && (
+              <Viewer
+                src={capturedFrame}
+                detections={detections}
+              />
+            )}
+          </Box>
+          
+          {(capturedFrame && showViewer) && (
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mt: 2,
+            }}>
+              <Button
+                variant="contained"
+                onClick={handleBack}
+                sx={{
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  },
+                  padding: '12px 24px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                ← Back to Camera
+              </Button>
+            </Box>
+          )}
         </Box>
         <Controls
-          captureError={captureError}
           detections={detections}
           handleClick={handleClick}
           handleSliderChange={handleSliderChange}
@@ -120,6 +178,7 @@ export default function WebcamCapture({
           orientation={orientation}
           totalCars={totalCars}
           zoomLevel={zoomLevel}
+          captureError={captureError}
         />
       </Paper>
     </Box>

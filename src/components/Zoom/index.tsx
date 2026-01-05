@@ -35,16 +35,13 @@ export default function Shutter({
               </Typography>
             )}
             {totalCars > 0 && `Total Cars Detected: ${totalCars}`}
-            {detections.map(({ wheel_count }: CarDetection, index: number) => (
-              <>
-                {wheel_count > 0 && (
+            {detections.map(({ wheel_count }: CarDetection, index: number) => {
+                return (wheel_count > 0) ? (
                   <Box key={index}>
                     {`car ${index + 1}: ${wheel_count} wheel(s) detected`}
                   </Box>
-                )
-                }
-              </>
-            ))}
+                ) : null;
+            })}
           </Box>
           <Box sx={{
             ...styles.shutterContainer,

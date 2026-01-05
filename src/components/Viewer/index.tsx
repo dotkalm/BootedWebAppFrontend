@@ -33,7 +33,27 @@ export default function Viewer({
   const baseCanvasRef = base2DCanvasRef as RefObject<HTMLCanvasElement>;
 
   return (
-    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+    <Box sx={{ 
+      position: 'relative',
+      display: 'block',
+      borderRadius: '16px',
+      border: '4px solid',
+      borderColor: 'white',
+      overflow: 'hidden',
+      maxWidth: '100%',
+      maxHeight: {
+        xs: 'calc(100vh - 350px)',
+        sm: 'calc(100vh - 100px)'
+      },
+      width: {
+        xs: '95%',
+        sm: 'auto'
+      },
+      height: {
+        xs: 'auto',
+        sm: '80vh'
+      },
+    }}>
       <HiddenImage
         canvasRef={mainCanvasRef}
         imgRef={hiddenImageRef}

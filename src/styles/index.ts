@@ -35,6 +35,14 @@ export const styles = {
         },
         position: 'relative',
     },
+    containerNoCanvas: {
+        position: 'relative',
+        width: {
+            xs: 'auto',
+            sm: '100vw'
+        },
+        height: 'auto',
+    },
     container: {
         position: 'relative',
         width: {

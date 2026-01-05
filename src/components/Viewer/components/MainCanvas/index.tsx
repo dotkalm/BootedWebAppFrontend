@@ -1,13 +1,16 @@
 import type { MainCanvasProps } from "@/types";
+import Box from '@mui/material/Box';
 
 const MainCanvas = ({ canvasRef }: MainCanvasProps) => (
-    <canvas
+    <Box
+        component="canvas"
         ref={canvasRef}
-        style={{
-            display: 'block',
-            height: 'auto',
-            maxWidth: '100%',
-            width: '100%',
+        sx={{
+            display: 'block !important',
+            height: 'auto !important',
+            maxWidth: '100% !important',
+            width: '100% !important',
+            position: 'relative !important',
         }}
     />
 );

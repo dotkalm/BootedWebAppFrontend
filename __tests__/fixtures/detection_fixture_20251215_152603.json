@@ -1,0 +1,291 @@
+{
+    "total_cars": 1,
+    "results": [
+        {
+            "car_id": 0,
+            "car": {
+                "class": "car",
+                "confidence": 0.909,
+                "bbox": {
+                    "x1": 18,
+                    "y1": 116,
+                    "x2": 610,
+                    "y2": 357,
+                    "width": 591,
+                    "height": 240
+                }
+            },
+            "wheels": [
+                {
+                    "class": "wheel",
+                    "confidence": 0.905,
+                    "bbox": {
+                        "x1": 79,
+                        "y1": 252,
+                        "x2": 189,
+                        "y2": 354,
+                        "width": 110,
+                        "height": 102
+                    }
+                },
+                {
+                    "class": "wheel",
+                    "confidence": 0.887,
+                    "bbox": {
+                        "x1": 458,
+                        "y1": 252,
+                        "x2": 560,
+                        "y2": 348,
+                        "width": 102,
+                        "height": 96
+                    }
+                }
+            ],
+            "wheel_count": 2,
+            "wheel_positions": {
+                "front": {
+                    "class": "wheel",
+                    "confidence": 0.905,
+                    "bbox": {
+                        "x1": 79,
+                        "y1": 252,
+                        "x2": 189,
+                        "y2": 354,
+                        "width": 110,
+                        "height": 102
+                    }
+                },
+                "rear": {
+                    "class": "wheel",
+                    "confidence": 0.887,
+                    "bbox": {
+                        "x1": 458,
+                        "y1": 252,
+                        "x2": 560,
+                        "y2": 348,
+                        "width": 102,
+                        "height": 96
+                    }
+                }
+            },
+            "rear_wheel_transform": {
+                "position": {
+                    "x": 0.590625,
+                    "y": -0.25,
+                    "z": -0.3232142857142857,
+                    "pixel_x": 509.0,
+                    "pixel_y": 300.0
+                },
+                "rotation": {
+                    "rotation_matrix": [
+                        [
+                            0.0,
+                            -0.0007999997440001228,
+                            -0.9999996800001536
+                        ],
+                        [
+                            0.0,
+                            0.9999996800001536,
+                            -0.0007999997440001228
+                        ],
+                        [
+                            1.0,
+                            -0.0,
+                            0.0
+                        ]
+                    ],
+                    "basis_vectors": {
+                        "x_axis": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "y_axis": [
+                            -0.0007999997440001228,
+                            0.9999996800001536,
+                            -0.0
+                        ],
+                        "z_axis": [
+                            -0.9999996800001536,
+                            -0.0007999997440001228,
+                            0.0
+                        ]
+                    },
+                    "euler_angles": {
+                        "x": 0.0007999998293333989,
+                        "y": -1.5707963267948966,
+                        "z": 0,
+                        "order": "XYZ"
+                    },
+                    "quaternion": {
+                        "x": 0.00028284264459239606,
+                        "y": -0.7071067246180299,
+                        "z": 0.00028284264459239606,
+                        "w": 0.7071067246180299
+                    },
+                    "metadata": {
+                        "viewing_angle_rad": 0.0,
+                        "viewing_angle_deg": 0.0,
+                        "ground_angle_rad": -0.015998634876343527,
+                        "ground_angle_deg": -0.9166542563852877,
+                        "wheel_to_wheel_2d": [
+                            -0.9999680015359181,
+                            0.007999744012287344
+                        ],
+                        "viewing_side": "left",
+                        "target_wheel": "rear",
+                        "ellipse_angle_deg": 167.21798706054688,
+                        "ellipse_viewing_angle_deg": 36.85271350515402,
+                        "used_ellipse": true
+                    }
+                },
+                "scale": {
+                    "uniform": 0.3535714285714286,
+                    "radius_pixels": 49.5
+                },
+                "bounding_box": {
+                    "x1": 458,
+                    "y1": 252,
+                    "x2": 560,
+                    "y2": 348,
+                    "width": 102,
+                    "height": 96
+                },
+                "confidence": 0.887
+            },
+            "rear_wheel_ellipse": {
+                "center": [
+                    509.50107192993164,
+                    288.1582794189453
+                ],
+                "axes": [
+                    56.60688018798828,
+                    45.29568862915039
+                ],
+                "angle": 167.21798706054688,
+                "axis_ratio": 0.8001799159170395,
+                "viewing_angle_deg": 36.85271350515402,
+                "confidence": 0.9028386914337097,
+                "dark_ring_ratio": 1.0,
+                "avg_brightness": 41.241379310344826,
+                "has_dark_ring": true,
+                "method": "contour_fit_dark_validated"
+            },
+            "front_wheel_transform": {
+                "position": {
+                    "x": -0.58125,
+                    "y": -0.26249999999999996,
+                    "z": -0.3107142857142857,
+                    "pixel_x": 134.0,
+                    "pixel_y": 303.0
+                },
+                "rotation": {
+                    "rotation_matrix": [
+                        [
+                            0.0,
+                            -0.0007999997440001228,
+                            -0.9999996800001536
+                        ],
+                        [
+                            0.0,
+                            0.9999996800001536,
+                            -0.0007999997440001228
+                        ],
+                        [
+                            1.0,
+                            -0.0,
+                            0.0
+                        ]
+                    ],
+                    "basis_vectors": {
+                        "x_axis": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "y_axis": [
+                            -0.0007999997440001228,
+                            0.9999996800001536,
+                            -0.0
+                        ],
+                        "z_axis": [
+                            -0.9999996800001536,
+                            -0.0007999997440001228,
+                            0.0
+                        ]
+                    },
+                    "euler_angles": {
+                        "x": 0.0007999998293333989,
+                        "y": -1.5707963267948966,
+                        "z": 0,
+                        "order": "XYZ"
+                    },
+                    "quaternion": {
+                        "x": 0.00028284264459239606,
+                        "y": -0.7071067246180299,
+                        "z": 0.00028284264459239606,
+                        "w": 0.7071067246180299
+                    },
+                    "metadata": {
+                        "viewing_angle_rad": 0.0,
+                        "viewing_angle_deg": 0.0,
+                        "ground_angle_rad": -0.015998634876343527,
+                        "ground_angle_deg": -0.9166542563852877,
+                        "wheel_to_wheel_2d": [
+                            -0.9999680015359181,
+                            0.007999744012287344
+                        ],
+                        "viewing_side": "left",
+                        "target_wheel": "rear",
+                        "ellipse_angle_deg": 0.038970947265625,
+                        "ellipse_viewing_angle_deg": 6.569577787770759,
+                        "used_ellipse": true
+                    }
+                },
+                "scale": {
+                    "uniform": 0.37857142857142856,
+                    "radius_pixels": 53.0
+                },
+                "bounding_box": {
+                    "x1": 79,
+                    "y1": 252,
+                    "x2": 189,
+                    "y2": 354,
+                    "width": 110,
+                    "height": 102
+                },
+                "confidence": 0.905
+            },
+            "front_wheel_ellipse": {
+                "center": [
+                    130.73487854003906,
+                    307.9151840209961
+                ],
+                "axes": [
+                    40.22765350341797,
+                    39.963504791259766
+                ],
+                "angle": 0.038970947265625,
+                "axis_ratio": 0.9934336534907322,
+                "viewing_angle_deg": 6.569577787770759,
+                "confidence": 0.8360482767106489,
+                "dark_ring_ratio": 1.0,
+                "avg_brightness": 52.47222222222222,
+                "has_dark_ring": true,
+                "method": "contour_fit_dark_validated"
+            },
+            "car_geometry": {
+                "wheel_to_wheel_2d": [
+                    -0.9999680015359181,
+                    0.007999744012287344
+                ],
+                "ground_angle_deg": -0.9166542563852877,
+                "viewing_side": "left"
+            }
+        }
+    ],
+    "image_dimensions": {
+        "width": 640,
+        "height": 480
+    }
+}
