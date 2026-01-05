@@ -122,19 +122,18 @@ export default function WebcamCapture({
               />
             )}
             
-            <Box
-              component="video"
-              ref={videoRef}
-              playsInline
-              muted
-              autoPlay
-              sx={{
-                ...styles.video,
-                display: (capturedFrame && showViewer) ? 'none' : 'block',
-              }}
-            />
+            {!(capturedFrame && showViewer) && (
+              <Box
+                component="video"
+                ref={videoRef}
+                playsInline
+                muted
+                autoPlay
+                sx={styles.video}
+              />
+            )}
             
-            {(capturedFrame && !showLoader && showViewer) && (
+            {(capturedFrame && showViewer) && (
               <Viewer
                 src={capturedFrame}
                 detections={detections}

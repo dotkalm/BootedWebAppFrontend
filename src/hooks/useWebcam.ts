@@ -39,7 +39,9 @@ export function useWebcam({
       }
     };
 
-    startWebcam();
+    if (videoRef.current) {
+      startWebcam();
+    }
 
     // Cleanup
     return () => {
@@ -47,7 +49,7 @@ export function useWebcam({
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [width, height, facingMode]);
+  }, [width, height, facingMode, advanced]);
 
   return {
     videoRef,
