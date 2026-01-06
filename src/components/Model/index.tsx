@@ -84,12 +84,14 @@ export default function Model({
                   ),
                   new THREE.Color(0xffff00)
                 ]}
+                visible={false}
               />
 
               {/* Clamp mesh bounding box visualization */}
               {modelInfo.clampBoundingBox && (
                 <box3Helper
                   args={[modelInfo.clampBoundingBox, new THREE.Color(0xff00ff)]}
+                  visible={false}
                 />
               )}
             </>

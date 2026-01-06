@@ -46,8 +46,8 @@ const R3FiberCanvas = ({
         }}
         style={{ background: 'transparent' }}
       >
-        <gridHelper args={[20, 20, '#666666', '#444444']} />
-        <axesHelper args={[5]} />
+        <gridHelper args={[20, 20, '#666666', '#444444']} visible={false}/>
+        <axesHelper args={[5]} visible={false}/>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>

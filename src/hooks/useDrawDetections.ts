@@ -81,14 +81,14 @@ export function useDrawDetections({
 
       ctx.beginPath();
       ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#00ff00';
+      ctx.strokeStyle = 'rgba(0, 255, 0, 0)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Draw center point
       ctx.beginPath();
       ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
-      ctx.fillStyle = '#00ff00';
+      ctx.fillStyle = 'rgba(0, 255, 0, 0)';
       ctx.fill();
     }
 
@@ -101,14 +101,14 @@ export function useDrawDetections({
 
       ctx.beginPath();
       ctx.ellipse(cx, cy, semiMajor, semiMinor, angleRad, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#ff00ff';
+      ctx.strokeStyle = 'rgba(255, 0, 255, 0)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Draw center point
       ctx.beginPath();
       ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
-      ctx.fillStyle = '#ff00ff';
+      ctx.fillStyle = 'rgba(255, 0, 255, 0)';
       ctx.fill();
     }
 
@@ -128,14 +128,14 @@ export function useDrawDetections({
       ctx.beginPath();
       ctx.moveTo(rearX, rearY);
       ctx.lineTo(frontX, frontY);
-      ctx.strokeStyle = '#ffff00';
+      ctx.strokeStyle = 'rgba(255, 255, 0, 0)';
       ctx.lineWidth = 3;
       ctx.stroke();
 
       // Display angle text at midpoint
       const midX = (rearX + frontX) / 2;
       const midY = (rearY + frontY) / 2;
-      ctx.fillStyle = '#ffff00';
+      ctx.fillStyle = 'rgba(255, 255, 0, 0)';
       ctx.font = 'bold 16px monospace';
       ctx.fillText(`${angleDeg.toFixed(1)}°`, midX + 10, midY - 10);
     }
@@ -150,14 +150,14 @@ export function useDrawDetections({
         ctx.beginPath();
         ctx.moveTo(px, py);
         ctx.lineTo(px + axis[0] * axisLength, py + axis[1] * axisLength);
-        ctx.strokeStyle = color;
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
         ctx.lineWidth = 2;
         ctx.stroke();
       };
 
-      makeLines(basis.x_axis, '#ff0000');
-      makeLines(basis.y_axis, '#00ff00');
-      makeLines(basis.z_axis, '#0000ff');
+      makeLines(basis.x_axis, 'rgba(0, 0, 0, 0)');
+      makeLines(basis.y_axis, 'rgba(0, 0, 0, 0)');
+      makeLines(basis.z_axis, 'rgba(0, 0, 0, 0)');
     }
 
     // Copy base 2D to main canvas initially
