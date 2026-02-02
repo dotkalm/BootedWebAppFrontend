@@ -10,7 +10,6 @@ export function useCanvasCapture({
   imgRef,
   modelLoaded,
   scale,
-  verticalOffset,
 }: TCanvasCaptureProps) {
   const { gl, scene, camera } = useThree();
   const [captured, setCaptured] = useState(false);

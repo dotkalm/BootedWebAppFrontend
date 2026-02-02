@@ -103,14 +103,13 @@ function BasisVectors3D({
 function CaptureScene({
   ellipse,
   basisVectors,
-  quaternion,
   objPath,
   mtlPath,
   onRender
 }: Omit<BootOverlayProps, 'renderSize'>) {
   const { gl, scene, camera } = useThree();
   const frameCount = useRef(0);
-  
+
   // Scale factor: convert pixel axes to Three.js world units
   // We'll use a simple mapping: 1 pixel = 0.01 world units
   // This keeps the model at a reasonable size in the scene
@@ -119,11 +118,11 @@ function CaptureScene({
     ellipse.axes[0] * pixelToWorld,
     ellipse.axes[1] * pixelToWorld
   ];
-  
+
   // Capture frame after model is loaded (give it a few frames)
   useFrame(() => {
     frameCount.current++;
-    
+
     // Wait a few frames for model to load, then capture
     if (frameCount.current === 10 && onRender) {
       gl.render(scene, camera);
@@ -131,40 +130,45 @@ function CaptureScene({
       onRender(dataUrl);
     }
   });
-  
+
+  const dummyCanvasRef = useRef<HTMLCanvasElement>(null);
+  const dummyImgRef = useRef<HTMLImageElement>(null);
+
   return (
     <>
       {/* Lighting */}
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 5, 5]} intensity={1} />
       <directionalLight position={[-5, -5, -5]} intensity={0.3} />
-      
+
       {/* Ellipse at origin (for alignment reference) */}
-      <Ellipse3D 
-        axes={worldAxes} 
-        angle={ellipse.angle} 
+      <Ellipse3D
+        axes={worldAxes}
+        angle={ellipse.angle}
         color={0x00ff00}
       />
-      
+
       {/* Basis vectors at origin (for alignment reference) */}
-      <BasisVectors3D 
-        basisVectors={basisVectors} 
+      <BasisVectors3D
+        basisVectors={basisVectors}
         axisLength={Math.max(...worldAxes) * 1.5}
       />
-      
+
       {/* The boot model - positioned and scaled to fit the ellipse */}
       <Suspense fallback={null}>
         <Model
           objPath={objPath}
           mtlPath={mtlPath}
-          quaternion={quaternion}
-          basisVectors={basisVectors}
           position={[0, 0, 0]}
-          // Use standard Three.js coordinates
-          useStandardCoords={true}
-          pixelToWorld={pixelToWorld}
-          ellipseAxes={[ellipse.axes[0], ellipse.axes[1]]}
-          ellipseAngle={ellipse.angle}
+          canvasCaptureProps={{
+            base2DImageRef: dummyCanvasRef,
+            canvas2DRef: dummyCanvasRef,
+            deltaX: 0,
+            deltaY: 0,
+            imgRef: dummyImgRef,
+            scale: 1,
+          }}
+        // Use standard Three.js coordinates
         />
       </Suspense>
     </>
