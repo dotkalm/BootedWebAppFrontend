@@ -1,7 +1,7 @@
-import Webcam from '@/components/Webcam';
+import LandingPage from '@/components/LandingPage';
 
 export default function Home() {
   return (
-      <Webcam />
+      <LandingPage />
   );
 }
