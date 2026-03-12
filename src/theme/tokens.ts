@@ -20,15 +20,18 @@ export const tokens = {
     xxl: '48px',
   },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontFamily: '"Canva Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     fontSizeSmall: '12px',
     fontSizeBase: '14px',
     fontSizeLarge: '16px',
     fontSizeXL: '20px',
     fontSizeXXL: '24px',
+    fontSizeH1: 'clamp(48px, 8vw, 96px)',
+    fontSizeH2: 'clamp(20px, 3vw, 32px)',
     fontWeightNormal: '400',
     fontWeightMedium: '500',
     fontWeightBold: '700',
+    fontWeightExtraBold: '800',
     lineHeightTight: '1.2',
     lineHeightNormal: '1.5',
     lineHeightRelaxed: '1.75',
@@ -37,7 +40,15 @@ export const tokens = {
     sm: '4px',
     md: '8px',
     lg: '12px',
+    xl: '16px',
     full: '9999px',
+    clamped: 'clamp(4px, 0.5em, 12px)',
+    button: 'clamp(8px, 1em, 16px)',
+  },
+  borders: {
+    width: '2px',
+    style: 'solid',
+    default: '2px solid transparent',
   },
   shadows: {
     sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
@@ -48,6 +59,9 @@ export const tokens = {
     fast: '150ms',
     base: '200ms',
     slow: '300ms',
+  },
+  gradients: {
+    primary: 'linear-gradient(135deg, #00c4cc, #7d2ae8)',
   },
 } as const;
 

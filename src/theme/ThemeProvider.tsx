@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, ReactNode } from 'react';
 import { tokens, Tokens } from './tokens';
 
@@ -6,10 +8,13 @@ function tokensToCSSVariables(tokens: Tokens): Record<string, string> {
   const cssVars: Record<string, string> = {};
 
   Object.entries(tokens).forEach(([category, values]) => {
+    // Convert category to kebab-case: borderRadius -> border-radius
+    const kebabCategory = category.replace(/([A-Z])/g, '-$1').toLowerCase();
+
     Object.entries(values).forEach(([key, value]) => {
       // Convert camelCase to kebab-case: fontSizeSmall -> font-size-small
       const kebabKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
-      cssVars[`--${category}-${kebabKey}`] = value;
+      cssVars[`--${kebabCategory}-${kebabKey}`] = value;
     });
   });
 
