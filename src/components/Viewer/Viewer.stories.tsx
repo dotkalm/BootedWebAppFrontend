@@ -53,7 +53,7 @@ export const TwoD = () => {
 
 // With 3D model viewer side-by-side
 export const With3DModel = () => {
-  const dataUrl = useImageDataUrl('/output_image_no_ext.jpg');
+  const dataUrl = useImageDataUrl('/mustang_1.jpg');
   if (!dataUrl) return <div>Loading…</div>;
 
   return (
