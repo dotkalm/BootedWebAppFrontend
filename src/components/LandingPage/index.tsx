@@ -13,11 +13,11 @@ export default function LandingPage() {
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 gap: 4,
-                background: 'linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 30%, #ffffff 100%)',
+                background: 'linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 60%, #ffffff 100%)',
             }}
         >
-            <BootedStamp />
             <Hero />
         </Box>
     )
 }
+// <BootedStamp />
