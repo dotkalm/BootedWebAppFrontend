@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { springUpAnimation } from '@/theme/animations';
 import iphoneImage from '@/../public/iphone_lowres.png';
+import iphoneFlashImage from '@/../public/iphone_lowres_flash.png';
 import corollaImage from '@/../public/corolla.webp';
 import { tokens } from '@/theme/tokens';
 
@@ -178,6 +179,32 @@ export default function CameraDemo() {
               style={{ objectFit: 'contain' }}
               priority
             />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 1, 0],
+                transition: {
+                  duration: 0.15,
+                  times: [0, 0.5, 1],
+                  delay: 2.5,
+                  ease: "linear"
+                }
+              }}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                top: 0,
+                left: 0,
+              }}
+            >
+              <Image
+                src={iphoneFlashImage}
+                alt="iPhone Camera Demo Flash"
+                fill
+                style={{ objectFit: 'contain' }}
+              />
+            </motion.div>
           </motion.div>
         </Box>
       </Box>
