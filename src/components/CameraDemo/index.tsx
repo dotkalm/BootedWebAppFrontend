@@ -2,12 +2,16 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { springUpAnimation } from '@/theme/animations';
 import iphoneImage from '@/../public/iphone_lowres.png';
 import corollaImage from '@/../public/corolla.webp';
 import { tokens } from '@/theme/tokens';
 
 export default function CameraDemo() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const slideDistance = isMobile ? 22 : 54.5;
   return (
     <Box
       sx={{
@@ -61,13 +65,29 @@ export default function CameraDemo() {
               zIndex: 0,
             }}
           >
-            <Image
-              src={corollaImage}
-              alt="Corolla"
-              width={140}
-              height={283}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-            />
+            <motion.div
+              initial={{ scale: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, rotateZ: 0 }}
+              animate={{ scale: 0.5, x: -80, y: 5, rotateY: -12, rotateX: 5, rotateZ: 2 }}
+              transition={{
+                type: 'spring',
+                stiffness: 100,
+                damping: 20,
+                delay: 1.5,
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <Image
+                src={corollaImage}
+                alt="Corolla"
+                width={140}
+                height={283}
+                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+              />
+            </motion.div>
           </motion.div>
 
           {/* iPhone - in front */}
@@ -75,14 +95,16 @@ export default function CameraDemo() {
             initial={{
               y: 20,
               opacity: 0,
-              skewY: 8,
-              rotateZ: 3,
+              rotateY: -12,
+              rotateX: 5,
+              rotateZ: 2,
             }}
             animate={{
               y: 0,
               opacity: 1,
-              skewY: 8,
-              rotateZ: 3,
+              rotateY: -12,
+              rotateX: 5,
+              rotateZ: 2,
             }}
             transition={springUpAnimation.transition}
             style={{
@@ -90,18 +112,34 @@ export default function CameraDemo() {
               left: 0,
               top: '50%',
               translateY: '-50%',
+              transformStyle: 'preserve-3d',
               width: '100%',
               height: '100%',
               zIndex: 1,
             }}
           >
-            <Image
-              src={iphoneImage}
-              alt="iPhone Camera Demo"
-              fill
-              style={{ objectFit: 'contain' }}
-              priority
-            />
+            <motion.div
+              initial={{ x: 0 }}
+              animate={{ x: slideDistance }}
+              transition={{
+                type: 'spring',
+                stiffness: 100,
+                damping: 20,
+                delay: 1.5,
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+            >
+              <Image
+                src={iphoneImage}
+                alt="iPhone Camera Demo"
+                fill
+                style={{ objectFit: 'contain' }}
+                priority
+              />
+            </motion.div>
           </motion.div>
         </Box>
       </Box>
