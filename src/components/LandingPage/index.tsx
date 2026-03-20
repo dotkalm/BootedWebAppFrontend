@@ -1,25 +1,22 @@
-import styles from './LandingPage.module.css';
+import Box from '@mui/material/Box';
 import Button from '../shared/Button';
+import Hero from '@/components/Hero';
 
-interface LandingPageProps {
-    onStartClick?: () => void;
-}
-
-export default function LandingPage({ onStartClick }: LandingPageProps) {
+export default function LandingPage() {
     return (
-        <div className={styles['landing-page']}>
-            <h1>Welcome to the Edge Detector App</h1>
-            <p>Use your webcam to detect edges in real-time.</p>
-            <Button
-                label="Start Detecting"
-                variant="solid"
-                size="medium"
-                onClick={onStartClick}
-                themeColor={{
-                    background: 'white',
-                    text: '#7d2ae8',
-                }}
-            />
-        </div>
+        <Box
+            sx={{
+                width: '100%',
+                minHeight: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: 4,
+                background: 'linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 30%, #ffffff 100%)',
+            }}
+        >
+            <Hero />
+        </Box>
     )
 }
