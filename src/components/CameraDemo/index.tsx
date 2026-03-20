@@ -7,6 +7,7 @@ import { springUpAnimation } from '@/theme/animations';
 import iphoneImage from '@/../public/iphone_lowres.png';
 import iphoneFlashImage from '@/../public/iphone_lowres_flash.png';
 import corollaImage from '@/../public/corolla.webp';
+import bootForCorollaImage from '@/../public/boot_for_corolla.png';
 import { tokens } from '@/theme/tokens';
 
 export default function CameraDemo() {
@@ -46,7 +47,7 @@ export default function CameraDemo() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          maxWidth: { 
+          maxWidth: {
             xs: '100%', 
             sm: '35%',
             md: '50%',
@@ -127,6 +128,33 @@ export default function CameraDemo() {
                 height={283}
                 style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  duration: 0,
+                  delay: 2.85,
+                }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              >
+                <Image
+                  src={bootForCorollaImage}
+                  alt="Boot on Corolla"
+                  width={140}
+                  height={283}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    objectFit: 'contain',
+                  }}
+                />
+              </motion.div>
             </motion.div>
           </motion.div>
 
