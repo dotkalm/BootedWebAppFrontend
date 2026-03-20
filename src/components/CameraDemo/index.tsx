@@ -68,6 +68,7 @@ export default function CameraDemo() {
             <motion.div
               initial={{ scale: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, rotateZ: 0 }}
               animate={[
+              // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
                 {
                   scale: 0.5,
                   x: -80,
@@ -82,6 +83,7 @@ export default function CameraDemo() {
                     delay: 1.5,
                   }
                 },
+              // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
                 {
                   rotateY: 0,
                   rotateX: 0,
@@ -139,7 +141,7 @@ export default function CameraDemo() {
                   delay: 2.5,
                 }
               }
-            ]}
+            ] as any}
             style={{
               position: 'absolute',
               left: 0,
