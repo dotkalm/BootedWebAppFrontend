@@ -54,10 +54,11 @@ export default function AppBar() {
               pt: {
                 xs: '8px',
                 sm: '5px',
+                textAlign: 'center',
               } 
             }}
           >
-            "You got booted." 
+            "You got booted."<br/> 🚗 📸 😂 📲 😩 
           </Typography>
           </motion.div>
 

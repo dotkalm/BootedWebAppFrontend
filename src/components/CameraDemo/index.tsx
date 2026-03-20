@@ -11,18 +11,31 @@ import { tokens } from '@/theme/tokens';
 export default function CameraDemo() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const slideDistance = isMobile ? 22 : 54.5;
+  const slideDistance = isMobile ? 20 : 54.5;
   return (
     <Box
       sx={{
         width: '100%',
         display: 'flex',
-        flexDirection: { xs: 'column', sm: 'column', md: 'row' },
-        gap: { xs: 4, md: 8 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { 
+          xs: 4, 
+          sm: 4,
+          md: 0,
+          lg: 0,
+        },
         alignItems: 'center',
         justifyContent: 'center',
         py: { xs: 4, md: 8 },
-        px: { xs: 2, md: 4 },
+        px: { 
+          xs: 2, 
+          md: 0 
+        },
+        paddingLeft: {
+          xs: 2,
+          sm: 6,
+          md: 0,
+        }
       }}
     >
       {/* Left Column - Images */}
@@ -32,7 +45,11 @@ export default function CameraDemo() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          maxWidth: { xs: '100%', md: '50%' },
+          maxWidth: { 
+            xs: '100%', 
+            sm: '35%',
+            md: '50%',
+          },
         }}
       >
         <Box
@@ -68,10 +85,10 @@ export default function CameraDemo() {
             <motion.div
               initial={{ scale: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, rotateZ: 0 }}
               animate={[
-              // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
+                // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
                 {
                   scale: 0.5,
-                  x: -80,
+                  x: -80 - slideDistance,
                   y: 5,
                   rotateY: -12,
                   rotateX: 5,
@@ -83,7 +100,7 @@ export default function CameraDemo() {
                     delay: 1.5,
                   }
                 },
-              // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
+                // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
                 {
                   rotateY: 0,
                   rotateX: 0,
@@ -153,28 +170,14 @@ export default function CameraDemo() {
               zIndex: 1,
             }}
           >
-            <motion.div
-              initial={{ x: 0 }}
-              animate={{ x: slideDistance }}
-              transition={{
-                type: 'spring',
-                stiffness: 100,
-                damping: 20,
-                delay: 1.5,
-              }}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <Image
-                src={iphoneImage}
-                alt="iPhone Camera Demo"
-                fill
-                style={{ objectFit: 'contain' }}
-                priority
-              />
-            </motion.div>
+
+            <Image
+              src={iphoneImage}
+              alt="iPhone Camera Demo"
+              fill
+              style={{ objectFit: 'contain' }}
+              priority
+            />
           </motion.div>
         </Box>
       </Box>
@@ -187,14 +190,37 @@ export default function CameraDemo() {
           flexDirection: 'column',
           gap: 2,
           maxWidth: { xs: '100%', md: '50%' },
+          paddingRight: { 
+            xs: 0, 
+            sm: 3,
+            md: 6,
+            lg: 8,
+            xl: 25,
+          },
+          transform: {
+            xs: 'translateX(0)',
+            sm: 'translateX(0)',
+            md: 'translateX(-15%)',
+            lg: 'translateX(-29%)',
+            xl: 'translateX(-10dvw)',
+          }
         }}
       >
         <Typography
           variant="h3"
           sx={{
+            lineHeight: {
+              xs: 'inherit',
+              sm: 0, 
+            },
             fontWeight: 700,
             color: tokens.colors.primary,
-            mb: 2,
+            transform: {
+              xs: 'translateY(0)',
+              sm: 'translateY(-50px)',
+              md: 'translateY(-80px)',
+              lg: 'translateY(-80px)',
+            }
           }}
         >
           Camera Demo
