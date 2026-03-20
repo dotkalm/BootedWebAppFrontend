@@ -1,7 +1,9 @@
 import Box from '@mui/material/Box';
-import AppBar from '@/components/AppBar';
+// import AppBar from '@/components/AppBar';
 import Hero from '@/components/Hero';
 import BootedStamp from '@/components/BootedStamp';
+import { tokens } from '@/theme/tokens';
+import AppBar from '../AppBar';
 
 export default function LandingPage() {
     return (
@@ -14,13 +16,14 @@ export default function LandingPage() {
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 gap: 4,
-                background: 'linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 60%, #ffffff 100%)',
+                background: `linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 70%, ${tokens.colors.renoSand} 100%)`,
             }}
         >
+            {/*<AppBar />*/}
             <AppBar />
             <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <BootedStamp />
                 <Hero />
+                <BootedStamp delay={0.8} />
             </Box>
         </Box>
     )

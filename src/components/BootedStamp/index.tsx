@@ -1,42 +1,49 @@
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import bootedStamp from '@/../public/BOOTED.png';
+import wordmark from '@/../public/BOOTED_yellow.png';
 
-export default function BootedStamp() {
+interface BootedStampProps {
+    delay?: number;
+}
+
+export default function BootedStamp({ delay = 0.5 }: BootedStampProps) {
 
     return (
         <Box
             sx={{
                 position: 'absolute',
-                zIndex: 1,
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 10,
                 display: 'flex',
-                width: '100%',
-                aspectRatio: '1920 / 823.109',
-                overflow: 'visible',
-                maxWidth: '100%',
-                maxHeight: {
-                    xs: 'calc(100vh - 350px)',
-                    sm: 'calc(100vh - 100px)',
-                },
-                alignItems: {
-                    xs: 'flex-start',
-                    sm: 'center',
-                },
+                alignItems: 'center',
                 justifyContent: 'center',
-                alignContent: 'center',
                 pointerEvents: 'none',
+                img: {
+                    width: {
+                        xs: '80%',
+                        md: '100%',
+                    },
+                    height: {
+                        xs: '80%',
+                        md: '100%',
+                    },
+                    maxWidth: '500px',
+                }
             }}
         >
             <motion.div
                 initial={{
                     scale: 0,
-                    rotate: -15,
+                    rotate: 4,
                     y: -100,
                 }}
                 animate={{
                     scale: 0.9,
-                    rotate: -15,
+                    rotate: 5,
                     y: 0,
                     x: 0,
                 }}
@@ -45,6 +52,7 @@ export default function BootedStamp() {
                     stiffness: 400,
                     damping: 15,
                     mass: 1,
+                    delay,
                 }}
                 style={{
                     width: '60%',
@@ -55,11 +63,9 @@ export default function BootedStamp() {
                 }}
             >
                 <Image
-                    src={bootedStamp}
+                    src={wordmark}
                     alt="BOOTED Stamp"
                     width={500}
-                    height={335}
-                    style={{ width: '100%', height: 'auto' }}
                     priority
                 />
             </motion.div>
