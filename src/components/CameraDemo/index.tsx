@@ -10,6 +10,8 @@ import corollaImage from '@/../public/corolla.webp';
 import bootForCorollaImage from '@/../public/boot_for_corolla.png';
 import { tokens } from '@/theme/tokens';
 import BootedStamp from '@/components/BootedStamp';
+import ChatBubble from '@/components/ChatBubble';
+import TypingIndicator from '@/components/TypingIndicator';
 
 export default function CameraDemo() {
   const theme = useTheme();
@@ -149,10 +151,10 @@ export default function CameraDemo() {
                 style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ ...springUpAnimation.initial, opacity: 0 }}
+                animate={{ ...springUpAnimation.animate, opacity: 1 }}
                 transition={{
-                  duration: 0,
+                  ...springUpAnimation.transition,
                   delay: 2.85,
                 }}
                 style={{
@@ -257,14 +259,18 @@ export default function CameraDemo() {
         </Box>
       </Box>
 
-      {/* Right Column - Text */}
+      {/* Right Column - Chat Bubbles */}
       <Box
         sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'flex-end',
           gap: 2,
-          maxWidth: { xs: '100%', md: '50%' },
+          width: {
+            xs: '100%',
+            md: '50%'
+          },
           paddingRight: {
             xs: 0,
             sm: 3,
@@ -282,56 +288,23 @@ export default function CameraDemo() {
         }}
       >
         <motion.div
+          initial={{ ...springUpAnimation.initial, y: 70 }}
+          animate={[
+            { ...springUpAnimation.animate, y: 70, transition: { ...springUpAnimation.transition, delay: 3.5 } },
+            { y: 0, transition: { type: 'spring', stiffness: 200, damping: 30, delay: 4.5 } }
+          ]}
+        >
+          <ChatBubble message="Hey... Is this your car?" type="outgoing" />
+        </motion.div>
+        <motion.div
           initial={springUpAnimation.initial}
           animate={springUpAnimation.animate}
           transition={{
             ...springUpAnimation.transition,
-            delay: 0.5,
+            delay: 4.5,
           }}
         >
-          <Typography
-          variant="h3"
-          sx={{
-            lineHeight: {
-              xs: 'inherit',
-              sm: 0, 
-            },
-            fontWeight: 700,
-            color: tokens.colors.primary,
-            transform: {
-              xs: 'translateY(0)',
-              sm: 'translateY(-50px)',
-              md: 'translateY(-80px)',
-              lg: 'translateY(-80px)',
-            }
-          }}
-        >
-          Camera Demo
-        </Typography>
-
-        <Typography
-          variant="body1"
-          sx={{
-            color: tokens.colors.text,
-            lineHeight: 1.6,
-            mb: 2,
-          }}
-        >
-          Experience the power of real-time edge detection directly from your camera.
-          Our advanced technology processes your video feed instantly, highlighting
-          edges and contours in real-time.
-        </Typography>
-
-        <Typography
-          variant="body1"
-          sx={{
-            color: tokens.colors.text,
-            lineHeight: 1.6,
-          }}
-        >
-          Perfect for developers, designers, and anyone interested in computer vision.
-          Try it now and see the magic happen right in your browser.
-        </Typography>
+          <TypingIndicator type="incoming" />
         </motion.div>
       </Box>
     </Box>
