@@ -16,24 +16,27 @@ export default function LandingPage() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                gap: 4,
-                background: `linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 70%, ${tokens.colors.renoSand} 100%)`,
+                background: `linear-gradient(
+                   180deg,
+                 #f0f0f0 0%,
+                 #f0f0f0 60%,
+                  ${tokens.colors.renoSand} 100%
+                  )`,
             }}
         >
             {/*<AppBar />*/}
             <AppBar />
             <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <Hero />
-            </Box>
             <BootedStamp delay={.5} styleOverride={{
               transform: {
-                xs: 'translateY(-35px)',
-                sm: 'translateY(90px)',
+                xs: 'translateY(-5px)',
               },
               img: {
                 width: {
-                  xs: '100dvw',
-                  sm: '20dvw',
+                  xs: '90dvw',
+                  sm: '60dvw',
+                  xl: '30dvw',
                 },
                 height: {
                   xs: 'auto',
@@ -41,6 +44,7 @@ export default function LandingPage() {
                 }
               }
             }}/>
+            </Box>
             <CameraDemo />
         </Box>
     )

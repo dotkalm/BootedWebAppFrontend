@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import { SxProps, Theme } from '@mui/material/styles';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import wordmark from '@/../public/BOOTED_Brown.png';
+import wordmark from '@/../public/BOOTED_yellow.png';
 
 interface BootedStampProps {
     delay?: number;

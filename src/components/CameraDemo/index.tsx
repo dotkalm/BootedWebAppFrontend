@@ -29,7 +29,18 @@ export default function CameraDemo() {
         },
         alignItems: 'center',
         justifyContent: 'center',
-        py: { xs: 4, md: 8 },
+        mx: {
+          xs: 0,
+          sm: 4,
+        },
+        paddingBottom: {
+          xs: 4,
+          sm: 0,
+        },
+        paddingTop: {
+          xs: 4,
+          sm: 0,
+        },
         px: { 
           xs: 2, 
           md: 0 
@@ -38,7 +49,15 @@ export default function CameraDemo() {
           xs: 2,
           sm: 6,
           md: 0,
-        }
+        },
+                /*
+                background: `linear-gradient(
+                   180deg,
+                 #f0f0f0 0%,
+                 #f0f0f0 20%,
+                  ${tokens.colors.renoSand} 100%
+                  )`,
+                  */
       }}
     >
       {/* Left Column - Images */}
@@ -246,8 +265,8 @@ export default function CameraDemo() {
           flexDirection: 'column',
           gap: 2,
           maxWidth: { xs: '100%', md: '50%' },
-          paddingRight: { 
-            xs: 0, 
+          paddingRight: {
+            xs: 0,
             sm: 3,
             md: 6,
             lg: 8,
@@ -262,7 +281,15 @@ export default function CameraDemo() {
           }
         }}
       >
-        <Typography
+        <motion.div
+          initial={springUpAnimation.initial}
+          animate={springUpAnimation.animate}
+          transition={{
+            ...springUpAnimation.transition,
+            delay: 0.5,
+          }}
+        >
+          <Typography
           variant="h3"
           sx={{
             lineHeight: {
@@ -305,6 +332,7 @@ export default function CameraDemo() {
           Perfect for developers, designers, and anyone interested in computer vision.
           Try it now and see the magic happen right in your browser.
         </Typography>
+        </motion.div>
       </Box>
     </Box>
   );
