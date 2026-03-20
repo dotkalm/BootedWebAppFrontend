@@ -4,6 +4,7 @@ import Hero from '@/components/Hero';
 import BootedStamp from '@/components/BootedStamp';
 import { tokens } from '@/theme/tokens';
 import AppBar from '../AppBar';
+import CameraDemo from '@/components/CameraDemo';
 
 export default function LandingPage() {
     return (
@@ -25,6 +26,7 @@ export default function LandingPage() {
                 <Hero />
                 <BootedStamp delay={0.8} />
             </Box>
+            <CameraDemo />
         </Box>
     )
 }

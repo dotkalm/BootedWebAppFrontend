@@ -2,11 +2,10 @@ import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Image from 'next/image';
+import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
 import { tokens } from '@/theme/tokens';
 import { springUpAnimation } from '@/theme/animations';
-import bootedLogo from '@/../public/BOOTED_Brown.png';
 
 export default function AppBar() {
   return (
@@ -24,69 +23,115 @@ export default function AppBar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          alignContent: 'center',
           py: 2,
+          height: 'auto',
         }}
       >
-      <Toolbar sx={{
-        py: 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        alignContent: 'center',
-        width: '90%',
-        bgcolor: tokens.colors.ripeLemon,
-        border: `4px solid ${tokens.colors.renoSand}`,
-        borderRadius: 10,
-        px: 4,
-      }}>
-          <Box sx={{ px:4, position: 'relative', height: { xs: 40, md: 50 }, width: { xs: 120, md: 150 } }}>
-            <Image
-              src={bootedLogo}
-              alt="BOOTED"
-              fill
-              style={{ objectFit: 'contain', objectPosition: 'left' }}
-              priority
-            />
-          </Box>
-
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <Button
-            color="inherit"
-            sx={{
-              display: { xs: 'none', sm: 'inline-flex' },
-              textTransform: 'none',
-              fontWeight: 500
-            }}
-          >
-            Features
-          </Button>
-          <Button
-            color="inherit"
-            sx={{
-              display: { xs: 'none', sm: 'inline-flex' },
-              textTransform: 'none',
-              fontWeight: 500
-            }}
-          >
-            About
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-              bgcolor: 'primary.main',
-              '&:hover': {
-                bgcolor: 'primary.dark'
+        <Toolbar
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '90%',
+            bgcolor: tokens.colors.ripeLemon,
+            border: `4px solid ${tokens.colors.renoSand}`,
+            borderRadius: 10,
+            px: 4,
+          }}
+        >
+                    <motion.div
+            { ...springUpAnimation }
+            transition={{
+                  ...springUpAnimation.transition,
+                  delay: 0.4,
               }
+            }
+          >
+          <Typography
+            variant='h5'
+            color={tokens.colors.renoSand}
+            sx={{
+              pt: {
+                xs: '8px',
+                sm: '5px',
+              } 
             }}
           >
-            Get Started
-          </Button>
-        </Box>
-      </Toolbar>
-    </MuiAppBar>
+            "You got booted." 
+          </Typography>
+          </motion.div>
+
+          <Box sx={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <Button
+              color="inherit"
+              variant='text'
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                textTransform: 'none',
+                fontWeight: 500
+              }}
+            >
+              <Typography
+                variant='h6'
+                color={tokens.colors.renoSand}
+                sx={{
+                  pt: '4px',
+                }}
+              >
+                Features
+              </Typography>
+            </Button>
+            <Button
+              color="inherit"
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                textTransform: 'none',
+                fontWeight: 500
+              }}
+            >
+              <Typography
+                variant='h6'
+                color={tokens.colors.renoSand}
+                sx={{
+                  pt: '4px',
+                }}
+              >
+                About
+              </Typography>
+            </Button>
+            <Button
+              variant="contained"
+              size='small'
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                bgcolor: 'primary.main',
+                minHeight: { xs: '32px', sm: '36px' },
+                py: { xs: 0.5, sm: 1 },
+                px: { xs: 2, sm: 3 },
+                '&:hover': {
+                  bgcolor: 'primary.dark'
+                },
+                border: `4px solid 'primary.main'`,
+                borderRadius: 2,
+              }}
+            >
+              <Typography
+                variant='body2'
+                color={tokens.colors.ripeLemon}
+                sx={{
+                  pt: {
+                    xs: '4px'
+                  },
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                }}
+              >
+                Get Started
+              </Typography>
+            </Button>
+          </Box>
+        </Toolbar>
+      </MuiAppBar>
     </motion.div>
   );
 }

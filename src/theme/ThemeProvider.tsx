@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, ReactNode } from 'react';
+import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import { tokens, Tokens } from './tokens';
 
 // Convert design tokens to CSS variables
@@ -30,10 +31,25 @@ function applyTokens(tokens: Tokens) {
   });
 }
 
+// Create MUI theme with custom font and colors
+const muiTheme = createTheme({
+  typography: {
+    fontFamily: tokens.typography.fontFamily,
+  },
+  palette: {
+    primary: {
+      main: tokens.colors.primary,
+    },
+    secondary: {
+      main: tokens.colors.secondary,
+    },
+  },
+});
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     applyTokens(tokens);
   }, []);
 
-  return <>{children}</>;
+  return <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>;
 }

@@ -1,9 +1,9 @@
 // Design Tokens
 export const tokens = {
   colors: {
-    primary: '#0066ff',
-    secondary: '#7c3aed',
     background: '#ffffff',
+    secondary: '#AD6B14',
+    primary: '#5F2D14',
     surface: '#f5f5f5',
     text: '#1a1a1a',
     textSecondary: '#666666',
@@ -23,7 +23,7 @@ export const tokens = {
     xxl: '48px',
   },
   typography: {
-    fontFamily: '"Canva Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontFamily: '"Italia Std", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     fontSizeSmall: '12px',
     fontSizeBase: '14px',
     fontSizeLarge: '16px',
