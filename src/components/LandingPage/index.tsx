@@ -24,8 +24,23 @@ export default function LandingPage() {
             <AppBar />
             <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <Hero />
-                <BootedStamp delay={0.8} />
             </Box>
+            <BootedStamp delay={.5} styleOverride={{
+              transform: {
+                xs: 'translateY(-35px)',
+                sm: 'translateY(90px)',
+              },
+              img: {
+                width: {
+                  xs: '100dvw',
+                  sm: '20dvw',
+                },
+                height: {
+                  xs: 'auto',
+                  sm: 'auto',
+                }
+              }
+            }}/>
             <CameraDemo />
         </Box>
     )

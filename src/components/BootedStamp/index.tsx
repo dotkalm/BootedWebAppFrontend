@@ -1,13 +1,15 @@
 import Box from '@mui/material/Box';
+import { SxProps, Theme } from '@mui/material/styles';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import wordmark from '@/../public/BOOTED_yellow.png';
+import wordmark from '@/../public/BOOTED_Brown.png';
 
 interface BootedStampProps {
     delay?: number;
+    styleOverride?: SxProps<Theme>;
 }
 
-export default function BootedStamp({ delay = 0.5 }: BootedStampProps) {
+export default function BootedStamp({ delay = 0.5, styleOverride }: BootedStampProps) {
 
     return (
         <Box
@@ -32,7 +34,8 @@ export default function BootedStamp({ delay = 0.5 }: BootedStampProps) {
                         md: '100%',
                     },
                     maxWidth: '500px',
-                }
+                },
+                ...styleOverride
             }}
         >
             <motion.div
@@ -43,7 +46,7 @@ export default function BootedStamp({ delay = 0.5 }: BootedStampProps) {
                 }}
                 animate={{
                     scale: 0.9,
-                    rotate: 5,
+                    rotate: -5,
                     y: 0,
                     x: 0,
                 }}

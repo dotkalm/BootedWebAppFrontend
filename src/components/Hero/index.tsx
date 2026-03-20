@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { springUpAnimation } from '@/theme/animations';
-import ThreeScene from './components/ThreeScene';
 import mustangImage from '@/../public/mustang_not_booted.jpg';
 import bootForMustang from '@/../public/boot_for_mustang.png';
 

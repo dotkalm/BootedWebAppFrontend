@@ -9,6 +9,7 @@ import iphoneFlashImage from '@/../public/iphone_lowres_flash.png';
 import corollaImage from '@/../public/corolla.webp';
 import bootForCorollaImage from '@/../public/boot_for_corolla.png';
 import { tokens } from '@/theme/tokens';
+import BootedStamp from '@/components/BootedStamp';
 
 export default function CameraDemo() {
   const theme = useTheme();
