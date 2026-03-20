@@ -10,6 +10,9 @@ export const tokens = {
     border: '#e0e0e0',
     error: '#ef4444',
     success: '#10b981',
+    renoSand: '#AD6B14',
+    ripeLemon: '#F8E22D',
+    jambalaya: '#5F2D14',
   },
   spacing: {
     xs: '4px',

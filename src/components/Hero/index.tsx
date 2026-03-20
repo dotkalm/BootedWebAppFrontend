@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { springUpAnimation } from '@/theme/animations';
 import ThreeScene from './components/ThreeScene';
 import mustangImage from '@/../public/mustang_not_booted.jpg';
 import bootForMustang from '@/../public/boot_for_mustang.png';
@@ -38,14 +39,7 @@ export default function Hero() {
     >
       <motion.div
         className='bootForMustang'
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{
-          type: 'spring',
-          stiffness: 100,
-          damping: 10,
-          mass: 0.8
-        }}
+        {...springUpAnimation}
         style={{ position: 'absolute', width: '100%', height: '100%' }}
       >
         <Image

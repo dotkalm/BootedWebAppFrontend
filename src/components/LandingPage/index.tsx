@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import AppBar from '@/components/AppBar';
 import Hero from '@/components/Hero';
 import BootedStamp from '@/components/BootedStamp';
 
@@ -16,7 +17,11 @@ export default function LandingPage() {
                 background: 'linear-gradient(180deg, #f0f0f0 0%, #f0f0f0 60%, #ffffff 100%)',
             }}
         >
-            <Hero />
+            <AppBar />
+            <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <BootedStamp />
+                <Hero />
+            </Box>
         </Box>
     )
 }
