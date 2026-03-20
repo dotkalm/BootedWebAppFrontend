@@ -67,13 +67,33 @@ export default function CameraDemo() {
           >
             <motion.div
               initial={{ scale: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, rotateZ: 0 }}
-              animate={{ scale: 0.5, x: -80, y: 5, rotateY: -12, rotateX: 5, rotateZ: 2 }}
-              transition={{
-                type: 'spring',
-                stiffness: 100,
-                damping: 20,
-                delay: 1.5,
-              }}
+              animate={[
+                {
+                  scale: 0.5,
+                  x: -80,
+                  y: 5,
+                  rotateY: -12,
+                  rotateX: 5,
+                  rotateZ: 2,
+                  transition: {
+                    type: 'spring',
+                    stiffness: 100,
+                    damping: 20,
+                    delay: 1.5,
+                  }
+                },
+                {
+                  rotateY: 0,
+                  rotateX: 0,
+                  rotateZ: 0,
+                  transition: {
+                    type: 'spring',
+                    stiffness: 100,
+                    damping: 20,
+                    delay: 2.5,
+                  }
+                }
+              ]}
               style={{
                 width: '100%',
                 height: '100%',
@@ -99,14 +119,27 @@ export default function CameraDemo() {
               rotateX: 5,
               rotateZ: 2,
             }}
-            animate={{
-              y: 0,
-              opacity: 1,
-              rotateY: -12,
-              rotateX: 5,
-              rotateZ: 2,
-            }}
-            transition={springUpAnimation.transition}
+            animate={[
+              {
+                y: 0,
+                opacity: 1,
+                rotateY: -12,
+                rotateX: 5,
+                rotateZ: 2,
+                transition: springUpAnimation.transition,
+              },
+              {
+                rotateY: 0,
+                rotateX: 0,
+                rotateZ: 0,
+                transition: {
+                  type: 'spring',
+                  stiffness: 100,
+                  damping: 20,
+                  delay: 2.5,
+                }
+              }
+            ]}
             style={{
               position: 'absolute',
               left: 0,
