@@ -18,8 +18,6 @@ export default function RootLayout({
         style={{
           margin: 0,
           padding: 0,
-          height: '100vh',
-          overscrollBehavior: 'none',
         }}
       >
         <ThemeProvider>
