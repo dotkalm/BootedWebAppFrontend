@@ -3,8 +3,8 @@ import { ThemeProvider } from "@/theme/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "edge detector",
-  description: "lets detect edges",
+  title: "Booted",
+  description: "#1 AI prank app for booting cars.",
 };
 
 export default function RootLayout({
