@@ -12,7 +12,6 @@ export default function Features() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        pt: 2,
         pb: 6,
         px: 2,
         flexDirection: 'column',
@@ -24,27 +23,8 @@ export default function Features() {
         viewport={{ amount: 0.8 }}
         transition={springUpAnimation.transition}
       >
-        <Typography
-          variant="h4"
-          color="text.primary"
-          sx={{
-            fontWeight: 600,
-            textAlign: 'center',
-            lineHeight: 1.4,
-            textShadow: `4px 4px 8px ${tokens.colors.renoSand}`, 
-          }}
-        >
-          Take a photo of a car, we detect the wheels. Boot any car in seconds.
-        </Typography>
-      </motion.div>
-      <motion.div
-        initial={springUpAnimation.initial}
-        whileInView={springUpAnimation.animate}
-        viewport={{ amount: 0.8 }}
-        transition={springUpAnimation.transition}
-      >
           <Typography
-          variant='h4'
+          variant='h3'
           sx={{
             pt: 5,
           }}

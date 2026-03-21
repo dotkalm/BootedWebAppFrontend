@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
@@ -16,7 +17,14 @@ import TypingIndicator from '@/components/TypingIndicator';
 export default function CameraDemo() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const slideDistance = isMobile ? -10 : -35;
+  const slideDistance = -35;
+  const [key, setKey] = useState(0);
+
+  // Force re-render when component mounts to ensure animations restart
+  useEffect(() => {
+    setKey(prev => prev + 1);
+  }, []);
+
   return (
     <Box
       sx={{
@@ -99,6 +107,7 @@ export default function CameraDemo() {
             }}
           >
             <motion.div
+              key={`corolla-${key}`}
               initial={{ scale: 0.5, x: -40 - slideDistance, y: 5, rotateY: -12, rotateX: 5, rotateZ: 2 }}
               animate={{
                 rotateY: 0,
@@ -156,6 +165,7 @@ export default function CameraDemo() {
 
           {/* iPhone - in front */}
           <motion.div
+            key={`iphone-${key}`}
             initial={{
               y: 0,
               opacity: 1,

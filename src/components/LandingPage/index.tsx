@@ -24,7 +24,7 @@ export default function LandingPage() {
                 background: `linear-gradient(
                    180deg,
                  #f0f0f0 0%,
-                 #f0f0f0 60%,
+                 #f0f0f0 40%,
                   ${tokens.colors.renoSand} 100%
                   )`,
             }}
