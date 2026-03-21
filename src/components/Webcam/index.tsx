@@ -31,11 +31,28 @@ export default function WebcamCapture({
   const [capturedFrame, setCapturedFrame] = useState<string | null>(null);
   const [showViewer, setShowViewer] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const isApplyingZoomRef = useRef(false);
 
   const { orientation, isLandscape } = useOrientation();
   const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlay = () => setIsVideoReady(true);
+    const handleLoadedData = () => setIsVideoReady(true);
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('loadeddata', handleLoadedData);
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('loadeddata', handleLoadedData);
+    };
+  }, [videoRef]);
   const { 
     captureFrame, 
     isUploading, 
@@ -133,13 +150,42 @@ export default function WebcamCapture({
 
             {!(capturedFrame && showViewer) && (
               <>
+                {/* Placeholder before video loads */}
+                <Box sx={{
+                  ...styles.video,
+                  background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 5,
+                  opacity: isVideoReady ? 0 : 1,
+                  transition: 'opacity 0.3s ease-in-out',
+                  pointerEvents: isVideoReady ? 'none' : 'auto',
+                }}>
+                  <Box sx={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)',
+                    backdropFilter: 'blur(10px)',
+                  }} />
+                </Box>
+
                 <Box
                   component="video"
                   ref={videoRef}
                   playsInline
                   muted
                   autoPlay
-                  sx={styles.video}
+                  sx={{
+                    ...styles.video,
+                    opacity: isVideoReady ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out',
+                  }}
                 />
                 {/* Zoom indicator overlay */}
                 <Box sx={{
@@ -154,6 +200,8 @@ export default function WebcamCapture({
                   borderRadius: '20px',
                   padding: '6px 12px',
                   zIndex: 10,
+                  opacity: isVideoReady ? 1 : 0,
+                  transition: 'opacity 0.3s ease-in-out',
                 }}>
                   <Typography sx={{
                     color: '#FFD700',
@@ -174,7 +222,29 @@ export default function WebcamCapture({
             )}
           </Box>
         </Box>
-        {!(capturedFrame && showViewer) ? (
+        <Box sx={{
+          position: {
+            xs: 'absolute',
+            sm: 'relative',
+          },
+          bottom: {
+            xs: '30px',
+            sm: 'auto',
+          },
+          left: {
+            xs: 0,
+            sm: 'auto',
+          },
+          right: {
+            xs: 0,
+            sm: 'auto',
+          },
+          width: {
+            xs: '100%',
+            sm: 'auto',
+          },
+          display: !(capturedFrame && showViewer) ? 'block' : 'none',
+        }}>
           <Controls
             detections={detections}
             handleClick={handleClick}
@@ -188,36 +258,60 @@ export default function WebcamCapture({
             zoomLevel={zoomLevel}
             captureError={captureError}
           />
-        ) : (
-          <Box sx={styles.zoomInfoContainer}>
-            <Box sx={styles.shutterContainer} />
-            <Box sx={styles.shutterContainer}>
-              <Box
-                sx={{
-                  borderRadius: '50%',
-                  width: '80px',
-                  height: '80px',
-                  backgroundColor: '#1976d2',
-                  borderColor: '#0d47a1',
-                  borderWidth: '2px',
-                  borderStyle: 'solid',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.5rem',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  '&:hover': {
-                    backgroundColor: '#1565c0',
-                  },
-                }}
-                onClick={handleBack}
-              >
-                ←
+        </Box>
+        {(capturedFrame && showViewer) && (
+          <Box sx={{
+            position: {
+              xs: 'absolute',
+              sm: 'relative',
+            },
+            bottom: {
+              xs: '30px',
+              sm: 'auto',
+            },
+            left: {
+              xs: 0,
+              sm: 'auto',
+            },
+            right: {
+              xs: 0,
+              sm: 'auto',
+            },
+            width: {
+              xs: '100%',
+              sm: 'auto',
+            },
+          }}>
+            <Box sx={styles.zoomInfoContainer}>
+              <Box sx={styles.shutterContainer} />
+              <Box sx={styles.shutterContainer}>
+                <Box
+                  sx={{
+                    borderRadius: '50%',
+                    width: '80px',
+                    height: '80px',
+                    backgroundColor: '#1976d2',
+                    borderColor: '#0d47a1',
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.5rem',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: '#1565c0',
+                    },
+                  }}
+                  onClick={handleBack}
+                >
+                  ←
+                </Box>
               </Box>
+              <Box sx={styles.shutterContainer} />
             </Box>
-            <Box sx={styles.shutterContainer} />
           </Box>
         )}
       </Paper>
