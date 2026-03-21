@@ -36,7 +36,7 @@ export default function Features() {
             textShadow: `4px 4px 8px ${tokens.colors.renoSand}`,
           }}
         >
-          Take a photo of a car, we detect the wheels.
+          Take a photo of a car, we provide the boot.
         </Typography>
       </motion.div>
       <motion.div
