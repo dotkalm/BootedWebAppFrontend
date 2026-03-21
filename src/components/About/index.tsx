@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import Image from 'next/image';
+import githubLogo from '@/../public/Octicons-mark-github.svg';
 
 export default function About() {
   return (
     <Box
-      component="footer"
       sx={{
         width: '100%',
         display: 'flex',
@@ -13,7 +14,7 @@ export default function About() {
           xs: 'center',
           sm: 'flex-start',
         },
-        alignItems: 'flex-start',
+        alignItems: 'center',
         py: 4,
         px: {
           xs: 2,
@@ -23,33 +24,66 @@ export default function About() {
         },
       }}
     >
-      <Typography
-        variant="body2"
+      <Box
         sx={{
-          textAlign: 'left',
-          color: 'text.secondary',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
           paddingLeft: {
             xs: 0,
             sm: 2,
           },
         }}
       >
-        2026 -{' '}
-        <Link
-          href="https://joelholmberg.com"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Image
+          src={githubLogo}
+          alt="GitHub"
+          width={20}
+          height={20}
+          style={{ opacity: 0.7 }}
+        />
+        <Typography
+          variant="body2"
           sx={{
-            color: 'inherit',
-            textDecoration: 'none',
-            '&:hover': {
-              textDecoration: 'underline',
-            },
+            color: 'text.secondary',
+            fontSize: '0.875rem',
+            paddingTop: {
+              xs: '3px',
+            }
           }}
         >
-          Joel Holmberg
-        </Link>
-      </Typography>
+          view the source:{' '}
+          <Link
+            href="https://github.com/dotkalm/BootedWebAppFrontend"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              color: 'inherit',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            front end
+          </Link>
+          {' · '}
+          <Link
+            href="https://github.com/dotkalm/booted-server"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              color: 'inherit',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            back end
+          </Link>
+        </Typography>
+      </Box>
     </Box>
   );
 }

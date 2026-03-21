@@ -1,10 +1,26 @@
-/* Italia Std Bold Font Face */
+/* Italia Std Font Faces */
+@font-face {
+  font-display: swap;
+  font-family: "Italia Std";
+  font-style: normal;
+  font-weight: 400;
+  src: url(/italia/ItaliaStd-Book.otf) format("opentype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Italia Std";
+  font-style: normal;
+  font-weight: 500;
+  src: url(/italia/ItaliaStd-Medium.otf) format("opentype");
+}
+
 @font-face {
   font-display: swap;
   font-family: "Italia Std";
   font-style: normal;
   font-weight: 700;
-  src: url(/italiaStdBold.otf) format("opentype");
+  src: url(/italia/ItaliaStd-Bold.otf) format("opentype");
 }
 
 :root {
