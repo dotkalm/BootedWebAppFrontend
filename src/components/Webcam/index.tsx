@@ -150,31 +150,6 @@ export default function WebcamCapture({
 
             {!(capturedFrame && showViewer) && (
               <>
-                {/* Placeholder before video loads */}
-                <Box sx={{
-                  ...styles.video,
-                  background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 5,
-                  opacity: isVideoReady ? 0 : 1,
-                  transition: 'opacity 0.3s ease-in-out',
-                  pointerEvents: isVideoReady ? 'none' : 'auto',
-                }}>
-                  <Box sx={{
-                    width: '100%',
-                    height: '100%',
-                    background: 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)',
-                    backdropFilter: 'blur(10px)',
-                  }} />
-                </Box>
-
                 <Box
                   component="video"
                   ref={videoRef}
@@ -187,6 +162,25 @@ export default function WebcamCapture({
                     transition: 'opacity 0.3s ease-in-out',
                   }}
                 />
+
+                {/* Placeholder before video loads */}
+                <Box sx={{
+                  ...styles.video,
+                  backgroundColor: '#000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 5,
+                  opacity: isVideoReady ? 0 : 1,
+                  transition: 'opacity 0.3s ease-in-out',
+                  pointerEvents: 'none',
+                }} />
+
                 {/* Zoom indicator overlay */}
                 <Box sx={{
                   position: 'absolute',
@@ -243,6 +237,7 @@ export default function WebcamCapture({
             xs: '100%',
             sm: 'auto',
           },
+          zIndex: 20,
           display: !(capturedFrame && showViewer) ? 'block' : 'none',
         }}>
           <Controls

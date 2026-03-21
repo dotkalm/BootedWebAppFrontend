@@ -4,6 +4,9 @@ export const styles = {
         width: '80%',
         maxWidth: '400px',
         zIndex: 10,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        position: 'absolute',
     },
     sliderVertical: {
         height: '300px',
