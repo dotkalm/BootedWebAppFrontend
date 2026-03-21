@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -9,8 +8,6 @@ import iphoneImage from '@/../public/iphone_lowres.png';
 import iphoneFlashImage from '@/../public/iphone_lowres_flash.png';
 import corollaImage from '@/../public/corolla.webp';
 import bootForCorollaImage from '@/../public/boot_for_corolla.png';
-import { tokens } from '@/theme/tokens';
-import BootedStamp from '@/components/BootedStamp';
 import ChatBubble from '@/components/ChatBubble';
 import TypingIndicator from '@/components/TypingIndicator';
 

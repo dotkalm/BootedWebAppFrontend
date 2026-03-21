@@ -33,10 +33,10 @@ export default function TypingIndicator({ type }: TypingIndicatorProps) {
             <motion.div
               key={index}
               animate={{
-                y: [0, -8, 0],
+                opacity: [0.3, 1, 0.3],
               }}
               transition={{
-                duration: 1,
+                duration: 1.4,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: index * 0.2,
