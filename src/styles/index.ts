@@ -128,11 +128,11 @@ export const styles = {
             sm: '100%',
         },
         gap: {
-            xs: '1vh',
+            xs: '0',
             sm: '10vh',
         },
         paddingBottom: {
-            xs: '40px',
+            xs: '30px',
             sm: 0,
         }
     },
@@ -165,7 +165,7 @@ export const styles = {
             sm: 'column',
         },
         padding: {
-            xs: '20px 0',
+            xs: '10px 0',
             sm: 0,
         }
     },

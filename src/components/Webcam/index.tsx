@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import Controls from '@/components/Controls';
 import Viewer from '@/components/Viewer';
@@ -106,6 +107,10 @@ export default function WebcamCapture({
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          paddingTop: {
+            xs: '60px',
+            sm: 0,
+          }
         }}>
           <Box sx={{
             width: '100%',
@@ -127,14 +132,38 @@ export default function WebcamCapture({
             )}
 
             {!(capturedFrame && showViewer) && (
-              <Box
-                component="video"
-                ref={videoRef}
-                playsInline
-                muted
-                autoPlay
-                sx={styles.video}
-              />
+              <>
+                <Box
+                  component="video"
+                  ref={videoRef}
+                  playsInline
+                  muted
+                  autoPlay
+                  sx={styles.video}
+                />
+                {/* Zoom indicator overlay */}
+                <Box sx={{
+                  position: 'absolute',
+                  bottom: {
+                    xs: '20px',
+                    sm: '40px',
+                  },
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(60, 60, 60, 0.7)',
+                  borderRadius: '20px',
+                  padding: '6px 12px',
+                  zIndex: 10,
+                }}>
+                  <Typography sx={{
+                    color: '#FFD700',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                  }}>
+                    {zoomLevel.toFixed(1)}x
+                  </Typography>
+                </Box>
+              </>
             )}
 
             {(capturedFrame && showViewer) && (

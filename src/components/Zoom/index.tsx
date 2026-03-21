@@ -19,11 +19,6 @@ export default function Shutter({
     return (
         <Box sx={styles.zoomInfoContainer}>
           <Box sx={styles.shutterContainer}>
-            {orientation === Orientation.PORTRAIT && (
-              <Typography sx={styles.zoomInfo}>
-                Camera Zoom: {zoomLevel.toFixed(1)}x
-              </Typography>
-            )}
             {captureError && (
               <Typography sx={{
                 color: 'red',
