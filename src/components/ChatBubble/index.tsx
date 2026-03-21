@@ -33,6 +33,7 @@ export default function ChatBubble({ message, type }: ChatBubbleProps) {
             fontSize: '16px',
             lineHeight: 1.4,
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+            fontWeight: 500,
           }}
         >
           {message}

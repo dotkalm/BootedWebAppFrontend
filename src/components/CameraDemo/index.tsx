@@ -16,7 +16,7 @@ import TypingIndicator from '@/components/TypingIndicator';
 export default function CameraDemo() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const slideDistance = isMobile ? 20 : 54.5;
+  const slideDistance = isMobile ? -10 : -35;
   return (
     <Box
       sx={{
@@ -84,59 +84,36 @@ export default function CameraDemo() {
             height: { xs: '300px', sm: '400px' },
             aspectRatio: '1',
             perspective: '1000px',
+            overflow: 'hidden',
           }}
         >
           {/* Corolla - slides in from behind */}
           <motion.div
-            initial={{ x: 100, opacity: 0 }}
+            initial={{ x: 0, opacity: 1 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{
-              type: 'spring',
-              stiffness: 100,
-              damping: 20,
-              delay: 0.5,
-            }}
             style={{
               position: 'absolute',
-              right: '-25%',
+              right: '5%',
               top: '50%',
               transform: 'translateY(-50%)',
-              width: '85%',
+              width: '90%',
               height: 'auto',
               zIndex: 0,
             }}
           >
             <motion.div
-              initial={{ scale: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, rotateZ: 0 }}
-              animate={[
-                // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
-                {
-                  scale: 0.5,
-                  x: -80 - slideDistance,
-                  y: 5,
-                  rotateY: -12,
-                  rotateX: 5,
-                  rotateZ: 2,
-                  transition: {
-                    type: 'spring',
-                    stiffness: 100,
-                    damping: 20,
-                    delay: 1.5,
-                  }
-                },
-                // @ts-expect-error - Framer Motion supports animation arrays but types don't reflect this
-                {
-                  rotateY: 0,
-                  rotateX: 0,
-                  rotateZ: 0,
-                  transition: {
-                    type: 'spring',
-                    stiffness: 100,
-                    damping: 20,
-                    delay: 2.5,
-                  }
-                }
-              ]}
+              initial={{ scale: 0.5, x: -40 - slideDistance, y: 5, rotateY: -12, rotateX: 5, rotateZ: 2 }}
+              animate={{
+                rotateY: 0,
+                rotateX: 0,
+                rotateZ: 0,
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 100,
+                damping: 20,
+                delay: 1,
+              }}
               style={{
                 width: '100%',
                 height: '100%',
@@ -155,7 +132,7 @@ export default function CameraDemo() {
                 animate={{ ...springUpAnimation.animate, opacity: 1 }}
                 transition={{
                   ...springUpAnimation.transition,
-                  delay: 2.85,
+                  delay: 1.35,
                 }}
                 style={{
                   position: 'absolute',
@@ -183,33 +160,23 @@ export default function CameraDemo() {
           {/* iPhone - in front */}
           <motion.div
             initial={{
-              y: 20,
-              opacity: 0,
+              y: 0,
+              opacity: 1,
               rotateY: -12,
               rotateX: 5,
               rotateZ: 2,
             }}
-            animate={[
-              {
-                y: 0,
-                opacity: 1,
-                rotateY: -12,
-                rotateX: 5,
-                rotateZ: 2,
-                transition: springUpAnimation.transition,
-              },
-              {
-                rotateY: 0,
-                rotateX: 0,
-                rotateZ: 0,
-                transition: {
-                  type: 'spring',
-                  stiffness: 100,
-                  damping: 20,
-                  delay: 2.5,
-                }
-              }
-            ] as any}
+            animate={{
+              rotateY: 0,
+              rotateX: 0,
+              rotateZ: 0,
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 100,
+              damping: 20,
+              delay: 1,
+            }}
             style={{
               position: 'absolute',
               left: 0,
@@ -236,7 +203,7 @@ export default function CameraDemo() {
                 transition: {
                   duration: 0.15,
                   times: [0, 0.5, 1],
-                  delay: 2.5,
+                  delay: 1,
                   ease: "linear"
                 }
               }}
@@ -290,8 +257,10 @@ export default function CameraDemo() {
         <motion.div
           initial={{ ...springUpAnimation.initial, y: 70 }}
           animate={[
-            { ...springUpAnimation.animate, y: 70, transition: { ...springUpAnimation.transition, delay: 3.5 } },
-            { y: 0, transition: { type: 'spring', stiffness: 200, damping: 30, delay: 4.5 } }
+            // @ts-ignore - this is a valid framer-motion syntax for sequencing animations, but the types don't seem to understand it
+            { ...springUpAnimation.animate, y: 70, transition: { ...springUpAnimation.transition, delay: 2 } },
+            // @ts-ignore - this is a valid framer-motion syntax for sequencing animations, but the types don't seem to understand it
+            { y: 0, transition: { type: 'spring', stiffness: 200, damping: 30, delay: 3 } }
           ]}
         >
           <ChatBubble message="Hey... Is this your car?" type="outgoing" />
@@ -301,7 +270,7 @@ export default function CameraDemo() {
           animate={springUpAnimation.animate}
           transition={{
             ...springUpAnimation.transition,
-            delay: 4.5,
+            delay: 3,
           }}
         >
           <TypingIndicator type="incoming" />
