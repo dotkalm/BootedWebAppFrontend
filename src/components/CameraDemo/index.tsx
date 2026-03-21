@@ -23,13 +23,14 @@ export default function CameraDemo() {
         width: '100%',
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
-        gap: { 
-          xs: 4, 
+        gap: {
+          xs: 2,
           sm: 4,
           md: 0,
           lg: 0,
         },
-        alignItems: 'center',
+        alignItems: { xs: 'center', sm: 'flex-end' },
+        alignContent: 'flex-end',
         justifyContent: 'center',
         mx: {
           xs: 0,
@@ -40,17 +41,13 @@ export default function CameraDemo() {
           sm: 0,
         },
         paddingTop: {
-          xs: 4,
+          xs: '1vh',
           sm: 0,
         },
         px: { 
           xs: 2, 
-          md: 0 
-        },
-        paddingLeft: {
-          xs: 2,
-          sm: 6,
-          md: 0,
+          md: 1, 
+          xl: 40, 
         },
                 /*
                 background: `linear-gradient(
@@ -229,15 +226,25 @@ export default function CameraDemo() {
       {/* Right Column - Chat Bubbles */}
       <Box
         sx={{
-          flex: 1,
+          flex: {
+            xs: 1,
+            sm: 3,
+            xl: 3 
+          },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
           gap: 2,
           width: {
             xs: '100%',
-            md: '50%'
+            sm: '50%'
           },
+          pr: {
+            xs: 0,
+            sm: '40px',
+            md: '100px'
+          },
+          /*
           paddingRight: {
             xs: 0,
             sm: 3,
@@ -251,16 +258,18 @@ export default function CameraDemo() {
             md: 'translateX(-15%)',
             lg: 'translateX(-29%)',
             xl: 'translateX(-10dvw)',
-          }
+          },
+          */
+          height: '100%'
         }}
       >
         <motion.div
           initial={{ ...springUpAnimation.initial, y: 70 }}
           animate={[
             // @ts-ignore - this is a valid framer-motion syntax for sequencing animations, but the types don't seem to understand it
-            { ...springUpAnimation.animate, y: 70, transition: { ...springUpAnimation.transition, delay: 2 } },
+            { ...springUpAnimation.animate, y: 70, transition: { ...springUpAnimation.transition, delay: 1 } },
             // @ts-ignore - this is a valid framer-motion syntax for sequencing animations, but the types don't seem to understand it
-            { y: 0, transition: { type: 'spring', stiffness: 200, damping: 30, delay: 3 } }
+            { y: 0, transition: { type: 'spring', stiffness: 200, damping: 30, delay: 1.5 } }
           ]}
         >
           <ChatBubble message="Hey... Is this your car?" type="outgoing" />
@@ -270,7 +279,7 @@ export default function CameraDemo() {
           animate={springUpAnimation.animate}
           transition={{
             ...springUpAnimation.transition,
-            delay: 3,
+            delay: 2.5,
           }}
         >
           <TypingIndicator type="incoming" />

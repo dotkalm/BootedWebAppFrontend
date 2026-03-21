@@ -1,17 +1,34 @@
+'use client';
+
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { tokens } from '@/theme/tokens';
 import { springUpAnimation } from '@/theme/animations';
 
 export default function AppBar() {
+  const router = useRouter();
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <motion.div
       {...springUpAnimation}
-      style={{ width: '100%' }}
+      style={{
+        width: '100%',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+      }}
     >
       <MuiAppBar
         position="static"
@@ -66,10 +83,12 @@ export default function AppBar() {
             <Button
               color="inherit"
               variant='text'
+              onClick={() => scrollToSection('features')}
               sx={{
                 display: { xs: 'none', sm: 'inline-flex' },
                 textTransform: 'none',
-                fontWeight: 500
+                fontWeight: 500,
+                cursor: 'pointer',
               }}
             >
               <Typography
@@ -84,10 +103,12 @@ export default function AppBar() {
             </Button>
             <Button
               color="inherit"
+              onClick={() => scrollToSection('about')}
               sx={{
                 display: { xs: 'none', sm: 'inline-flex' },
                 textTransform: 'none',
-                fontWeight: 500
+                fontWeight: 500,
+                cursor: 'pointer',
               }}
             >
               <Typography
@@ -103,6 +124,7 @@ export default function AppBar() {
             <Button
               variant="contained"
               size='small'
+              onClick={() => router.push('/webcam')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
@@ -115,6 +137,7 @@ export default function AppBar() {
                 },
                 border: `4px solid 'primary.main'`,
                 borderRadius: 2,
+                cursor: 'pointer',
               }}
             >
               <Typography

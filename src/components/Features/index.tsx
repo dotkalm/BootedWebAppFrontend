@@ -1,0 +1,58 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { motion } from 'framer-motion';
+import { springUpAnimation } from '@/theme/animations';
+import { tokens } from '@/theme/tokens';
+
+export default function Features() {
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        pt: 2,
+        pb: 6,
+        px: 2,
+        flexDirection: 'column',
+      }}
+    >
+      <motion.div
+        initial={springUpAnimation.initial}
+        whileInView={springUpAnimation.animate}
+        viewport={{ amount: 0.8 }}
+        transition={springUpAnimation.transition}
+      >
+        <Typography
+          variant="h4"
+          color="text.primary"
+          sx={{
+            fontWeight: 600,
+            textAlign: 'center',
+            lineHeight: 1.4,
+            textShadow: `4px 4px 8px ${tokens.colors.renoSand}`, 
+          }}
+        >
+          Take a photo of a car, we detect the wheels. Boot any car in seconds.
+        </Typography>
+      </motion.div>
+      <motion.div
+        initial={springUpAnimation.initial}
+        whileInView={springUpAnimation.animate}
+        viewport={{ amount: 0.8 }}
+        transition={springUpAnimation.transition}
+      >
+          <Typography
+          variant='h4'
+          sx={{
+            pt: 5,
+          }}
+          >
+            🚗 👢
+          </Typography>
+      </motion.div>
+
+    </Box>
+  );
+}

@@ -102,6 +102,7 @@ export const styles = {
             xs: '8px',
             sm: 0
         },
+        fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
         zIndex: 10,
     },
     zoomInfoContainer: {
