@@ -108,7 +108,7 @@ export default function CameraDemo() {
           >
             <motion.div
               key={`corolla-${key}`}
-              initial={{ scale: 0.5, x: -40 - slideDistance, y: 5, rotateY: -12, rotateX: 5, rotateZ: 2 }}
+              initial={{ scale: 0.5, x: -40 - slideDistance, y: -45, rotateY: -12, rotateX: 5, rotateZ: 2 }}
               animate={{
                 rotateY: 0,
                 rotateX: 0,

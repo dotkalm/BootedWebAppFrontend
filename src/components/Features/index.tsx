@@ -12,11 +12,33 @@ export default function Features() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        pt: 2,
         pb: 6,
-        px: 2,
+        px: 4,
         flexDirection: 'column',
+        letterSpacing: '0.08em',
       }}
     >
+      <motion.div
+        initial={springUpAnimation.initial}
+        whileInView={springUpAnimation.animate}
+        viewport={{ amount: 0.8 }}
+        transition={springUpAnimation.transition}
+      >
+        <Typography
+          variant="h4"
+          color="text.primary"
+          sx={{
+            fontWeight: 600,
+            textAlign: 'justify',
+            textAlignLast: 'center',
+            lineHeight: 1.4,
+            textShadow: `4px 4px 8px ${tokens.colors.renoSand}`,
+          }}
+        >
+          Take a photo of a car, we detect the wheels.
+        </Typography>
+      </motion.div>
       <motion.div
         initial={springUpAnimation.initial}
         whileInView={springUpAnimation.animate}
