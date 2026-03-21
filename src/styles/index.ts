@@ -1,6 +1,9 @@
 export const styles = {
     sliderHorizontal: {
-        bottom: '1vh',
+        bottom: {
+            xs: '20px',
+            sm: '1vh',
+        },
         width: '80%',
         maxWidth: '400px',
         zIndex: 10,

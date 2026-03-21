@@ -125,7 +125,7 @@ export default function WebcamCapture({
           display: 'flex',
           flexDirection: 'column',
           paddingTop: {
-            xs: '60px',
+            xs: '0px',
             sm: 0,
           }
         }}>
