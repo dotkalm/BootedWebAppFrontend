@@ -101,17 +101,20 @@ export default function WebcamCapture({
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
-        <Box sx={styles.container}>
+        <Box sx={{
+          ...styles.container,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
           <Box sx={{
             width: '100%',
-            height: 'calc(100vh - 350px)',
-            borderRadius: 1,
-            border: '4px solid #fff',
+            flex: 1,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            overflow: 'visible',
+            overflow: 'hidden',
           }}>
 
             {(capturedFrame && showLoader && showViewer) && (
@@ -122,7 +125,7 @@ export default function WebcamCapture({
                 }}
               />
             )}
-            
+
             {!(capturedFrame && showViewer) && (
               <Box
                 component="video"
@@ -133,7 +136,7 @@ export default function WebcamCapture({
                 sx={styles.video}
               />
             )}
-            
+
             {(capturedFrame && showViewer) && (
               <Viewer
                 src={capturedFrame}

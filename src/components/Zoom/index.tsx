@@ -52,10 +52,20 @@ export default function Shutter({
                 ...styles.shutter,
                 cursor: 'pointer',
                 opacity: isUploading ? 0.5 : 1,
-                transition: 'opacity 0.2s ease',
+                transition: 'transform 0.1s ease',
+                '&:active': {
+                  transform: 'scale(0.95)',
+                }
               }}
               onClick={handleClick}
-            />
+            >
+              <Box sx={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                backgroundColor: 'white',
+              }} />
+            </Box>
             {/* Upload status indicator */}
           </Box>
           <Box sx={styles.shutterContainer}>

@@ -34,6 +34,7 @@ export const styles = {
         position: 'relative',
         height: '100vh',
         width: '100vw',
+        backgroundColor: '#000',
     },
     containerNoCanvas: {
         position: 'relative',
@@ -71,21 +72,20 @@ export const styles = {
         },
     },
     video: {
-        borderRadius: '16px',
-        border: '4px solid',
-        borderColor: 'white',
+        borderRadius: {
+            xs: 0,
+            sm: '16px'
+        },
+        border: 'none',
         objectFit: 'cover',
         maxWidth: '100%',
-        maxHeight: {
-            xs: 'calc(100vh - 350px)',
-            sm: 'calc(100vh - 100px)'
-        },
+        maxHeight: '100%',
         width: {
-            xs: '95%',
+            xs: '100%',
             sm: 'auto'
         },
         height: {
-            xs: 'auto',
+            xs: '100%',
             sm: '80vh'
         },
     },
@@ -111,33 +111,44 @@ export const styles = {
             xs: 'column',
             sm: 'column',
         },
-        justifyContent: 'center',
+        justifyContent: {
+            xs: 'flex-end',
+            sm: 'center',
+        },
         alignItems: {
             xs: 'center',
             sm: 'start',
         },
-        width: '70%',
+        width: {
+            xs: '100%',
+            sm: '70%',
+        },
         height: {
-            xs: '20%',
+            xs: 'auto',
             sm: '100%',
         },
         gap: {
             xs: '1vh',
             sm: '10vh',
+        },
+        paddingBottom: {
+            xs: '40px',
+            sm: 0,
         }
     },
     shutter: {
         borderRadius: '50%',
-        width: '80px',
-        height: '80px',
-        backgroundColor: 'rgba(246, 3, 3, 0.7)',
-        borderColor: '#0f0000',
-        borderWidth: '2px',
-        borderStyle: 'solid',
+        width: '68px',
+        height: '68px',
+        backgroundColor: 'transparent',
+        border: '4px solid white',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     shutterContainer: {
         height: {
-            xs: '13vh',
+            xs: 'auto',
             sm: '20vh',
         },
         width: {
@@ -152,6 +163,10 @@ export const styles = {
         flexDirection: {
             xs: 'column',
             sm: 'column',
+        },
+        padding: {
+            xs: '20px 0',
+            sm: 0,
         }
     },
 }
