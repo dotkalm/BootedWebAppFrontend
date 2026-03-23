@@ -40,9 +40,10 @@ export default function WebcamCapture({
 
   const isApplyingZoomRef = useRef(false);
   const mainCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const advancedConstraints = useRef([{ zoom: 1 }]);
 
   const { orientation, isLandscape } = useOrientation();
-  const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
+  const { videoRef } = useWebcam({ advanced: advancedConstraints.current, facingMode: 'environment', height, width });
 
   useEffect(() => {
     const video = videoRef.current;
@@ -393,6 +394,9 @@ export default function WebcamCapture({
                         padding: {
                           xs: '20px 24px',
                           sm: '24px 32px',
+                        },
+                        paddingTop: {
+                          xs: '25px',
                         },
                         textAlign: 'center',
                         width: '80%',

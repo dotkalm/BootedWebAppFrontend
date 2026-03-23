@@ -15,6 +15,16 @@ export function useWebcam({
   useEffect(() => {
     const startWebcam = async () => {
       try {
+        // Check permission state first (helps with UX but won't fix ngrok issue)
+        let permissionGranted = false;
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
+          permissionGranted = permissionStatus.state === 'granted';
+        } catch (e) {
+          // Permissions API might not be supported, proceed anyway
+          console.log('Permissions API not available');
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             width: { ideal: width },
