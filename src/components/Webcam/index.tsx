@@ -145,6 +145,13 @@ export default function WebcamCapture({
     setTotalCars(0);
     setCompositeComplete(false);
     setFinalImage(null);
+
+    // Re-engage the webcam video element
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.error('Error restarting video:', err);
+      });
+    }
   };
 
   const handleCaptureComplete = () => {
@@ -233,20 +240,23 @@ export default function WebcamCapture({
           }}>
 
             {/* Webcam mode - show video feed */}
+            {/* Keep video element always mounted to preserve stream */}
+            <Box
+              component="video"
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              sx={{
+                ...styles.video,
+                opacity: isVideoReady && !capturedFrame ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+                display: !capturedFrame ? 'block' : 'none',
+              }}
+            />
+
             {!capturedFrame && (
               <>
-                <Box
-                  component="video"
-                  ref={videoRef}
-                  playsInline
-                  muted
-                  autoPlay
-                  sx={{
-                    ...styles.video,
-                    opacity: isVideoReady ? 1 : 0,
-                    transition: 'opacity 0.3s ease-in-out',
-                  }}
-                />
 
                 {/* Placeholder before video loads */}
                 <Box sx={{
