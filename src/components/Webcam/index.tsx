@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 
 import Controls from '@/components/Controls';
 import Viewer from '@/components/Viewer';
+import FinalImage from '@/components/FinalImage';
 import {
   useFrameCapture,
   useOrientation,
@@ -32,6 +33,7 @@ export default function WebcamCapture({
   const [showLoader, setShowLoader] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [compositeComplete, setCompositeComplete] = useState(false);
+  const [finalImage, setFinalImage] = useState<string | null>(null);
 
   const isApplyingZoomRef = useRef(false);
   const mainCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -120,45 +122,50 @@ export default function WebcamCapture({
     setShowViewer(false);
     setTotalCars(0);
     setCompositeComplete(false);
+    setFinalImage(null);
   };
 
   const handleCaptureComplete = () => {
     console.log('3D composite render complete!');
     setCompositeComplete(true);
+
+    // Capture the final MainCanvas as a 2D image
+    const canvas = mainCanvasRef.current;
+    if (canvas) {
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      setFinalImage(dataUrl);
+      console.log('Final image captured from MainCanvas');
+    }
   };
 
   const handleShare = async () => {
-    const canvas = mainCanvasRef.current;
-    if (!canvas) {
-      console.error('Canvas not found');
+    // Use the finalImage data URL if available
+    const imageDataUrl = finalImage;
+    if (!imageDataUrl) {
+      console.error('Final image not ready');
       return;
     }
 
     try {
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          console.error('Failed to create blob from canvas');
-          return;
-        }
+      // Convert data URL to blob
+      const response = await fetch(imageDataUrl);
+      const blob = await response.blob();
 
-        const file = new File([blob], 'car-detection.jpg', { type: 'image/jpeg' });
+      const file = new File([blob], 'car-detection.jpg', { type: 'image/jpeg' });
 
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Car Detection',
-            text: `Detected ${totalCars} car${totalCars !== 1 ? 's' : ''}`,
-          });
-        } else {
-          // Fallback: download the image
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'car-detection.jpg';
-          a.click();
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/jpeg', 0.95);
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Car Detection',
+          text: `Detected ${totalCars} car${totalCars !== 1 ? 's' : ''}`,
+        });
+      } else {
+        // Fallback: download the image
+        const a = document.createElement('a');
+        a.href = imageDataUrl;
+        a.download = 'car-detection.jpg';
+        a.click();
+      }
     } catch (error) {
       console.error('Error sharing:', error);
     }
@@ -291,13 +298,18 @@ export default function WebcamCapture({
             )}
 
             {/* Viewer mode - show with detections */}
-            {capturedFrame && showViewer && (
+            {capturedFrame && showViewer && !finalImage && (
               <Viewer
                 src={capturedFrame}
                 detections={detections}
                 canvasRef={mainCanvasRef}
                 onCaptured={handleCaptureComplete}
               />
+            )}
+
+            {/* Final image mode - show static capture after composite complete */}
+            {finalImage && (
+              <FinalImage src={finalImage} />
             )}
           </Box>
         </Box>
@@ -323,7 +335,7 @@ export default function WebcamCapture({
             sm: 'auto',
           },
           zIndex: 20,
-          display: !(capturedFrame && showViewer) ? 'block' : 'none',
+          display: !(capturedFrame && showViewer) && !finalImage ? 'block' : 'none',
         }}>
           <Controls
             detections={detections}
@@ -339,7 +351,7 @@ export default function WebcamCapture({
             captureError={captureError}
           />
         </Box>
-        {(capturedFrame && showViewer) && (
+        {finalImage && (
           <Box sx={{
             position: {
               xs: 'absolute',
