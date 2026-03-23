@@ -111,8 +111,8 @@ export default function WebcamCapture({
       setTotalCars(response.total_cars);
       setDetections(response.detections);
     }
-    setShowLoader(false);
-    setShowViewer(true); // Now transition to viewer with detections
+    // Keep loader visible - it will be hidden when final image is ready
+    setShowViewer(true); // Start viewer rendering (hidden)
   }
 
   const handleBack = () => {
@@ -135,6 +135,8 @@ export default function WebcamCapture({
       const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       setFinalImage(dataUrl);
       console.log('Final image captured from MainCanvas');
+      // Hide loader now that final image is ready
+      setShowLoader(false);
     }
   };
 
@@ -269,8 +271,8 @@ export default function WebcamCapture({
               </>
             )}
 
-            {/* Loading mode - show captured frame while waiting for API */}
-            {capturedFrame && !showViewer && (
+            {/* Loading mode - show captured frame while waiting for final image */}
+            {capturedFrame && !finalImage && (
               <>
                 <Box
                   component="img"
@@ -297,14 +299,20 @@ export default function WebcamCapture({
               </>
             )}
 
-            {/* Viewer mode - show with detections */}
+            {/* Viewer mode - render for 3D work but keep hidden until final image ready */}
             {capturedFrame && showViewer && !finalImage && (
-              <Viewer
-                src={capturedFrame}
-                detections={detections}
-                canvasRef={mainCanvasRef}
-                onCaptured={handleCaptureComplete}
-              />
+              <Box sx={{
+                position: 'absolute',
+                visibility: 'hidden',
+                pointerEvents: 'none',
+              }}>
+                <Viewer
+                  src={capturedFrame}
+                  detections={detections}
+                  canvasRef={mainCanvasRef}
+                  onCaptured={handleCaptureComplete}
+                />
+              </Box>
             )}
 
             {/* Final image mode - show static capture after composite complete */}
