@@ -8,7 +8,6 @@ import {
 } from '@/types';
 
 export default function Shutter({
-    captureError,
     detections,
     handleClick,
     isUploading,
@@ -19,16 +18,6 @@ export default function Shutter({
     return (
         <Box sx={styles.zoomInfoContainer}>
           <Box sx={styles.shutterContainer}>
-            {captureError && (
-              <Typography sx={{
-                color: 'red',
-                textAlign: 'center',
-                mt: 1,
-                fontSize: '0.8rem'
-              }}>
-                {captureError}
-              </Typography>
-            )}
             {totalCars > 0 && `Total Cars Detected: ${totalCars}`}
             {detections.map(({ wheel_count }: CarDetection, index: number) => {
                 return (wheel_count > 0) ? (

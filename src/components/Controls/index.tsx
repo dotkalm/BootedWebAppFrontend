@@ -6,7 +6,6 @@ import { type TControlsProps } from '@/types';
 import { styles } from '@/styles';
 
 export default function Controls({
-    captureError,
     detections,
     handleClick,
     handleSliderChange,
@@ -36,7 +35,6 @@ export default function Controls({
                 totalCars={totalCars}
                 detections={detections}
                 isUploading={isUploading}
-                captureError={captureError}
                 handleClick={handleClick}
             />
         </Fragment>

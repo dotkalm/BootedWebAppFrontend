@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -19,6 +20,7 @@ import {
 } from '@/types';
 import { styles } from '@/styles';
 import { applyZoomToCamera } from '@/utils';
+import { defaultSpring } from '@/config/animations';
 
 export default function WebcamCapture({
   width = 640,
@@ -34,6 +36,7 @@ export default function WebcamCapture({
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [compositeComplete, setCompositeComplete] = useState(false);
   const [finalImage, setFinalImage] = useState<string | null>(null);
+  const [showError, setShowError] = useState(false);
 
   const isApplyingZoomRef = useRef(false);
   const mainCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -68,7 +71,25 @@ export default function WebcamCapture({
 
   useEffect(() => {
     if (captureError) {
+      // Reset state but keep capturedFrame visible to avoid black flash
       setShowLoader(false);
+      setShowViewer(false);
+      setDetections([]);
+      setCompositeComplete(false);
+      setFinalImage(null);
+      // Show error message
+      setShowError(true);
+
+      // Auto-hide error after 4 seconds
+      const hideErrorTimer = setTimeout(() => {
+        setShowError(false);
+        // Clear captured frame only after error message is gone and we're sure video is ready
+        setCapturedFrame(null);
+      }, 4000);
+
+      return () => {
+        clearTimeout(hideErrorTimer);
+      };
     }
   }, [captureError]);
 
@@ -268,6 +289,44 @@ export default function WebcamCapture({
                     {zoomLevel.toFixed(1)}x
                   </Typography>
                 </Box>
+
+                {/* Error message overlay */}
+                {showError && (
+                  <Box
+                    component={motion.div}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={defaultSpring}
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      backgroundColor: 'rgba(220, 53, 69, 0.95)',
+                      borderRadius: '16px',
+                      padding: {
+                        xs: '20px 24px',
+                        sm: '24px 32px',
+                      },
+                      zIndex: 100,
+                      maxWidth: '90%',
+                      textAlign: 'center',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                    }}
+                  >
+                    <Typography variant="h2" sx={{
+                      color: 'white',
+                      fontSize: {
+                        xs: '1.5rem',
+                        sm: '2rem',
+                      },
+                      fontWeight: 700,
+                      margin: 0,
+                    }}>
+                      Wheel not detected, give it another shot
+                    </Typography>
+                  </Box>
+                )}
               </>
             )}
 
@@ -294,6 +353,43 @@ export default function WebcamCapture({
                         height: '8rem !important',
                       }}
                     />
+                  </Box>
+                )}
+                {/* Error message overlay on captured frame */}
+                {showError && (
+                  <Box
+                    component={motion.div}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={defaultSpring}
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      backgroundColor: 'rgba(220, 53, 69, 0.95)',
+                      borderRadius: '16px',
+                      padding: {
+                        xs: '20px 24px',
+                        sm: '24px 32px',
+                      },
+                      zIndex: 100,
+                      maxWidth: '90%',
+                      textAlign: 'center',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                    }}
+                  >
+                    <Typography variant="h2" sx={{
+                      color: 'white',
+                      fontSize: {
+                        xs: '1.5rem',
+                        sm: '2rem',
+                      },
+                      fontWeight: 700,
+                      margin: 0,
+                    }}>
+                      Wheel not detected, give it another shot
+                    </Typography>
                   </Box>
                 )}
               </>
@@ -356,7 +452,6 @@ export default function WebcamCapture({
             orientation={orientation}
             totalCars={totalCars}
             zoomLevel={zoomLevel}
-            captureError={captureError}
           />
         </Box>
         {finalImage && (

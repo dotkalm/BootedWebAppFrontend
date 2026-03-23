@@ -4,7 +4,6 @@ import {
 } from '@/types';
 
 export interface ShutterProps {
-    captureError: string | null;
     detections: CarDetection[];
     handleClick: () => void;
     isUploading: boolean;
