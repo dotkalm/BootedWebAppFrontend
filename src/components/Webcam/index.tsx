@@ -33,6 +33,7 @@ export default function WebcamCapture({
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const isApplyingZoomRef = useRef(false);
+  const mainCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const { orientation, isLandscape } = useOrientation();
   const { videoRef } = useWebcam({ advanced: [{ zoom: zoomLevel }], facingMode: 'environment', height, width });
@@ -117,6 +118,43 @@ export default function WebcamCapture({
     setDetections([]);
     setShowViewer(false);
     setTotalCars(0);
+  };
+
+  const handleShare = async () => {
+    const canvas = mainCanvasRef.current;
+    if (!canvas) {
+      console.error('Canvas not found');
+      return;
+    }
+
+    try {
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          console.error('Failed to create blob from canvas');
+          return;
+        }
+
+        const file = new File([blob], 'car-detection.jpg', { type: 'image/jpeg' });
+
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Car Detection',
+            text: `Detected ${totalCars} car${totalCars !== 1 ? 's' : ''}`,
+          });
+        } else {
+          // Fallback: download the image
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'car-detection.jpg';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/jpeg', 0.95);
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   };
 
   console.log(JSON.stringify({totalCars, detections, captureError, isUploading}));
@@ -237,6 +275,7 @@ export default function WebcamCapture({
               <Viewer
                 src={capturedFrame}
                 detections={detections}
+                canvasRef={mainCanvasRef}
               />
             )}
           </Box>
@@ -302,35 +341,65 @@ export default function WebcamCapture({
               sm: 'auto',
             },
           }}>
-            <Box sx={styles.zoomInfoContainer}>
-              <Box sx={styles.shutterContainer} />
-              <Box sx={styles.shutterContainer}>
-                <Box
-                  sx={{
-                    borderRadius: '50%',
-                    width: '80px',
-                    height: '80px',
-                    backgroundColor: '#1976d2',
-                    borderColor: '#0d47a1',
-                    borderWidth: '2px',
-                    borderStyle: 'solid',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.5rem',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    '&:hover': {
-                      backgroundColor: '#1565c0',
-                    },
-                  }}
-                  onClick={handleBack}
-                >
-                  ←
-                </Box>
+            <Box sx={{
+              ...styles.zoomInfoContainer,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              gap: '20px',
+            }}>
+              <Box
+                sx={{
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
+                  backgroundColor: '#1976d2',
+                  borderColor: '#0d47a1',
+                  borderWidth: '2px',
+                  borderStyle: 'solid',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  },
+                }}
+                onClick={handleBack}
+              >
+                ←
               </Box>
-              <Box sx={styles.shutterContainer} />
+              <Box
+                sx={{
+                  borderRadius: '50%',
+                  width: '80px',
+                  height: '80px',
+                  backgroundColor: '#1976d2',
+                  borderColor: '#0d47a1',
+                  borderWidth: '2px',
+                  borderStyle: 'solid',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  },
+                }}
+                onClick={handleShare}
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="m16 5-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2" />
+                </svg>
+              </Box>
             </Box>
           </Box>
         )}

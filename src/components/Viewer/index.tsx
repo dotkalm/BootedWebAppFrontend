@@ -8,12 +8,14 @@ import MainCanvas from './components/MainCanvas';
 import OffScreenCanvas from './components/OffscreenCanvas';
 
 export default function Viewer({
+  canvasRef: externalCanvasRef,
   src,
   detections = [],
 }: ViewerProps) {
 
   const base2DCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const internalCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = externalCanvasRef || internalCanvasRef;
   const imgRef = useRef<HTMLImageElement | null>(null);
 
   const {

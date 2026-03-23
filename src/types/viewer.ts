@@ -3,6 +3,7 @@ import { type CarDetection } from '@/types';
 import { invalidate } from '@react-three/fiber';
 
 export interface ViewerProps {
+  canvasRef?: RefObject<HTMLCanvasElement | null>;
   detections?: CarDetection[];
   src: string;
 }
