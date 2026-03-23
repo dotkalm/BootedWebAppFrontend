@@ -17,30 +17,41 @@ export function useCanvasCapture({
 
   useEffect(() => {
     if (modelLoaded && !readyToCapture) {
+      console.log('Model loaded - ready to capture');
       setReadyToCapture(true);
     }
   }, [modelLoaded, readyToCapture]);
 
   useFrame(() => {
     const renderModel = () => {
-      if (!readyToCapture || captured) return;
+      if (!readyToCapture || captured) {
+        return;
+      }
       const base2DImage = base2DImageRef.current;
       const canvas2D = canvas2DRef.current;
       const canvas3D = gl.domElement;
       const img = imgRef.current;
 
       if (!canvas2D || !canvas3D || !img || !base2DImage) {
-        console.log('Missing canvas elements');
+        console.log('Missing canvas elements', { canvas2D: !!canvas2D, canvas3D: !!canvas3D, img: !!img, base2DImage: !!base2DImage });
         return;
       }
 
       if (base2DImage.width === 0 || base2DImage.height === 0) {
-        console.log('Base 2D canvas not ready');
+        console.log('Base 2D canvas not ready', { width: base2DImage.width, height: base2DImage.height });
+        return;
+      }
+
+      // Don't render if we don't have valid detection offsets yet (scale would still be default 1)
+      if (scale === 1 && deltaX === 0 && deltaY === 0) {
+        console.log('Waiting for valid detection offsets - scale is still default');
         return;
       }
 
       const ctx = canvas2D.getContext('2d');
       if (!ctx) return;
+
+      console.log('Starting 3D render with params:', { deltaX, deltaY, scale, modelLoaded });
 
       try {
         const glContext = gl.getContext();
@@ -50,6 +61,7 @@ export function useCanvasCapture({
         }
 
         gl.render(scene, camera);
+        console.log('3D scene rendered successfully');
 
         ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
         ctx.drawImage(base2DImage, 0, 0);
@@ -84,6 +96,7 @@ export function useCanvasCapture({
         }
 
         ctx.drawImage(tempCanvas, 0, 0);
+        console.log('3D model composite complete - setting captured to true');
         setCaptured(true);
       } catch (error) {
         console.error('Error capturing 3D canvas:', error);

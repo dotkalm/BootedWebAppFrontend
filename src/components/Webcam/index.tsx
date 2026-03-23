@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import Controls from '@/components/Controls';
@@ -116,6 +115,7 @@ export default function WebcamCapture({
     setTotalCars(0);
   };
 
+  console.log(JSON.stringify({totalCars, detections, captureError, isUploading}));
   return (
     <Box sx={styles.webcamContainer}>
       <Paper elevation={3} sx={styles.webcam}>
