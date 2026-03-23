@@ -90,14 +90,16 @@ export default function WebcamCapture({
           ctx.drawImage(videoRef.current, 0, 0, tempCanvas.width, tempCanvas.height);
           const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
           setCapturedFrame(dataUrl);
-          setShowViewer(true);
-          setShowLoader(false);
+          // Don't set showViewer yet - keep showing the frame in webcam view while loading
         }
       } catch (err) {
         console.error('Local capture failed', err);
+        setShowLoader(false);
+        return;
       }
-    }else{
+    } else {
       setShowLoader(false);
+      return;
     }
 
     const response = await captureFrame();
@@ -105,6 +107,8 @@ export default function WebcamCapture({
       setTotalCars(response.total_cars);
       setDetections(response.detections);
     }
+    setShowLoader(false);
+    setShowViewer(true); // Now transition to viewer with detections
   }
 
   const handleBack = () => {
@@ -139,16 +143,8 @@ export default function WebcamCapture({
             overflow: 'hidden',
           }}>
 
-            {(capturedFrame && showLoader && showViewer) && (
-              <CircularProgress
-                sx={{
-                  width: '8rem !important',
-                  height: '8rem !important',
-                }}
-              />
-            )}
-
-            {!(capturedFrame && showViewer) && (
+            {/* Webcam mode - show video feed */}
+            {!capturedFrame && (
               <>
                 <Box
                   component="video"
@@ -208,7 +204,36 @@ export default function WebcamCapture({
               </>
             )}
 
-            {(capturedFrame && showViewer) && (
+            {/* Loading mode - show captured frame while waiting for API */}
+            {capturedFrame && !showViewer && (
+              <>
+                <Box
+                  component="img"
+                  src={capturedFrame}
+                  sx={{
+                    ...styles.video,
+                  }}
+                />
+                {showLoader && (
+                  <Box sx={{
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <CircularProgress
+                      sx={{
+                        width: '8rem !important',
+                        height: '8rem !important',
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
+            )}
+
+            {/* Viewer mode - show with detections */}
+            {capturedFrame && showViewer && (
               <Viewer
                 src={capturedFrame}
                 detections={detections}
