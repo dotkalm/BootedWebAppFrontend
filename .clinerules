@@ -1,0 +1,17 @@
+# Project Conventions
+
+## Component Structure
+- Components follow the pattern `<ComponentName>/index.tsx`, NOT `<ComponentName>.tsx`
+- When searching for components, always check for the `/index.tsx` pattern first
+- Example: `components/Viewer/index.tsx`, `components/MainCanvas/index.tsx`
+
+## Code Style
+- TypeScript throughout
+- Material-UI (MUI) for UI components with `sx` prop styling
+- React hooks for state management
+
+## File Organization
+- Components in `src/components/`
+- Hooks in `src/hooks/`
+- Types in `src/types/`
+- Styles in `src/styles/`
