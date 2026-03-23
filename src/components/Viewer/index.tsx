@@ -11,6 +11,7 @@ export default function Viewer({
   canvasRef: externalCanvasRef,
   src,
   detections = [],
+  onCaptured,
 }: ViewerProps) {
 
   const base2DCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -36,7 +37,7 @@ export default function Viewer({
   const baseCanvasRef = base2DCanvasRef as RefObject<HTMLCanvasElement>;
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       position: 'relative',
       display: 'block',
       borderRadius: '16px',
@@ -74,6 +75,7 @@ export default function Viewer({
         deltaX={deltaX}
         deltaY={deltaY}
         imgRef={hiddenImageRef}
+        onCaptured={onCaptured}
         overlayScale={overlayScale}
         tireCenterLineAngle={tireCenterLineAngle}
       />

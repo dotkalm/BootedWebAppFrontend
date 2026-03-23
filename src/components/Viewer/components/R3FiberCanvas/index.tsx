@@ -10,6 +10,7 @@ const R3FiberCanvas = ({
     deltaX,
     deltaY,
     imgRef,
+    onCaptured,
     overlayScale,
     tireCenterLineAngle,
 }: R3FiberCanvasProps) => {
@@ -20,6 +21,7 @@ const R3FiberCanvas = ({
     deltaX,
     deltaY,
     imgRef,
+    onCaptured,
     scale: overlayScale,
   };
   

@@ -55,7 +55,13 @@ export default function Model({
     setModelLoaded,
   ]);
 
-  useCanvasCapture({ ...canvasCaptureProps, modelLoaded, verticalOffset });
+  const { captured } = useCanvasCapture({ ...canvasCaptureProps, modelLoaded, verticalOffset });
+
+  useEffect(() => {
+    if (captured && canvasCaptureProps.onCaptured) {
+      canvasCaptureProps.onCaptured();
+    }
+  }, [captured, canvasCaptureProps]);
 
   return (
     <group position={position} rotation={rotation} scale={scale}>

@@ -31,6 +31,7 @@ export default function WebcamCapture({
   const [showViewer, setShowViewer] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [compositeComplete, setCompositeComplete] = useState(false);
 
   const isApplyingZoomRef = useRef(false);
   const mainCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -118,6 +119,12 @@ export default function WebcamCapture({
     setDetections([]);
     setShowViewer(false);
     setTotalCars(0);
+    setCompositeComplete(false);
+  };
+
+  const handleCaptureComplete = () => {
+    console.log('3D composite render complete!');
+    setCompositeComplete(true);
   };
 
   const handleShare = async () => {
@@ -160,6 +167,19 @@ export default function WebcamCapture({
   console.log(JSON.stringify({totalCars, detections, captureError, isUploading}));
   return (
     <Box sx={styles.webcamContainer}>
+      {/* Debug indicator - red circle when composite is complete */}
+      {compositeComplete && (
+        <Box sx={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          backgroundColor: 'red',
+          zIndex: 9999,
+        }} />
+      )}
       <Paper elevation={3} sx={styles.webcam}>
         <Box sx={{
           ...styles.container,
@@ -276,6 +296,7 @@ export default function WebcamCapture({
                 src={capturedFrame}
                 detections={detections}
                 canvasRef={mainCanvasRef}
+                onCaptured={handleCaptureComplete}
               />
             )}
           </Box>

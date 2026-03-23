@@ -5,6 +5,7 @@ import { invalidate } from '@react-three/fiber';
 export interface ViewerProps {
   canvasRef?: RefObject<HTMLCanvasElement | null>;
   detections?: CarDetection[];
+  onCaptured?: () => void;
   src: string;
 }
 
@@ -14,6 +15,7 @@ export interface R3FiberCanvasProps {
   deltaX: number;
   deltaY: number;
   imgRef: RefObject<HTMLImageElement>;
+  onCaptured?: () => void;
   overlayScale: number;
   tireCenterLineAngle: number;
 }
@@ -34,11 +36,12 @@ export interface OffscreenCanvasProps {
 
 export interface TCanvasCaptureProps {
   base2DImageRef: React.RefObject<HTMLCanvasElement | null>;
-  canvas2DRef: React.RefObject<HTMLCanvasElement | null>; 
+  canvas2DRef: React.RefObject<HTMLCanvasElement | null>;
   deltaX: number;
   deltaY: number;
-  imgRef: React.RefObject<HTMLImageElement | null>; 
+  imgRef: React.RefObject<HTMLImageElement | null>;
   modelLoaded: boolean;
+  onCaptured?: () => void;
   scale: number;
   verticalOffset?: number;
   invalidatedOnce?: boolean;
