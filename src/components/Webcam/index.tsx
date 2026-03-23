@@ -269,21 +269,28 @@ export default function WebcamCapture({
                 <Box sx={{
                   position: 'absolute',
                   bottom: {
-                    xs: '20px',
+                    xs: '200px',
                     sm: '40px',
                   },
-                  left: '50%',
-                  transform: 'translateX(-50%)',
                   backgroundColor: 'rgba(60, 60, 60, 0.7)',
                   borderRadius: '20px',
-                  padding: '6px 12px',
+                  padding: '8px 12px',
+                  paddingBottom: '4px',
+                  width: '65px',
                   zIndex: 10,
                   opacity: isVideoReady ? 1 : 0,
                   transition: 'opacity 0.3s ease-in-out',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
                 }}>
-                  <Typography sx={{
+                  <Typography 
+                  variant='body1'
+                  sx={{
                     color: '#FFD700',
-                    fontSize: '14px',
+                    //fontSize: '14px',
+                  textAlign: 'center',
                     fontWeight: 600,
                   }}>
                     {zoomLevel.toFixed(1)}x
@@ -292,40 +299,45 @@ export default function WebcamCapture({
 
                 {/* Error message overlay */}
                 {showError && (
-                  <Box
-                    component={motion.div}
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={defaultSpring}
-                    sx={{
+                    style={{
                       position: 'absolute',
                       top: '50%',
-                      left: '50%',
+                      left: '0',
                       transform: 'translate(-50%, -50%)',
-                      backgroundColor: 'rgba(220, 53, 69, 0.95)',
-                      borderRadius: '16px',
-                      padding: {
-                        xs: '20px 24px',
-                        sm: '24px 32px',
-                      },
                       zIndex: 100,
+                      width: '100%',
                       maxWidth: '90%',
-                      textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
                     }}
                   >
-                    <Typography variant="h2" sx={{
-                      color: 'white',
-                      fontSize: {
-                        xs: '1.5rem',
-                        sm: '2rem',
-                      },
-                      fontWeight: 700,
-                      margin: 0,
-                    }}>
-                      Wheel not detected, give it another shot
-                    </Typography>
-                  </Box>
+                    <Box
+                      sx={{
+                        backgroundColor: 'rgba(220, 53, 69, 0.95)',
+                        borderRadius: '16px',
+                        padding: {
+                          xs: '20px 24px',
+                          sm: '24px 32px',
+                        },
+                        textAlign: 'center',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                      }}
+                    >
+                      <Typography variant="h2" sx={{
+                        color: 'white',
+                        fontSize: {
+                          xs: '1.5rem',
+                          sm: '2rem',
+                        },
+                        fontWeight: 700,
+                        margin: 0,
+                      }}>
+                        Wheel not detected, give it another shot
+                      </Typography>
+                    </Box>
+                  </motion.div>
                 )}
               </>
             )}
@@ -357,40 +369,49 @@ export default function WebcamCapture({
                 )}
                 {/* Error message overlay on captured frame */}
                 {showError && (
-                  <Box
-                    component={motion.div}
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={defaultSpring}
-                    sx={{
+                    style={{
                       position: 'absolute',
-                      top: '50%',
-                      left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      backgroundColor: 'rgba(220, 53, 69, 0.95)',
-                      borderRadius: '16px',
-                      padding: {
-                        xs: '20px 24px',
-                        sm: '24px 32px',
-                      },
                       zIndex: 100,
-                      maxWidth: '90%',
-                      textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                      maxWidth: '100%',
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignContent: 'center',
+                      alignItems: 'center',
+                      height: '100dvh',
                     }}
                   >
-                    <Typography variant="h2" sx={{
-                      color: 'white',
-                      fontSize: {
-                        xs: '1.5rem',
-                        sm: '2rem',
-                      },
-                      fontWeight: 700,
-                      margin: 0,
-                    }}>
-                      Wheel not detected, give it another shot
-                    </Typography>
-                  </Box>
+                    <Box
+                      sx={{
+                        backgroundColor: 'rgba(220, 53, 69, 0.95)',
+                        borderRadius: '16px',
+                        padding: {
+                          xs: '20px 24px',
+                          sm: '24px 32px',
+                        },
+                        textAlign: 'center',
+                        width: '80%',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                      }}
+                    >
+                      <Typography variant="h2" sx={{
+                        color: 'white',
+                        fontSize: {
+                          xs: '1.5rem',
+                          sm: '2rem',
+                        },
+                        fontWeight: 700,
+                        margin: 0,
+                      }}>
+                        Wheel not detected.<br/>Try again!
+                      </Typography>
+                    </Box>
+                  </motion.div>
                 )}
               </>
             )}

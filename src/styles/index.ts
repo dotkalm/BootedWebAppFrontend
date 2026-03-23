@@ -143,6 +143,8 @@ export const styles = {
         }
     },
     shutter: {
+        position: 'absolute',
+        bottom: '80px',
         borderRadius: '50%',
         width: '68px',
         height: '68px',
