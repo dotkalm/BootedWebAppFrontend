@@ -36,7 +36,7 @@ export default function Features() {
             textShadow: `4px 4px 8px ${tokens.colors.renoSand}`,
           }}
         >
-          Take a photo of a car, we provide the boot.
+          Take a photo of a car, our AI will overlay a parking enforcement boot on it, and you can prank your friends.
         </Typography>
       </motion.div>
       <motion.div
